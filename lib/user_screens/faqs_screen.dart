@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_screen.dart';
-import 'package:bookstore_recommendation_system_fyp/user_screens/user_profile_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

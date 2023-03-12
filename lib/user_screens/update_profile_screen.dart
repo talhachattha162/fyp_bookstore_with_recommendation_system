@@ -224,7 +224,18 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                       'photo': downloadUrl,
                                     });
                                   } else {
-                                    flutterToast('plz upload file');
+                                    if (photoURL.isEmpty) {
+                                      flutterToast('plz upload image');
+                                    } else {
+                                      FirebaseFirestore.instance
+                                          .collection('users')
+                                          .doc(userId)
+                                          .update({
+                                        'name': _nameController.text,
+                                        'age': _ageController.text,
+                                        'photo': photoURL,
+                                      });
+                                    }
                                   }
 
                                   loadData();

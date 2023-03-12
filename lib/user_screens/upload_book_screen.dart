@@ -14,9 +14,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
-import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'dart:io';
-import 'package:http/http.dart' as http;
 
 import '../models/book.dart';
 import '../utils/firebase_constants.dart';
@@ -34,6 +32,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
   final ConfettiController _controller = ConfettiController();
   bool _isConverting = false;
   String _errorMessage = '';
+  RegExp year_valid = RegExp(r"\b(1\d{3}|2[0-8]\d{2}|29[0-9][0-9])\b");
   RegExp price_valid = RegExp(r"^\d+$");
   RegExp name_valid = RegExp(r"^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$");
   RegExp tags_valid = RegExp(r"^(\d|\w)+$");
@@ -51,12 +50,10 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
   final TextEditingController _tag1Controller = TextEditingController();
   final TextEditingController _tag2Controller = TextEditingController();
   final TextEditingController _tag3Controller = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _publishyearController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _authorController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
-
-  GlobalKey<AutoCompleteTextFieldState<String>> key = GlobalKey();
 
   FlutterTts flutterTts = FlutterTts();
 
@@ -71,12 +68,16 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
 
   void getCategories() {
     FirebaseFirestore.instance.collection('categories').get().then((snapshot) {
-      if (mounted) {
-        setState(() {
-          categories = List.castFrom<dynamic, String>(
-              snapshot.docs.map((doc) => doc.get('name')).toList());
-          selectedCategory = categories[0];
-        });
+      if (snapshot.docs.isNotEmpty) {
+        if (mounted) {
+          setState(() {
+            categories = List.castFrom<dynamic, String>(
+                snapshot.docs.map((doc) => doc.get('name')).toList());
+            if (categories.isNotEmpty) {
+              selectedCategory = categories[0];
+            }
+          });
+        }
       }
     });
   }
@@ -123,11 +124,11 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
               ConfettiWidget(
                 confettiController: _controller,
                 blastDirection: pi / 2,
-                maxBlastForce: 5,
+                maxBlastForce: 10,
                 minBlastForce: 1,
-                emissionFrequency: 0.03,
-                numberOfParticles: 8,
-                gravity: 0,
+                emissionFrequency: 0.08,
+                numberOfParticles: 20,
+                gravity: 0.2,
               ),
               SingleChildScrollView(
                 scrollDirection: Axis.vertical,
@@ -166,13 +167,16 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                           },
                         ),
                         TextInputField(
-                          hintText: 'Enter Description',
+                          hintText: 'Enter Published Year',
                           isPassword: false,
                           textInputType: TextInputType.text,
-                          textEditingController: _descriptionController,
+                          textEditingController: _publishyearController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter book description';
+                              return 'Enter publised year';
+                            }
+                            if (!year_valid.hasMatch(value)) {
+                              return 'Enter valid year';
                             }
                             return null;
                           },
@@ -184,12 +188,14 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                             value: selectedCategory == ''
                                 ? 'Select Category'
                                 : selectedCategory,
-                            items: categories.map((category) {
-                              return DropdownMenuItem(
-                                value: category,
-                                child: Text(category),
-                              );
-                            }).toList(),
+                            items: categories.isEmpty
+                                ? null
+                                : categories.map((category) {
+                                    return DropdownMenuItem(
+                                      value: category,
+                                      child: Text(category),
+                                    );
+                                  }).toList(),
                             onChanged: (value) {
                               setState(() {
                                 selectedCategory = value.toString();
@@ -461,95 +467,102 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                         } else {
                                           // _convertTextToSpeech();
                                           // createAudioScript();
-
                                           setState(() {
                                             isLoading = true;
                                           });
+                                          if (categories.isNotEmpty) {
+                                            String coverpic =
+                                                await uploadFileToFirebaseStorage(
+                                                    _file1!, 'coverpic');
+                                            String book =
+                                                await uploadFileToFirebaseStorage(
+                                                    _file2!, 'book');
+                                            String copyrightpic =
+                                                await uploadFileToFirebaseStorage(
+                                                    _file3!, 'copyrightpic');
+                                            // textToSpeech();
+                                            // createAudioScript();
+                                            // _showResult(text);
+                                            // await createAudioScript(text);
 
-                                          String coverpic =
-                                              await uploadFileToFirebaseStorage(
-                                                  _file1!, 'coverpic');
-                                          String book =
-                                              await uploadFileToFirebaseStorage(
-                                                  _file2!, 'book');
-                                          String copyrightpic =
-                                              await uploadFileToFirebaseStorage(
-                                                  _file3!, 'copyrightpic');
-                                          // textToSpeech();
-                                          // createAudioScript();
-                                          // _showResult(text);
-                                          // await createAudioScript(text);
-
-                                          CollectionReference bookCollection =
-                                              firestoreInstance
-                                                  .collection("books");
-                                          String bookid =
-                                              bookCollection.doc().id;
-                                          Book books;
-                                          if (FirebaseAuth
-                                                  .instance.currentUser ==
-                                              null) {
-                                            books = await Book(
-                                                bookid,
-                                                _titleController.text,
-                                                _descriptionController.text,
-                                                _authorController.text,
-                                                _tag1Controller.text,
-                                                _tag2Controller.text,
-                                                _tag3Controller.text,
-                                                _priceController.text == ''
-                                                    ? 0
-                                                    : int.parse(
-                                                        _priceController.text),
-                                                coverpic,
-                                                book,
-                                                copyrightpic,
-                                                selectedCategory,
-                                                'audiobook',
-                                                freeRentPaid,
-                                                [],
-                                                'admin',
-                                                false);
+                                            CollectionReference bookCollection =
+                                                firestoreInstance
+                                                    .collection("books");
+                                            String bookid =
+                                                bookCollection.doc().id;
+                                            Book books;
+                                            if (FirebaseAuth
+                                                    .instance.currentUser ==
+                                                null) {
+                                              books = await Book(
+                                                  bookid,
+                                                  _titleController.text,
+                                                  _publishyearController.text,
+                                                  _authorController.text,
+                                                  _tag1Controller.text,
+                                                  _tag2Controller.text,
+                                                  _tag3Controller.text,
+                                                  _priceController.text == ''
+                                                      ? 0
+                                                      : int.parse(
+                                                          _priceController
+                                                              .text),
+                                                  coverpic,
+                                                  book,
+                                                  copyrightpic,
+                                                  selectedCategory,
+                                                  'audiobook',
+                                                  freeRentPaid,
+                                                  [],
+                                                  'admin',
+                                                  false);
+                                            } else {
+                                              books = await Book(
+                                                  bookid,
+                                                  _titleController.text,
+                                                  _publishyearController.text,
+                                                  _authorController.text,
+                                                  _tag1Controller.text,
+                                                  _tag2Controller.text,
+                                                  _tag3Controller.text,
+                                                  _priceController.text == ''
+                                                      ? 0
+                                                      : int.parse(
+                                                          _priceController
+                                                              .text),
+                                                  coverpic,
+                                                  book,
+                                                  copyrightpic,
+                                                  selectedCategory,
+                                                  'audiobook',
+                                                  freeRentPaid,
+                                                  [],
+                                                  FirebaseAuth.instance
+                                                      .currentUser!.uid,
+                                                  false);
+                                            }
+                                            try {
+                                              await bookCollection
+                                                  .doc(bookid)
+                                                  .set(books.toMap())
+                                                  .then((value) async {})
+                                                  .onError((error,
+                                                      stackTrace) async {
+                                                flutterToast('Error:' +
+                                                    error.toString());
+                                              }).then((_) {
+                                                _controller.play();
+                                                Timer(Duration(seconds: 2), () {
+                                                  _controller.stop();
+                                                });
+                                                // flutterToast('Book Added');
+                                              });
+                                            } catch (e) {
+                                              flutterToast(e.toString());
+                                            }
                                           } else {
-                                            books = await Book(
-                                                bookid,
-                                                _titleController.text,
-                                                _descriptionController.text,
-                                                _authorController.text,
-                                                _tag1Controller.text,
-                                                _tag2Controller.text,
-                                                _tag3Controller.text,
-                                                _priceController.text == ''
-                                                    ? 0
-                                                    : int.parse(
-                                                        _priceController.text),
-                                                coverpic,
-                                                book,
-                                                copyrightpic,
-                                                selectedCategory,
-                                                'audiobook',
-                                                freeRentPaid,
-                                                [],
-                                                FirebaseAuth
-                                                    .instance.currentUser!.uid,
-                                                false);
+                                            flutterToast('No categories');
                                           }
-
-                                          await bookCollection
-                                              .doc(bookid)
-                                              .set(books.toMap())
-                                              .then((value) async {})
-                                              .onError(
-                                                  (error, stackTrace) async {
-                                            flutterToast(
-                                                'Error:' + error.toString());
-                                          }).then((_) {
-                                            _controller.play();
-                                            Timer(Duration(seconds: 3), () {
-                                              _controller.stop();
-                                            });
-                                            // flutterToast('Book Added');
-                                          });
                                           setState(() {
                                             isLoading = false;
                                           });

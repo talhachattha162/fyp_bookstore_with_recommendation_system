@@ -14,7 +14,6 @@ import '../providers/internetavailabilitynotifier.dart';
 import '../utils/InternetChecker.dart';
 import '../utils/navigation.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:path_provider/path_provider.dart';
 
 class ListenBookScreen extends StatefulWidget {
   var bookpath;
@@ -48,7 +47,7 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
   Future<void> speak(String text) async {
     await flutterTts.setLanguage('en-US');
     await flutterTts.setPitch(1);
-    await flutterTts.setSpeechRate(0.5);
+    await flutterTts.setSpeechRate(0.4);
     await flutterTts.speak(text);
     if (mounted) {
       setState(() {
@@ -329,131 +328,3 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
     }
   }
 }
-
-// import 'dart:io';
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_tts/flutter_tts.dart';
-// // import 'package:flutter_tts/flutter_tts_web.dart';
-
-// import '../models/book.dart';
-
-// class ListenBookScreen extends StatefulWidget {
-//   var bookpath;
-//   Book book;
-//   ListenBookScreen({
-//     super.key,
-//     required this.book,
-//     required this.bookpath,
-//   });
-
-//   @override
-//   State<ListenBookScreen> createState() => _ListenBookScreenState();
-// }
-
-// enum TtsState { playing, stopped }
-
-// class _ListenBookScreenState extends State<ListenBookScreen> {
-  
-//     late FlutterTts _flutterTts;
-//   String? _tts;
-//   TtsState _ttsState = TtsState.stopped;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     initTts();
-//   }
-
-//   @override
-//   void dispose() {
-//     super.dispose();
-//     _flutterTts.stop();
-//   }
-
-//   initTts() async {
-//     _flutterTts = FlutterTts();
-//     await _flutterTts.awaitSpeakCompletion(true);
-
-//     _flutterTts.setStartHandler(() {
-//       setState(() {
-//         print("Playing");
-//         _ttsState = TtsState.playing;
-//       });
-//     });
-
-//     _flutterTts.setCompletionHandler(() {
-//       setState(() {
-//         print("Complete");
-//         _ttsState = TtsState.stopped;
-//       });
-//     });
-
-//     _flutterTts.setCancelHandler(() {
-//       setState(() {
-//         print("Cancel");
-//         _ttsState = TtsState.stopped;
-//       });
-//     });
-
-//     _flutterTts.setErrorHandler((message) {
-
-//       setState(() {
-//         print("Error: $message");
-//         _ttsState = TtsState.stopped;
-//       });
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//         home: Scaffold(
-//             appBar: AppBar(title: const Text('Flutter TTS')),
-//             body: SingleChildScrollView(
-//               scrollDirection: Axis.vertical,
-//               child: Column(children: [input(), button()]),
-//             )));
-//   }
-
-//   Widget input() => Container(
-//         alignment: Alignment.topCenter,
-//         padding: const EdgeInsets.all(25.0),
-//         child: TextField(
-//           onChanged: (String value) {
-//             setState(() {
-//               _tts = value;
-//             });
-//           },
-//         ),
-//       );
-
-//   Widget button() {
-//     if (_ttsState == TtsState.stopped) {
-//       return TextButton(onPressed: speak, child: const Text('Play'));
-//     } else {
-//       return TextButton(onPressed: stop, child: const Text('Stop'));
-//     }
-//   }
-
-//   Future speak() async {
-//     await _flutterTts.setVolume(1);
-//     await _flutterTts.setSpeechRate(0.5);
-//     await _flutterTts.setPitch(1);
-
-//     if (_tts != null) {
-//       if (_tts!.isNotEmpty) {
-//         await _flutterTts.speak(_tts!);
-//       }
-//     }
-//   }
-
-//   Future stop() async {
-//     var result = await _flutterTts.stop();
-//     if (result == 1) {
-//       setState(() {
-//         _ttsState = TtsState.stopped;
-//       });
-//     }
-//   }
-// }

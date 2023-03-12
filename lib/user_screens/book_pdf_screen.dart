@@ -12,19 +12,6 @@ import '../utils/InternetChecker.dart';
 import '../utils/navigation.dart';
 import 'view_book_screen.dart';
 
-// class ApiServiceProvider {
-//   // static final BASE_URL = Uri.parse('https://www.ibm.com/downloads/cas/GJ5QVQ7X');
-
-//   // static Future<String> loadPDF() async {
-//   //   var response = await http.get(BASE_URL);
-
-//   //   var dir = await getApplicationDocumentsDirectory();
-//   //   File file = new File("${dir.path}/data.pdf");
-//   //   file.writeAsBytesSync(response.bodyBytes, flush: true);
-//   //   return file.path;
-//   // }
-// }
-
 class BookPdfScreen extends StatefulWidget {
   Book book;
   var bookpath;
@@ -120,27 +107,20 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
                 body: Column(
                   children: [
                     Container(
-                      height: height * 0.7,
+                      height: height * 0.77,
                       padding: EdgeInsets.symmetric(
                           horizontal: width * 0.05, vertical: height * 0.015),
                       child: _pdfPath.isNotEmpty
                           ? SfPdfViewer.file(File(_pdfPath))
                           : Center(child: Text('Loading...')),
                     ),
+                    SizedBox(height: 5),
                     Text(
-                      widget.book.title,
-                      textAlign: TextAlign.center,
+                      '${widget.book.title}',
                       style: TextStyle(
-                          fontSize: subheadingSize,
-                          fontWeight: FontWeight.bold),
+                        fontSize: 18,
+                      ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 26.0),
-                      child: Text(widget.book.description),
-                    )
                   ],
                 ),
               )

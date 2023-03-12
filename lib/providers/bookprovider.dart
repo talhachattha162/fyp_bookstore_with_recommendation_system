@@ -12,18 +12,15 @@ class BookProvider with ChangeNotifier {
         FirebaseFirestore.instance.collection('books').snapshots();
 
     await stream.listen((QuerySnapshot querySnapshot) async {
-      print('query' + querySnapshot.docs.toString());
       if (querySnapshot.docs.isEmpty) {
         return;
       }
       for (var doc in querySnapshot.docs) {
-        print('bookid' + doc['bookid']);
         if (bookid == doc['bookid']) {
-          print('bookid1' + doc['bookid']);
           var book = Book(
               doc['bookid'],
               doc['title'],
-              doc['description'],
+              doc['publishyear'],
               doc['author'],
               doc['tag1'],
               doc['tag2'],
@@ -38,10 +35,7 @@ class BookProvider with ChangeNotifier {
               doc['userliked'],
               doc['userid'],
               doc['isPermitted']);
-          print('bookid2' + book.bookid);
           _book = book;
-
-          print('bookid3' + _book!.bookid);
         }
       }
     }).asFuture();

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_screen.dart';
-import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,7 +17,6 @@ import '../providers/internetavailabilitynotifier.dart';
 import '../utils/InternetChecker.dart';
 import '../utils/firebase_constants.dart';
 import '../utils/fluttertoast.dart';
-import '../utils/snackbar.dart';
 
 class WriteReviewScreen extends StatefulWidget {
   Book book;
@@ -143,16 +141,19 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                                         FirebaseAuth.instance.currentUser!.uid,
                                     rating: rating,
                                     reviewtext: _reviewController.text);
-                                await reviewCollection
-                                    .doc(reviewid)
-                                    .set(review.toMap())
-                                    .then((value) async {})
-                                    .onError((error, stackTrace) async {
-                                  showSnackBar(
-                                      context, 'Error:' + error.toString());
-                                }).then((_) {
-                                  flutterToast('Review Added');
-                                });
+                                try {
+                                  await reviewCollection
+                                      .doc(reviewid)
+                                      .set(review.toMap())
+                                      .then((value) async {})
+                                      .onError((error, stackTrace) async {
+                                    flutterToast('Error:' + error.toString());
+                                  }).then((_) {
+                                    flutterToast('Review submitted');
+                                  });
+                                } catch (e) {
+                                  flutterToast('Error:' + e.toString());
+                                }
                                 setState(() {
                                   isLoading = false;
                                 });

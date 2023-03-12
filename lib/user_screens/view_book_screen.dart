@@ -42,40 +42,60 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
 //used from here
 //https://www.simplifiedcoding.net/razorpay-integration-flutter/
 //UPI->success@razorpay
-
   bool favourite = false;
   Razorpay? _razorpay;
   Timer? timer;
   var bookpath;
 
+  Duration _timeLeft = Duration.zero;
+
+  Future<bool> isBookFavorited() async {
+    final userid = FirebaseAuth.instance.currentUser!.uid;
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('favourities')
+        .where('bookid', isEqualTo: widget.book.bookid)
+        .where('userid', isEqualTo: userid)
+        .get();
+
+    return querySnapshot.docs.isNotEmpty;
+  }
+
   storeFile() async {
-    // Download PDF file from URL
-    Dio dio = Dio();
-    Response response = await dio.get(widget.book.bookFile,
-        options: Options(responseType: ResponseType.bytes));
-    List<int> pdfData = List<int>.from(response.data);
+    try {
+      // Download PDF file from URL
+      Dio dio = Dio();
+      Response response = await dio.get(widget.book.bookFile,
+          options: Options(responseType: ResponseType.bytes));
+      List<int> pdfData = List<int>.from(response.data);
 
-    // Encrypt PDF file
-    final key = encrypt.Key.fromLength(32);
-    final iv = encrypt.IV.fromLength(16);
-    final encrypter = encrypt.Encrypter(encrypt.AES(key));
-    encrypt.Encrypted encryptedPdf = encrypter.encryptBytes(pdfData, iv: iv);
+      // Encrypt PDF file
+      final key = encrypt.Key.fromLength(32);
+      final iv = encrypt.IV.fromLength(16);
+      final encrypter = encrypt.Encrypter(encrypt.AES(key));
+      encrypt.Encrypted encryptedPdf = encrypter.encryptBytes(pdfData, iv: iv);
 
-    // Store encrypted PDF file in folder
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String encryptedPath = '${appDocDir.path}/encrypted';
-    Directory(encryptedPath).createSync(recursive: true);
-    File encryptedFile = File('$encryptedPath/' + widget.book.bookid + '.pdf');
-    await encryptedFile.writeAsBytes(encryptedPdf.bytes);
-    // flutterToast(encryptedFile.path);
-    return encryptedFile.path;
+      // Store encrypted PDF file in folder
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+      String encryptedPath = '${appDocDir.path}/encrypted';
+      Directory(encryptedPath).createSync(recursive: true);
+      File encryptedFile =
+          File('$encryptedPath/' + widget.book.bookid + '.pdf');
+      await encryptedFile.writeAsBytes(encryptedPdf.bytes);
+      // flutterToast(encryptedFile.path);
+      return encryptedFile.path;
+    } catch (e) {
+      flutterToast(e.toString());
+    }
   }
 
   checkFavourities() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    final userid = FirebaseAuth.instance.currentUser!.uid;
     Query query = firestore
         .collection('favourities')
-        .where('bookid', isEqualTo: widget.book.bookid);
+        .where('bookid', isEqualTo: widget.book.bookid)
+        .where('userid', isEqualTo: userid);
     QuerySnapshot querySnapshot = await query.get();
     if (querySnapshot.docs.isNotEmpty) {
       if (mounted) {
@@ -111,6 +131,14 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     });
     checkFavourities();
     bookpath = storeFile();
+    // _checkIfBookIsFavorited();
+  }
+
+  Future<void> _checkIfBookIsFavorited() async {
+    final isFavorited = await isBookFavorited();
+    setState(() {
+      favourite = isFavorited;
+    });
   }
 
   @override
@@ -371,34 +399,37 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                           .get();
                                   setState(() {
                                     if (favourite == false) {
-                                      favouritiesRef
-                                          .add({
-                                            'bookid': widget.book.bookid,
-                                          })
-                                          .then((value) =>
-                                              print('favourities added'))
-                                          .catchError((error) => print(
-                                              'Failed to add favourities: $error'));
-                                      favourite = true;
+                                      favouritiesRef.add({
+                                        'bookid': widget.book.bookid,
+                                        'userid': FirebaseAuth
+                                            .instance.currentUser!.uid,
+                                      }).then((value) {
+                                        print('favourities added');
+                                        setState(() {
+                                          favourite = true;
+                                        });
+                                      }).catchError((error) => print(
+                                          'Failed to add favourities: $error'));
                                     } else {
-                                      favourite = false;
-
                                       querySnapshot.docs.forEach((doc) {
-                                        doc.reference
-                                            .delete()
-                                            .then((value) =>
-                                                print('favourities deleted'))
-                                            .catchError((error) => print(
-                                                'Failed to delete favourities: $error'));
+                                        doc.reference.delete().then((value) {
+                                          print('favourities deleted');
+                                          setState(() {
+                                            favourite = false;
+                                          });
+                                        }).catchError((error) => print(
+                                            'Failed to delete favourities: $error'));
                                       });
                                     }
                                   });
                                 },
                                 icon: Icon(
-                                  favourite
+                                  favourite == true
                                       ? Icons.favorite_sharp
                                       : Icons.favorite_border,
-                                  color: favourite ? Colors.amber : Colors.grey,
+                                  color: favourite == true
+                                      ? Colors.amber
+                                      : Colors.grey,
                                 )),
                             const IconButton(
                                 onPressed: null, icon: Icon(Icons.download))
@@ -416,7 +447,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                           Book? book = provider.book;
                           if (book == null) {
                             return Container(
-                              child: (Text('error! reload page...')),
+                              child: (Text('Loading...')),
                             );
                           } else {
                             if (book.freeRentPaid == "paid" &&
@@ -506,8 +537,17 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                     if (snapshot.data!.docs.isNotEmpty) {
                                       paymentCreationTime = snapshot
                                           .data!.docs.first['dateTimeCreated'];
-                                      difference = DateTime.now().difference(
-                                          paymentCreationTime!.toDate());
+                                      DateTime expirationDate =
+                                          paymentCreationTime!
+                                              .toDate()
+                                              .add(Duration(days: 30));
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) {
+                                        setState(() {
+                                          _timeLeft = expirationDate
+                                              .difference(DateTime.now());
+                                        });
+                                      });
                                     }
 
                                     if (snapshot.data!.docs.length != 0) {
@@ -520,35 +560,43 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                           }
                                         }
                                       }
-                                      return Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
+                                      return Column(
                                         children: [
-                                          ElevatedButton.icon(
-                                            onPressed: () {
-                                              flutterToast('Loading...');
-                                              navigateWithNoBack(
-                                                  context,
-                                                  ListenBookScreen(
-                                                    book: widget.book,
-                                                    bookpath: bookpath,
-                                                  ));
-                                            },
-                                            icon: Icon(Icons.headphones),
-                                            label: Text('Listen'),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              ElevatedButton.icon(
+                                                onPressed: () {
+                                                  flutterToast('Loading...');
+                                                  navigateWithNoBack(
+                                                      context,
+                                                      ListenBookScreen(
+                                                        book: widget.book,
+                                                        bookpath: bookpath,
+                                                      ));
+                                                },
+                                                icon: Icon(Icons.headphones),
+                                                label: Text('Listen'),
+                                              ),
+                                              ElevatedButton.icon(
+                                                onPressed: () async {
+                                                  navigateWithNoBack(
+                                                      context,
+                                                      BookPdfScreen(
+                                                        book: widget.book,
+                                                        bookpath: bookpath,
+                                                      ));
+                                                },
+                                                icon: Icon(Icons.book),
+                                                label: Text('Read'),
+                                              ),
+                                            ],
                                           ),
-                                          ElevatedButton.icon(
-                                            onPressed: () async {
-                                              navigateWithNoBack(
-                                                  context,
-                                                  BookPdfScreen(
-                                                    book: widget.book,
-                                                    bookpath: bookpath,
-                                                  ));
-                                            },
-                                            icon: Icon(Icons.book),
-                                            label: Text('Read'),
-                                          ),
+                                          Text('Timeleft ${_timeLeft.inDays}d:'
+                                              '${_timeLeft.inHours.remainder(24)}h:'
+                                              '${_timeLeft.inMinutes.remainder(60)}m:'
+                                              '${_timeLeft.inSeconds.remainder(60)}s')
                                         ],
                                       );
                                     }
@@ -617,9 +665,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                               const SizedBox(
                                 height: 10,
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              Wrap(
                                 children: [
                                   Text(
                                     'Title',
@@ -627,6 +673,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18),
                                   ),
+                                  SizedBox(width: 5),
                                   Text(
                                     widget.book.title,
                                     style: TextStyle(fontSize: 16),
@@ -655,18 +702,19 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                               const SizedBox(
                                 height: 10,
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Text(
-                                    'Tags',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  ),
                                   Wrap(
+                                    // mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
+                                      Text(
+                                        'Tags',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18),
+                                      ),
                                       Text(
                                         widget.book.tag1 +
                                             ',' +
@@ -674,9 +722,9 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                             ',' +
                                             widget.book.tag3,
                                         style: TextStyle(fontSize: 16),
-                                      ),
+                                      )
                                     ],
-                                  )
+                                  ),
                                 ],
                               ),
                               const SizedBox(
@@ -702,25 +750,23 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                 height: 10,
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Description',
+                                    'Published Year',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
                                     ),
                                   ),
+                                  Text(
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                      widget.book.publishyear),
                                 ],
                               ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                  ),
-                                  widget.book.description),
                               const SizedBox(
                                 height: 10,
                               ),
@@ -837,7 +883,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                             ),
                                           )
                                         : Container(),
-                                    SizedBox(height: 5),
+                                    const SizedBox(height: 5),
                                     provider.reviews.length > 1 &&
                                             provider.users.length > 1
                                         ? Card(
@@ -863,27 +909,24 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                       ),
                                                       Text(
                                                         provider.users[1].name,
-                                                        style: TextStyle(
+                                                        style: const TextStyle(
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                             fontSize: 16),
                                                       ),
                                                       Row(
                                                         children: [
-                                                          Icon(
+                                                          const Icon(
                                                             Icons.star,
                                                             color: Colors.amber,
                                                           ),
-                                                          Text((provider.reviews[1]
-                                                                          .rating +
-                                                                      1)
-                                                                  .toString() +
-                                                              '/5'),
+                                                          Text(
+                                                              '${provider.reviews[1].rating + 1}/5'),
                                                         ],
                                                       )
                                                     ],
                                                   ),
-                                                  SizedBox(
+                                                  const SizedBox(
                                                     height: 10,
                                                   ),
                                                   Padding(
@@ -892,7 +935,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                         10.0, 0, 0, 0),
                                                     child: Wrap(children: [
                                                       Text(
-                                                          style: TextStyle(
+                                                          style:
+                                                              const TextStyle(
                                                             fontSize: 16,
                                                           ),
                                                           provider.reviews[1]
@@ -904,7 +948,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                             ),
                                           )
                                         : Container(),
-                                    SizedBox(height: 5),
+                                    const SizedBox(height: 5),
                                     provider.reviews.length > 2 &&
                                             provider.users.length > 2
                                         ? Card(
@@ -930,27 +974,24 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                       ),
                                                       Text(
                                                         provider.users[2].name,
-                                                        style: TextStyle(
+                                                        style: const TextStyle(
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                             fontSize: 16),
                                                       ),
                                                       Row(
                                                         children: [
-                                                          Icon(
+                                                          const Icon(
                                                             Icons.star,
                                                             color: Colors.amber,
                                                           ),
-                                                          Text((provider.reviews[2]
-                                                                          .rating +
-                                                                      1)
-                                                                  .toString() +
-                                                              '/5'),
+                                                          Text(
+                                                              '${provider.reviews[2].rating + 1}/5'),
                                                         ],
                                                       )
                                                     ],
                                                   ),
-                                                  SizedBox(
+                                                  const SizedBox(
                                                     height: 10,
                                                   ),
                                                   Padding(
@@ -959,7 +1000,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                         10.0, 0, 0, 0),
                                                     child: Wrap(children: [
                                                       Text(
-                                                          style: TextStyle(
+                                                          style:
+                                                              const TextStyle(
                                                             fontSize: 16,
                                                           ),
                                                           provider.reviews[2]

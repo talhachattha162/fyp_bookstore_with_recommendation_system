@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Book {
   String bookid = '';
   String title = '';
-  String description = '';
+  String publishyear = '';
   String author = '';
   String tag1 = '';
   String tag2 = '';
@@ -31,9 +31,9 @@ class Book {
 
   set setTitle(title) => this.title = title;
 
-  get getDescription => this.description;
+  get getpublishyear => this.publishyear;
 
-  set setDescription(description) => this.description = description;
+  set setpublishyear(publishyear) => this.publishyear = publishyear;
 
   get getAuthor => this.author;
 
@@ -92,7 +92,7 @@ class Book {
   Book(
       this.bookid,
       this.title,
-      this.description,
+      this.publishyear,
       this.author,
       this.tag1,
       this.tag2,
@@ -114,7 +114,7 @@ class Book {
     return {
       'bookid': bookid,
       'title': title,
-      'description': description,
+      'publishyear': publishyear,
       'author': author,
       'tag1': tag1,
       'tag2': tag2,
@@ -136,7 +136,7 @@ class Book {
     return Book(
       map['bookid'],
       map['title'],
-      map['description'],
+      map['publishyear'],
       map['author'],
       map['tag1'],
       map['tag2'],

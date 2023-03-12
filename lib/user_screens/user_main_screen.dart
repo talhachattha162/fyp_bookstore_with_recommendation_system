@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
-import 'package:bookstore_recommendation_system_fyp/main.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/home_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/library_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/recommendation_screen.dart';
@@ -11,7 +9,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/authstatenotifier.dart';
-import '../providers/booksnotifier.dart';
 import '../providers/internetavailabilitynotifier.dart';
 import '../providers/themenotifier.dart';
 import '../utils/global_variables.dart';

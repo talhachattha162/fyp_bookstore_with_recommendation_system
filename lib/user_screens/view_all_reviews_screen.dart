@@ -79,7 +79,7 @@ class _ViewAllReviewsScreenState extends State<ViewAllReviewsScreen> {
                     )),
                 body: Consumer<ReviewProvider>(
                   builder: (context, provider, child) {
-                    return Container(
+                    return SizedBox(
                       height: height * 0.9,
                       child: ListView.builder(
                         itemCount: provider.reviews.length,
@@ -90,7 +90,7 @@ class _ViewAllReviewsScreenState extends State<ViewAllReviewsScreen> {
 
                           if (provider.users.isEmpty ||
                               provider.reviews.isEmpty) {
-                            return Container();
+                            return const Center(child: Text('No Reviews'));
                           }
                           if (provider.users.length > index) {
                             var review = provider.reviews[index];

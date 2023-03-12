@@ -3,7 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  connectivity_plus
   flutter_tts
   syncfusion_pdfviewer_windows
   url_launcher_windows

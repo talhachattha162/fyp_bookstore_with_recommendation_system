@@ -26,26 +26,21 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Book> books = [];
 
   List<String> titles = [];
-  List<String> tag1 = [];
-  List<String> tag2 = [];
-  List<String> tag3 = [];
   List<String> searchData = [];
 
   intialize() {
     titles = books.map((book) {
       return book.title;
     }).toList();
-    tag1 = books.map((book) => book.tag1).toList();
-    tag2 = books.map((book) => book.tag2).toList();
-    tag3 = books.map((book) => book.tag3).toList();
     searchData.addAll(titles);
-    searchData.addAll(tag1);
-    searchData.addAll(tag2);
-    searchData.addAll(tag3);
   }
 
   void getBooks() {
-    FirebaseFirestore.instance.collection('books').get().then((snapshot) {
+    FirebaseFirestore.instance
+        .collection('books')
+        .where('isPermitted', isEqualTo: true)
+        .get()
+        .then((snapshot) {
       List<Book> bookList = snapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
         return Book.fromMap(data);
@@ -345,10 +340,7 @@ class CustomSearchDelegate extends SearchDelegate {
             return InkWell(
               onTap: () {
                 for (var book in books) {
-                  if (book.title == result ||
-                      book.tag1 == result ||
-                      book.tag2 == result ||
-                      book.tag3 == result) {
+                  if (book.title == result) {
                     navigateWithNoBack(context, ViewBookScreen(book: book));
                   }
                 }
@@ -388,10 +380,7 @@ class CustomSearchDelegate extends SearchDelegate {
             return InkWell(
               onTap: () {
                 for (var book in books) {
-                  if (book.title == result ||
-                      book.tag1 == result ||
-                      book.tag2 == result ||
-                      book.tag3 == result) {
+                  if (book.title == result) {
                     navigateWithNoBack(context, ViewBookScreen(book: book));
                   }
                 }

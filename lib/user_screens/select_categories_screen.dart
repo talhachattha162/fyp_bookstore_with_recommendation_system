@@ -13,6 +13,7 @@ import '../models/categories.dart';
 import '../providers/internetavailabilitynotifier.dart';
 import '../utils/InternetChecker.dart';
 import '../utils/firebase_constants.dart';
+import '../utils/fluttertoast.dart';
 
 class SelectCategoriesScreen extends StatefulWidget {
   const SelectCategoriesScreen({super.key});
@@ -35,7 +36,7 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
 
   bool isLoading = false;
   int? _value = 1;
-  bool loading = true;
+  bool loading = false;
   Timer? timer;
   @override
   void initState() {
@@ -97,13 +98,14 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
                                   loading = true;
                                 });
                               });
-                            } else if (!snapshot.hasData) {
+                            }
+                            if (!snapshot.hasData) {
                               WidgetsBinding.instance.addPostFrameCallback((_) {
                                 setState(() {
                                   loading = false;
                                 });
                               });
-                              return Text('No data found');
+                              return Text('No categories found');
                             } else if (snapshot.hasError) {
                               WidgetsBinding.instance.addPostFrameCallback((_) {
                                 setState(() {
@@ -120,24 +122,28 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
                                 });
                               });
                               _categories = snapshot.data!;
-                              return Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(3.0),
-                                    child: ChipsChoice<String>.multiple(
-                                      choiceCheckmark: true,
-                                      wrapped: true,
-                                      value: tags,
-                                      onChanged: (val) =>
-                                          setState(() => tags = val),
-                                      choiceItems:
-                                          C2Choice.listFrom<String, String>(
-                                        source: _categories,
-                                        value: (i, v) => v,
-                                        label: (i, v) => v,
-                                      ),
-                                    ),
-                                  ));
+                              return _categories.isEmpty
+                                  ? Text('No categories found')
+                                  : Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(3.0),
+                                        child: _categories.isEmpty
+                                            ? null
+                                            : ChipsChoice<String>.multiple(
+                                                choiceCheckmark: true,
+                                                wrapped: true,
+                                                value: tags,
+                                                onChanged: (val) =>
+                                                    setState(() => tags = val),
+                                                choiceItems: C2Choice.listFrom<
+                                                    String, String>(
+                                                  source: _categories,
+                                                  value: (i, v) => v,
+                                                  label: (i, v) => v,
+                                                ),
+                                              ),
+                                      ));
                             }
                             return Container();
                           }),
@@ -147,30 +153,42 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      isLoading = true;
-                                    });
-                                    Categories category1 = Categories(tags);
-                                    var firebaseUser = auth.currentUser;
-                                    firestoreInstance
-                                        .collection("selectedcategories")
-                                        .doc(firebaseUser!.uid)
-                                        .set(category1.toMap())
-                                        .then((value) async {})
-                                        .onError((error, stackTrace) async {});
-                                    setState(() {
-                                      isLoading = false;
-                                    });
-                                    navigateWithNoBack(
-                                        context, const MainScreenUser());
-                                  },
-                                  child: const Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 80.0, vertical: 12.0),
-                                      child: Text('Next')),
-                                ),
+                                isLoading == true
+                                    ? CircularProgressIndicator()
+                                    : ElevatedButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            isLoading = true;
+                                          });
+                                          if (tags.isNotEmpty) {
+                                            Categories category1 =
+                                                Categories(tags);
+                                            var firebaseUser = auth.currentUser;
+                                            try {
+                                              firestoreInstance
+                                                  .collection(
+                                                      "selectedcategories")
+                                                  .doc(firebaseUser!.uid)
+                                                  .set(category1.toMap())
+                                                  .then((value) async {})
+                                                  .onError((error,
+                                                      stackTrace) async {});
+                                            } catch (e) {
+                                              flutterToast(e.toString());
+                                            }
+                                          }
+                                          setState(() {
+                                            isLoading = false;
+                                          });
+                                          navigateWithNoBack(
+                                              context, const MainScreenUser());
+                                        },
+                                        child: const Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 80.0,
+                                                vertical: 12.0),
+                                            child: Text('Next')),
+                                      ),
                               ],
                             ),
                     ])),

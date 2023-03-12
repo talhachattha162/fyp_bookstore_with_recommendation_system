@@ -59,7 +59,8 @@ class _RentedBooksState extends State<RentedBooks> {
               stream: firestore
                   .collection('payments')
                   .where('freeRentPaid', isEqualTo: 'rent')
-                  .where('userId',isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                  .where('userId',
+                      isEqualTo: FirebaseAuth.instance.currentUser!.uid)
                   .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -67,8 +68,9 @@ class _RentedBooksState extends State<RentedBooks> {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 }
                 if (!snapshot.hasData) {
-                  return Center(child: Text('No Data found'));
+                  return Center(child: Text('No Rented books found'));
                 }
+
                 List<String> bookIds = [];
                 for (QueryDocumentSnapshot payments in snapshot.data!.docs) {
                   bookIds.add(payments.get('bookId'));

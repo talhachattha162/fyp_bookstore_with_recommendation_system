@@ -13,7 +13,6 @@ import '../providers/internetavailabilitynotifier.dart';
 import '../providers/themenotifier.dart';
 import '../utils/InternetChecker.dart';
 import '../utils/firebase_constants.dart';
-import '../utils/snackbar.dart';
 import 'email_verification_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
