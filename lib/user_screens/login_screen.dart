@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:bookstore_recommendation_system_fyp/admin_screens/admin_main_screen.dart';
+import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -141,186 +142,209 @@ class _LoginScreenState extends State<LoginScreen> {
     return user;
   }
 
+  DateTime currentBackPressTime = DateTime.now();
+
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
+  FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
+    print('login');
+    User? user = _auth.currentUser;
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     final themeNotifier = Provider.of<ThemeNotifier>(context);
-    return SafeArea(
-      child: internetAvailabilityNotifier.getInternetAvailability() == false
-          ? InternetChecker()
-          : Scaffold(
-              resizeToAvoidBottomInset: false,
-              body: Column(children: [
-                const SizedBox(
-                  height: 10,
-                ),
-                themeNotifier.getTheme() == ThemeData.dark(useMaterial3: true)
-                    ? SvgPicture.asset('lib/assets/images/signinblue.svg',
-                        semanticsLabel: 'Login', height: 250, width: 200)
-                    : SvgPicture.asset('lib/assets/images/login.svg',
-                        semanticsLabel: 'Login', height: 250, width: 200),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 4.0),
-                        child: TextInputField(
-                          hintText: 'Enter Email',
-                          textInputType: TextInputType.emailAddress,
-                          textEditingController: _emailController,
-                          isPassword: false,
-                          validator: (value) {
-                            if (!email_valid.hasMatch(value)) {
-                              return 'Enter valid email';
-                            }
-                            if (value.length > 40) {
-                              return 'Enter valid email';
-                            }
-                            return null;
-                          },
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: SafeArea(
+        child: internetAvailabilityNotifier.getInternetAvailability() == false
+            ? InternetChecker()
+            : Scaffold(
+                resizeToAvoidBottomInset: false,
+                body: Column(children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  themeNotifier.getTheme() == ThemeData.dark(useMaterial3: true)
+                      ? SvgPicture.asset('lib/assets/images/signinblue.svg',
+                          semanticsLabel: 'Login', height: 250, width: 200)
+                      : SvgPicture.asset('lib/assets/images/login.svg',
+                          semanticsLabel: 'Login', height: 250, width: 200),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 10,
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 4.0),
-                        child: TextInputField(
-                          hintText: 'Enter Password',
-                          textInputType: TextInputType.visiblePassword,
-                          textEditingController: _passwordController,
-                          isPassword: false,
-                          validator: (value) {
-                            String password = value.trim();
-                            if (!pass_valid.hasMatch(password)) {
-                              return 'Enter valid password ';
-                            }
-                            if (value.length < 8) {
-                              return 'Enter valid password ';
-                            }
-                            return null;
-                          },
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 4.0),
+                          child: TextInputField(
+                            hintText: 'Enter Email',
+                            textInputType: TextInputType.emailAddress,
+                            textEditingController: _emailController,
+                            isPassword: false,
+                            validator: (value) {
+                              if (!email_valid.hasMatch(value)) {
+                                return 'Enter valid email';
+                              }
+                              if (value.length > 40) {
+                                return 'Enter valid email';
+                              }
+                              return null;
+                            },
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 20.0,
-                      ),
-                      isLoading == true
-                          ? CircularProgressIndicator()
-                          : ElevatedButton(
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 4.0),
+                          child: TextInputField(
+                            hintText: 'Enter Password',
+                            textInputType: TextInputType.visiblePassword,
+                            textEditingController: _passwordController,
+                            isPassword: false,
+                            validator: (value) {
+                              String password = value.trim();
+                              if (!pass_valid.hasMatch(password)) {
+                                return 'Enter valid password ';
+                              }
+                              if (value.length < 8) {
+                                return 'Enter valid password ';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20.0,
+                        ),
+                        isLoading == true
+                            ? CircularProgressIndicator()
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    setState(() {
+                                      isLoading = true;
+                                    });
+
+                                    if (_emailController.text ==
+                                        'talhachattha162@gmail.com') {
+                                      navigateWithNoBack(context,
+                                          const MainScreenAdmin()); //admin data will not be stored to firebase
+                                    } else {
+                                      User? user =
+                                          await signInUsingEmailPassword(
+                                              context: context,
+                                              email: _emailController.text,
+                                              password:
+                                                  _passwordController.text);
+                                      if (user != null) {
+                                        context.read<AuthState>().user = 1;
+                                        navigateWithNoBack(context, MyApp());
+                                        // here
+                                      }
+                                    }
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  }
+
+                                  // showSnackBar(context, 'Logined');
+                                },
+                                child: const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 75.0, vertical: 12.0),
+                                    child: Text('Login')),
+                              ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 60, 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                  onPressed: () {
+                                    navigateWithNoBack(
+                                        context, const ResetPasswordScreen());
+                                  },
+                                  child: Text(
+                                    'Reset Password',
+                                    style: TextStyle(fontSize: 12),
+                                  )),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          'OR',
+                          style: TextStyle(
+                              color: themeNotifier.getTheme() ==
+                                      ThemeData.dark(useMaterial3: true)
+                                  ? darkprimarycolor
+                                  : primarycolor,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(
+                          height: 10.0,
+                        ),
+                        isGoogleLoading == true
+                            ? CircularProgressIndicator()
+                            : SignInButton(
+                                Buttons.Google,
+                                text: "Sign in with Google",
+                                onPressed: () async {
+                                  // try {
                                   setState(() {
-                                    isLoading = true;
+                                    isGoogleLoading = true;
                                   });
 
-                                  if (_emailController.text ==
-                                      'talhachattha162@gmail.com') {
-                                    navigateWithNoBack(context,
-                                        const MainScreenAdmin()); //admin data will not be stored to firebase
-                                  } else {
-                                    User? user = await signInUsingEmailPassword(
-                                        context: context,
-                                        email: _emailController.text,
-                                        password: _passwordController.text);
-                                    if (user != null) {
-                                      context.read<AuthState>().user = 1;
-                                      navigateWithNoBack(context, MyApp());
-                                      // here
-                                    }
+                                  User? user;
+                                  try {
+                                    user = await _signInWithGoogle();
+                                  } on PlatformException catch (e) {
+                                    flutterToast(
+                                        'Error signing in with Google: ${e.message}');
+                                  } catch (e) {
+                                    flutterToast(e);
+                                  }
+                                  if (user != null) {
+                                    context.read<AuthState>().user = 1;
+                                    navigateWithNoBack(context, MyApp());
                                   }
                                   setState(() {
-                                    isLoading = false;
+                                    isGoogleLoading = false;
                                   });
-                                }
-
-                                // showSnackBar(context, 'Logined');
-                              },
-                              child: const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 75.0, vertical: 12.0),
-                                  child: Text('Login')),
-                            ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(0, 0, 60, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                                },
+                              ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            const Text("Don't have an account?"),
                             TextButton(
                                 onPressed: () {
                                   navigateWithNoBack(
-                                      context, const ResetPasswordScreen());
+                                      context, const SignUpScreen());
                                 },
-                                child: Text(
-                                  'Reset Password',
-                                  style: TextStyle(fontSize: 12),
-                                )),
+                                child: const Text('Signup'))
                           ],
-                        ),
-                      ),
-                      Text(
-                        'OR',
-                        style: TextStyle(
-                            color: themeNotifier.getTheme() ==
-                                    ThemeData.dark(useMaterial3: true)
-                                ? darkprimarycolor
-                                : primarycolor,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        height: 10.0,
-                      ),
-                      isGoogleLoading == true
-                          ? CircularProgressIndicator()
-                          : SignInButton(
-                              Buttons.Google,
-                              text: "Sign in with Google",
-                              onPressed: () async {
-                                // try {
-                                setState(() {
-                                  isGoogleLoading = true;
-                                });
-
-                                User? user;
-                                try {
-                                  user = await _signInWithGoogle();
-                                } on PlatformException catch (e) {
-                                  flutterToast(
-                                      'Error signing in with Google: ${e.message}');
-                                } catch (e) {
-                                  flutterToast(e);
-                                }
-                                if (user != null) {
-                                  context.read<AuthState>().user = 1;
-                                  navigateWithNoBack(context, MyApp());
-                                }
-                                setState(() {
-                                  isGoogleLoading = false;
-                                });
-                              },
-                            ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("Don't have an account?"),
-                          TextButton(
-                              onPressed: () {
-                                navigateWithNoBack(
-                                    context, const SignUpScreen());
-                              },
-                              child: const Text('Signup'))
-                        ],
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ])),
+                ])),
+      ),
     );
   }
 }

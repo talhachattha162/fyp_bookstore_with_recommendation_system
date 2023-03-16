@@ -28,7 +28,7 @@ class ListenBookScreen extends StatefulWidget {
   State<ListenBookScreen> createState() => _ListenBookScreenState();
 }
 
-enum TtsState { playing, stopped }
+enum TtsState { playing, stopped, paused, continued }
 
 class _ListenBookScreenState extends State<ListenBookScreen> {
   TtsState _ttsState = TtsState.stopped;
@@ -44,6 +44,23 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
 
   bool _isPaused = false;
 
+
+ DateTime currentBackPressTime = DateTime.now();
+
+
+   Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Press back again to exit')));
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
+
   Future<void> speak(String text) async {
     await flutterTts.setLanguage('en-US');
     await flutterTts.setPitch(1);
@@ -57,27 +74,24 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
     }
   }
 
-  Future<void> _speak(String text) async {
-    if (text.isNotEmpty) {
-      setState(() {
-        _isSpeaking = true;
-      });
 
-      int chunkSize = 4000;
-      List<String> chunks = [];
-      for (int i = 0; i < text.length; i += chunkSize) {
-        int end = i + chunkSize;
-        if (end > text.length) end = text.length;
-        chunks.add(text.substring(i, end));
-      }
 
-      for (int i = 0; i < chunks.length; i++) {
-        await speak(chunks[i]);
-        await Future.delayed(Duration(milliseconds: 150000));
+  void _speak(String text) async {
+    int chunkSize = 1000;
+    List<String> chunks = [];
+    while (text.isNotEmpty) {
+      if (text.length > chunkSize) {
+        chunks.add(text.substring(0, chunkSize));
+        text = text.substring(chunkSize);
+      } else {
+        chunks.add(text);
+        text = "";
       }
-      setState(() {
-        _isSpeaking = false;
-      });
+    }
+
+    for (String chunk in chunks) {
+      await flutterTts.speak(chunk);
+      if (_ttsState == TtsState.stopped) break;
     }
   }
 
@@ -89,8 +103,8 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
   }
 
   Future stop() async {
-    var result = await flutterTts.stop();
-    if (result == 1) {
+    await flutterTts.stop();
+    if (mounted) {
       setState(() {
         _ttsState = TtsState.stopped;
       });
@@ -155,24 +169,17 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
     });
 
     flutterTts.setCompletionHandler(() {
-      if (_isSpeaking == true) {
-        setState(() {
-          guidemsg = "Wait Loading...";
-          _ttsState = TtsState.playing;
-        });
-      } else {
-        setState(() {
-          print("Complete");
-          guidemsg = "Completed.";
-          _ttsState = TtsState.stopped;
-        });
-      }
+      setState(() {
+        print("Complete");
+        guidemsg = "Completed.";
+        _ttsState = TtsState.stopped;
+      });
     });
 
     flutterTts.setCancelHandler(() {
       setState(() {
         print("Cancel");
-        guidemsg = "Cancelled";
+        guidemsg = "Stopped";
         _ttsState = TtsState.stopped;
       });
     });
@@ -213,7 +220,7 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
   void dispose() {
     timer?.cancel();
     super.dispose();
-    flutterTts.stop();
+    stop();
   }
 
   @override
@@ -221,82 +228,86 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    return SafeArea(
-      child: internetAvailabilityNotifier.getInternetAvailability() == false
-          ? InternetChecker()
-          : isLoading == true
-              ? Scaffold(
-                  body: Center(
-                      child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Please wait'),
-                    Text('Loading...'),
-                  ],
-                )))
-              : Scaffold(
-                  appBar: AppBar(
-                      title: const Text('Listen Book'),
-                      leading: IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () {
-                          navigateWithNoBack(
-                              context,
-                              ViewBookScreen(
-                                book: widget.book,
-                              ));
-                        },
-                      )),
-                  body: SingleChildScrollView(
-                      child: Column(
+    return WillPopScope(
+      onWillPop:onWillPop,
+      child: SafeArea(
+        child: internetAvailabilityNotifier.getInternetAvailability() == false
+            ? InternetChecker()
+            : isLoading == true
+                ? Scaffold(
+                    body: Center(
+                        child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      SizedBox(
-                        height: height * 0.56,
-                        width: width * 0.8,
-                        child: ClipRect(
-                          child: Align(
-                            alignment: Alignment.center,
-                            // widthFactor: 0.9,
-                            // heightFactor: 0.55,
-                            child: CachedNetworkImage(
-                              imageUrl: widget.book.coverPhotoFile,
-                              placeholder: (context, url) =>
-                                  CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(Icons.error),
+                      Text('Please wait'),
+                      Text('Loading...'),
+                    ],
+                  )))
+                : Scaffold(
+                    appBar: AppBar(
+                        title: const Text('Listen Book'),
+                        leading: IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () {
+                            stop();
+                            navigateWithNoBack(
+                                context,
+                                ViewBookScreen(
+                                  book: widget.book,
+                                ));
+                          },
+                        )),
+                    body: SingleChildScrollView(
+                        child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        SizedBox(
+                          height: height * 0.56,
+                          width: width * 0.8,
+                          child: ClipRect(
+                            child: Align(
+                              alignment: Alignment.center,
+                              // widthFactor: 0.9,
+                              // heightFactor: 0.55,
+                              child: CachedNetworkImage(
+                                imageUrl: widget.book.coverPhotoFile,
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Text(widget.book.author),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        widget.book.title,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [button()],
-                      ),
-                      Text(guidemsg)
-                    ],
-                  )),
-                ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(widget.book.author),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          widget.book.title,
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [button()],
+                        ),
+                        Text(guidemsg)
+                      ],
+                    )),
+                  ),
+      ),
     );
   }
 

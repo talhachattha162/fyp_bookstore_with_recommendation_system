@@ -84,46 +84,63 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
     super.dispose();
   }
 
+  DateTime currentBackPressTime = DateTime.now();
+
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    return SafeArea(
-        child: internetAvailabilityNotifier.getInternetAvailability() == true
-            ? Scaffold(
-                appBar: AppBar(
-                    title: const Text('Read Book'),
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () {
-                        navigateWithNoBack(
-                            context,
-                            ViewBookScreen(
-                              book: widget.book,
-                            ));
-                      },
-                    )),
-                body: Column(
-                  children: [
-                    Container(
-                      height: height * 0.77,
-                      padding: EdgeInsets.symmetric(
-                          horizontal: width * 0.05, vertical: height * 0.015),
-                      child: _pdfPath.isNotEmpty
-                          ? SfPdfViewer.file(File(_pdfPath))
-                          : Center(child: Text('Loading...')),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      '${widget.book.title}',
-                      style: TextStyle(
-                        fontSize: 18,
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: SafeArea(
+          child: internetAvailabilityNotifier.getInternetAvailability() == true
+              ? Scaffold(
+                  appBar: AppBar(
+                      title: const Text('Read Book'),
+                      leading: IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () {
+                          navigateWithNoBack(
+                              context,
+                              ViewBookScreen(
+                                book: widget.book,
+                              ));
+                        },
+                      )),
+                  body: Column(
+                    children: [
+                      Container(
+                        height: height * 0.77,
+                        padding: EdgeInsets.symmetric(
+                            horizontal: width * 0.05, vertical: height * 0.015),
+                        child: _pdfPath.isNotEmpty
+                            ? SfPdfViewer.file(File(_pdfPath))
+                            : Center(child: Text('Loading...')),
                       ),
-                    ),
-                  ],
-                ),
-              )
-            : InternetChecker());
+                      SizedBox(height: 5),
+                      Text(
+                        '${widget.book.title}',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : InternetChecker()),
+    );
   }
 }

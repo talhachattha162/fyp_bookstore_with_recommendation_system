@@ -63,57 +63,74 @@ class _MainScreenAdminState extends State<MainScreenAdmin> {
     super.dispose();
   }
 
+  DateTime currentBackPressTime = DateTime.now();
+
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     return internetAvailabilityNotifier.getInternetAvailability() == false
         ? InternetChecker()
-        : Scaffold(
-            resizeToAvoidBottomInset: false,
-            body: Center(
-              child: _bottomNavigationItems.elementAt(_selectedIndex),
+        : WillPopScope(
+            onWillPop: onWillPop,
+            child: Scaffold(
+              resizeToAvoidBottomInset: false,
+              body: Center(
+                child: _bottomNavigationItems.elementAt(_selectedIndex),
+              ),
+              bottomNavigationBar: BottomNavigationBar(
+                  items: <BottomNavigationBarItem>[
+                    BottomNavigationBarItem(
+                        icon: Icon(
+                          Icons.supervised_user_circle_outlined,
+                        ),
+                        label: 'Users',
+                        backgroundColor: themeNotifier.getTheme() ==
+                                ThemeData.dark(useMaterial3: true)
+                            ? darkprimarycolor
+                            : primarycolor),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.upload),
+                        label: 'Upload',
+                        backgroundColor: themeNotifier.getTheme() ==
+                                ThemeData.dark(useMaterial3: true)
+                            ? darkprimarycolor
+                            : primarycolor),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.category_outlined),
+                        label: 'Categories',
+                        backgroundColor: themeNotifier.getTheme() ==
+                                ThemeData.dark(useMaterial3: true)
+                            ? darkprimarycolor
+                            : primarycolor),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.add_moderator_outlined),
+                        label: 'Permissions',
+                        backgroundColor: themeNotifier.getTheme() ==
+                                ThemeData.dark(useMaterial3: true)
+                            ? darkprimarycolor
+                            : primarycolor),
+                  ],
+                  type: BottomNavigationBarType.shifting,
+                  currentIndex: _selectedIndex,
+                  selectedItemColor: Colors.white,
+                  iconSize: 24,
+                  selectedLabelStyle: const TextStyle(fontSize: 10),
+                  onTap: _onItemTapped,
+                  elevation: 5),
             ),
-            bottomNavigationBar: BottomNavigationBar(
-                items: <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(
-                      icon: Icon(
-                        Icons.supervised_user_circle_outlined,
-                      ),
-                      label: 'Users',
-                      backgroundColor: themeNotifier.getTheme() ==
-                              ThemeData.dark(useMaterial3: true)
-                          ? darkprimarycolor
-                          : primarycolor),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.upload),
-                      label: 'Upload',
-                      backgroundColor: themeNotifier.getTheme() ==
-                              ThemeData.dark(useMaterial3: true)
-                          ? darkprimarycolor
-                          : primarycolor),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.category_outlined),
-                      label: 'Categories',
-                      backgroundColor: themeNotifier.getTheme() ==
-                              ThemeData.dark(useMaterial3: true)
-                          ? darkprimarycolor
-                          : primarycolor),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.add_moderator_outlined),
-                      label: 'Permissions',
-                      backgroundColor: themeNotifier.getTheme() ==
-                              ThemeData.dark(useMaterial3: true)
-                          ? darkprimarycolor
-                          : primarycolor),
-                ],
-                type: BottomNavigationBarType.shifting,
-                currentIndex: _selectedIndex,
-                selectedItemColor: Colors.white,
-                iconSize: 24,
-                selectedLabelStyle: const TextStyle(fontSize: 10),
-                onTap: _onItemTapped,
-                elevation: 5),
           );
   }
 }

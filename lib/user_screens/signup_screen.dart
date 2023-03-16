@@ -95,140 +95,158 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  DateTime currentBackPressTime = DateTime.now();
+
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     final themeNotifier = Provider.of<ThemeNotifier>(context);
-    return SafeArea(
-      child: internetAvailabilityNotifier.getInternetAvailability() == false
-          ? InternetChecker()
-          : Scaffold(
-              resizeToAvoidBottomInset: false,
-              body: Column(children: [
-                const SizedBox(
-                  height: 15,
-                ),
-                themeNotifier.getTheme() == ThemeData.dark(useMaterial3: true)
-                    ? SvgPicture.asset('lib/assets/images/signupblue.svg',
-                        semanticsLabel: 'Signup', height: 250, width: 200)
-                    : SvgPicture.asset('lib/assets/images/signup.svg',
-                        semanticsLabel: 'Signup', height: 250, width: 200),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 4.0),
-                        child: TextInputField(
-                          hintText: 'Enter Name',
-                          textInputType: TextInputType.name,
-                          textEditingController: _nameController,
-                          isPassword: false,
-                          validator: (value) {
-                            if (!name_valid.hasMatch(value)) {
-                              return 'Enter valid name';
-                            }
-                            if (value.length > 25) {
-                              return 'Name should be less\n than 25 characters';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 4.0),
-                        child: TextInputField(
-                          hintText: 'Enter Email',
-                          textInputType: TextInputType.emailAddress,
-                          textEditingController: _emailController,
-                          isPassword: false,
-                          validator: (value) {
-                            if (!email_valid.hasMatch(value)) {
-                              return 'Please enter valid email';
-                            }
-                            if (value.length > 40) {
-                              return 'Enter email with less\n than 40 characters';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 4.0),
-                        child: TextInputField(
-                          hintText: 'Enter Password',
-                          textInputType: TextInputType.text,
-                          textEditingController: _passwordController,
-                          isPassword: false,
-                          validator: (value) {
-                            String password = value.trim();
-                            if (!pass_valid.hasMatch(password)) {
-                              return 'password should contain capital,\nsmall,number,special characters';
-                            }
-                            if (value.length < 8) {
-                              return 'Password should be 8 characters';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 20.0,
-                      ),
-                      _isLoading
-                          ? const CircularProgressIndicator()
-                          : ElevatedButton(
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
-                                  await signUp(
-                                      name: _nameController.text,
-                                      userEmail: _emailController.text,
-                                      password: _passwordController.text,
-                                      context: context);
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (ctx) =>
-                                              EmailVerificationScreen(
-                                                  email: _emailController.text,
-                                                  password: _passwordController
-                                                      .text)));
-
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
-                                }
-                              },
-                              child: const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 75.0, vertical: 12.0),
-                                  child: Text('Signup')),
-                            ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("Already have an account?"),
-                          TextButton(
-                              onPressed: () {
-                                navigateWithNoBack(
-                                    context, const LoginScreen());
-                              },
-                              child: const Text('Login'))
-                        ],
-                      )
-                    ],
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: SafeArea(
+        child: internetAvailabilityNotifier.getInternetAvailability() == false
+            ? InternetChecker()
+            : Scaffold(
+                resizeToAvoidBottomInset: false,
+                body: Column(children: [
+                  const SizedBox(
+                    height: 15,
                   ),
-                ),
-              ])),
+                  themeNotifier.getTheme() == ThemeData.dark(useMaterial3: true)
+                      ? SvgPicture.asset('lib/assets/images/signupblue.svg',
+                          semanticsLabel: 'Signup', height: 250, width: 200)
+                      : SvgPicture.asset('lib/assets/images/signup.svg',
+                          semanticsLabel: 'Signup', height: 250, width: 200),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 4.0),
+                          child: TextInputField(
+                            hintText: 'Enter Name',
+                            textInputType: TextInputType.name,
+                            textEditingController: _nameController,
+                            isPassword: false,
+                            validator: (value) {
+                              if (!name_valid.hasMatch(value)) {
+                                return 'Enter valid name';
+                              }
+                              if (value.length > 25) {
+                                return 'Name should be less\n than 25 characters';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 4.0),
+                          child: TextInputField(
+                            hintText: 'Enter Email',
+                            textInputType: TextInputType.emailAddress,
+                            textEditingController: _emailController,
+                            isPassword: false,
+                            validator: (value) {
+                              if (!email_valid.hasMatch(value)) {
+                                return 'Please enter valid email';
+                              }
+                              if (value.length > 40) {
+                                return 'Enter email with less\n than 40 characters';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 4.0),
+                          child: TextInputField(
+                            hintText: 'Enter Password',
+                            textInputType: TextInputType.text,
+                            textEditingController: _passwordController,
+                            isPassword: false,
+                            validator: (value) {
+                              String password = value.trim();
+                              if (!pass_valid.hasMatch(password)) {
+                                return 'password should contain capital,\nsmall,number,special characters';
+                              }
+                              if (value.length < 8) {
+                                return 'Password should be 8 characters';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20.0,
+                        ),
+                        _isLoading
+                            ? const CircularProgressIndicator()
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    await signUp(
+                                        name: _nameController.text,
+                                        userEmail: _emailController.text,
+                                        password: _passwordController.text,
+                                        context: context);
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (ctx) =>
+                                                EmailVerificationScreen(
+                                                    email: _emailController.text,
+                                                    password: _passwordController
+                                                        .text)));
+    
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                  }
+                                },
+                                child: const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 75.0, vertical: 12.0),
+                                    child: Text('Signup')),
+                              ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Already have an account?"),
+                            TextButton(
+                                onPressed: () {
+                                  navigateWithNoBack(
+                                      context, const LoginScreen());
+                                },
+                                child: const Text('Login'))
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ])),
+      ),
     );
   }
 }

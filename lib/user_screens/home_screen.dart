@@ -90,6 +90,22 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+
+  DateTime currentBackPressTime = DateTime.now();
+
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
@@ -102,188 +118,196 @@ class _HomeScreenState extends State<HomeScreen> {
         //           ..fetchBooks(categories.isNotEmpty ? categories[tag] : ' '))
         //   ],
         //   child:
-        SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Book Store'),
-          actions: [
-            IconButton(
+        WillPopScope(
+      onWillPop: onWillPop,
+          child: SafeArea(
+              child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Book Store'),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    themeNotifier.setTheme(themeNotifier.getTheme() ==
+                            ThemeData(
+                                appBarTheme:
+                                    AppBarTheme(color: Colors.green[300]),
+                                primarySwatch: primarycolor,
+                                fontFamily: 'RobotoMono')
+                        ? ThemeData.dark(
+                            useMaterial3: true,
+                          )
+                        : ThemeData(
+                            appBarTheme: AppBarTheme(color: Colors.green[300]),
+                            primarySwatch: primarycolor,
+                            fontFamily: 'RobotoMono'));
+                  },
+                  icon: const Icon(CupertinoIcons.moon)),
+              IconButton(
                 onPressed: () {
-                  themeNotifier.setTheme(themeNotifier.getTheme() ==
-                          ThemeData(
-                              appBarTheme:
-                                  AppBarTheme(color: Colors.green[300]),
-                              primarySwatch: primarycolor,
-                              fontFamily: 'RobotoMono')
-                      ? ThemeData.dark(
-                          useMaterial3: true,
-                        )
-                      : ThemeData(
-                          appBarTheme: AppBarTheme(color: Colors.green[300]),
-                          primarySwatch: primarycolor,
-                          fontFamily: 'RobotoMono'));
+                  // method to show the search bar
+                  showSearch(
+                      context: context,
+                      // delegate to customize the search bar
+                      delegate: CustomSearchDelegate(
+                          searchData: searchData, books: books));
                 },
-                icon: const Icon(CupertinoIcons.moon)),
-            IconButton(
-              onPressed: () {
-                // method to show the search bar
-                showSearch(
-                    context: context,
-                    // delegate to customize the search bar
-                    delegate: CustomSearchDelegate(
-                        searchData: searchData, books: books));
-              },
-              icon: const Icon(CupertinoIcons.search),
-            )
-          ],
-        ),
-        resizeToAvoidBottomInset: false,
-        body: SingleChildScrollView(
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: ChipsChoice<int>.single(
-                        value: tag,
-                        onChanged: (val) {
-                          setState(() {
-                            tag = val;
-                          });
-                        },
-                        choiceItems: categories.isEmpty
-                            ? C2Choice.listFrom<int, String>(
-                                source: options,
-                                value: (i, v) => i,
-                                label: (i, v) => v,
-                              )
-                            : C2Choice.listFrom<int, String>(
-                                source: categories,
-                                value: (i, v) => i,
-                                label: (i, v) => v,
-                              ),
-                      ),
-                    )
-                  ]),
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  height: height * 0.73,
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: _queryBooksByCategory(
-                        categories.isEmpty ? ' ' : categories[tag]),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      }
-
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: Text('Loading...'));
-                      }
-
-                      return Stack(
-                        children: [
-                          GridView.builder(
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 6,
-                                    mainAxisSpacing: 6,
-                                    mainAxisExtent: 230),
-                            itemCount: snapshot.data!.docs.length,
-                            itemBuilder: (context, index) {
-                              Book book =
-                                  Book.fromSnapshot(snapshot.data!.docs[index]);
-                              return InkWell(
-                                onTap: () {
-                                  navigateWithNoBack(
-                                      context, ViewBookScreen(book: book));
-                                },
-                                child: Card(
-                                  elevation: 10,
-                                  borderOnForeground: true,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: Column(
-                                      children: [
-                                        CachedNetworkImage(
-                                          height: 170,
-                                          width: double.infinity,
-                                          fit: BoxFit.fill,
-                                          imageUrl: book.coverPhotoFile,
-                                          placeholder: (context, url) => Center(
-                                              child:
-                                                  CircularProgressIndicator()),
-                                          errorWidget: (context, url, error) =>
-                                              new Icon(Icons.error),
-                                        ),
-                                        SizedBox(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(4.0),
-                                            child: Row(
-                                              children: [
-                                                Flexible(
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        book.title.length > 20
-                                                            ? book.title
-                                                                    .substring(
-                                                                        0, 20) +
-                                                                '...'
-                                                            : book.title,
-                                                        style: TextStyle(
-                                                            fontSize: 12),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                // SizedBox(
-                                                //   width: 30,
-                                                // ),
-                                                Text(
-                                                  book.freeRentPaid == 'free'
-                                                      ? 'Free'
-                                                      : '\$' +
-                                                          book.price.toString(),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14),
-                                                )
-                                              ],
-                                            ),
+                icon: const Icon(CupertinoIcons.search),
+              )
+            ],
+          ),
+          resizeToAvoidBottomInset: false,
+          body: SingleChildScrollView(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(children: [
+                      Padding(
+                        padding: const EdgeInsets.all(3.0),
+                        child: ChipsChoice<int>.single(
+                          value: tag,
+                          onChanged: (val) {
+                            setState(() {
+                              tag = val;
+                            });
+                          },
+                          choiceItems: categories.isEmpty
+                              ? C2Choice.listFrom<int, String>(
+                                  source: options,
+                                  value: (i, v) => i,
+                                  label: (i, v) => v,
+                                )
+                              : C2Choice.listFrom<int, String>(
+                                  source: categories,
+                                  value: (i, v) => i,
+                                  label: (i, v) => v,
+                                ),
+                        ),
+                      )
+                    ]),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: height * 0.73,
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: _queryBooksByCategory(
+                          categories.isEmpty ? ' ' : categories[tag]),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        }
+        
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Center(child: Text('Loading...'));
+                        }
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return Visibility(
+                            visible: true,
+                            child: Center(child: Text('No books found')),
+                          );
+                        }
+                        return Stack(
+                          children: [
+                            GridView.builder(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 6,
+                                      mainAxisSpacing: 6,
+                                      mainAxisExtent: 230),
+                              itemCount: snapshot.data!.docs.length,
+                              itemBuilder: (context, index) {
+                                Book book =
+                                    Book.fromSnapshot(snapshot.data!.docs[index]);
+                                return InkWell(
+                                  onTap: () {
+                                    navigateWithNoBack(
+                                        context, ViewBookScreen(book: book));
+                                  },
+                                  child: Card(
+                                    elevation: 10,
+                                    borderOnForeground: true,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Column(
+                                        children: [
+                                          CachedNetworkImage(
+                                            height: 170,
+                                            width: double.infinity,
+                                            fit: BoxFit.fill,
+                                            imageUrl: book.coverPhotoFile,
+                                            placeholder: (context, url) => Center(
+                                                child:
+                                                    CircularProgressIndicator()),
+                                            errorWidget: (context, url, error) =>
+                                                new Icon(Icons.error),
                                           ),
-                                        )
-                                      ],
+                                          SizedBox(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(4.0),
+                                              child: Row(
+                                                children: [
+                                                  Flexible(
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          book.title.length > 20
+                                                              ? book.title
+                                                                      .substring(
+                                                                          0, 20) +
+                                                                  '...'
+                                                              : book.title,
+                                                          style: TextStyle(
+                                                              fontSize: 12),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  // SizedBox(
+                                                  //   width: 30,
+                                                  // ),
+                                                  Text(
+                                                    book.freeRentPaid == 'free'
+                                                        ? 'Free'
+                                                        : '\$' +
+                                                            book.price.toString(),
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 14),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-
-                  //stack
-                )
-              ]
-              //   },
-              // ),
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+        
+                    //stack
+                  )
+                ]
+                //   },
+                // ),
+                ),
+          ),
               ),
-        ),
-      ),
-    );
+            ),
+        );
     // );
   }
 }
@@ -351,7 +375,7 @@ class CustomSearchDelegate extends SearchDelegate {
             );
           } else {
             return Center(
-              child: Text('No data found'),
+              child: Text('No book found'),
             );
           }
         },
@@ -391,7 +415,7 @@ class CustomSearchDelegate extends SearchDelegate {
             );
           } else {
             return Center(
-              child: Text('No data found'),
+              child: Text('No Book found'),
             );
           }
         },

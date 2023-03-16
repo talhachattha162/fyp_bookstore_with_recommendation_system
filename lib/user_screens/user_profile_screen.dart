@@ -29,6 +29,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       .doc(FirebaseAuth.instance.currentUser!.uid);
   String photoUrl = '';
   String name1 = '';
+  String balance = '';
 
   Future<void> loadData() async {
     final DocumentSnapshot documentSnapshot = await documentReference.get();
@@ -38,10 +39,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       Users user1 = Users.fromMap(data);
       String name = user1.getName();
       final photo = user1.getPhoto();
+      String balance1 = user1.getBalance.toString();
       if (mounted) {
         setState(() {
           name1 = name;
           photoUrl = photo;
+          balance = balance1;
         });
       }
     }
@@ -54,101 +57,116 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     loadData();
   }
 
+  DateTime currentBackPressTime = DateTime.now();
+
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    return SafeArea(
-      child: Scaffold(
-        body: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(
-                  height: 40,
-                ),
-                CircleAvatar(
-                  maxRadius: 60,
-                  backgroundImage:
-                      photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
-                ),
-                const SizedBox(height: 20),
-                Text(name1,
-                    style: TextStyle(
-                        fontSize: subheadingSize, fontWeight: FontWeight.bold)),
-                const SizedBox(
-                  height: 10,
-                ),
-                SizedBox(
-                    height: height * 0.59,
-                    width: width * 0.93,
-                    child: ListView(
-                      children: <Widget>[
-                        ListTile(
-                          leading: const Icon(Icons.account_circle_outlined),
-                          title: const Text('My Account'),
-                          trailing: const Icon(Icons.chevron_right_sharp),
-                          onTap: () {
-                            navigateWithNoBack(
-                                context, const UpdateProfileScreen());
-                          },
-                        ),
-                        const Divider(),
-                        ListTile(
-                          leading: const Icon(Icons.question_mark_outlined),
-                          title: const Text('FAQS'),
-                          trailing: const Icon(Icons.chevron_right_sharp),
-                          onTap: () {
-                            navigateWithNoBack(context, const FaqScreen());
-                          },
-                        ),
-                        const Divider(),
-                        ListTile(
-                          leading: const Icon(Icons.mode_night_outlined),
-                          title: const Text('Dark Mode'),
-                          trailing: Switch(
-                              value: _isSwitched,
-                              onChanged: (value) {
-                                setState(() {
-                                  _isSwitched = value;
-                                });
-                              }),
-                        ),
-                        const Divider(),
-                        ListTile(
-                          leading: const Icon(Icons.privacy_tip_outlined),
-                          title: const Text('Privacy Policy'),
-                          trailing: const Icon(Icons.chevron_right_sharp),
-                          onTap: () {
-                            // navigateWithNoBack(context, PrivacyPolicyScreen());
-                          },
-                        ),
-                        const Divider(),
-                        ListTile(
-                            leading: const Icon(Icons.logout_outlined),
-                            title: const Text('Log out'),
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(title: Text('Balance: \$$balance')),
+          body: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  CircleAvatar(
+                    maxRadius: 60,
+                    backgroundImage:
+                        photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(name1,
+                      style: TextStyle(
+                          fontSize: subheadingSize,
+                          fontWeight: FontWeight.bold)),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                      height: height * 0.44,
+                      width: width * 0.93,
+                      child: ListView(
+                        children: <Widget>[
+                          ListTile(
+                            leading: const Icon(Icons.account_circle_outlined),
+                            title: const Text('My Account'),
                             trailing: const Icon(Icons.chevron_right_sharp),
                             onTap: () {
-                              auth.signOut();
-                              _googleSignIn.signOut();
-                              User? user;
-                              context.read<AuthState>().user = null;
-                              // navigateWithNoBackplus(context, LoginScreen());
-                              print('chattha' +
-                                  Provider.of<AuthState>(context, listen: false)
-                                      .user
-                                      .toString());
-                              if (user == null) {
-                                navigateWithNoBack(context, MyApp());
-                              }
-                            }),
-                      ],
-                    ))
-              ],
-            ),
-          ],
+                              navigateWithNoBack(
+                                  context, const UpdateProfileScreen());
+                            },
+                          ),
+                          const Divider(),
+                          ListTile(
+                            leading: const Icon(Icons.question_mark_outlined),
+                            title: const Text('FAQS'),
+                            trailing: const Icon(Icons.chevron_right_sharp),
+                            onTap: () {
+                              navigateWithNoBack(context, const FaqScreen());
+                            },
+                          ),
+                          const Divider(),
+                          ListTile(
+                            leading: const Icon(Icons.mode_night_outlined),
+                            title: const Text('Dark Mode'),
+                            trailing: Switch(
+                                value: _isSwitched,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isSwitched = value;
+                                  });
+                                }),
+                          ),
+                          const Divider(),
+                          ListTile(
+                            leading: const Icon(Icons.privacy_tip_outlined),
+                            title: const Text('Privacy Policy'),
+                            trailing: const Icon(Icons.chevron_right_sharp),
+                            onTap: () {
+                              // navigateWithNoBack(context, PrivacyPolicyScreen());
+                            },
+                          ),
+                          const Divider(),
+                          ListTile(
+                              leading: const Icon(Icons.logout_outlined),
+                              title: const Text('Log out'),
+                              trailing: const Icon(Icons.chevron_right_sharp),
+                              onTap: () {
+                                auth.signOut();
+                                _googleSignIn.signOut();
+                                User? user;
+                                context.read<AuthState>().user = null;
+                                // navigateWithNoBackplus(context, LoginScreen());
+                                if (user == null) {
+                                  navigateWithNoBack(context, MyApp());
+                                }
+                              }),
+                        ],
+                      ))
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

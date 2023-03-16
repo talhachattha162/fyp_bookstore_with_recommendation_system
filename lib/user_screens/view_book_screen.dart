@@ -49,6 +49,20 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
 
   Duration _timeLeft = Duration.zero;
 
+  DateTime currentBackPressTime = DateTime.now();
+
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
   Future<bool> isBookFavorited() async {
     final userid = FirebaseAuth.instance.currentUser!.uid;
     final querySnapshot = await FirebaseFirestore.instance
@@ -323,170 +337,313 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    return SafeArea(
-      child: internetAvailabilityNotifier.getInternetAvailability() == false
-          ? InternetChecker()
-          : MultiProvider(
-              providers: [
-                ChangeNotifierProvider(
-                  create: (_) =>
-                      ReviewProvider()..getReviews(widget.book.bookid),
-                ),
-                ChangeNotifierProvider(
-                  create: (_) => BookProvider()..getBook(widget.book.bookid),
-                )
-              ],
-              child: Scaffold(
-                  appBar: AppBar(
-                      title: const Text('Book Details'),
-                      leading: IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () {
-                          navigateWithNoBack(context, MainScreenUser());
-                        },
-                      )),
-                  body: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        SizedBox(
-                          height: height * 0.56,
-                          width: width * 0.8,
-                          child: ClipRect(
-                            child: Align(
-                              alignment: Alignment.center,
-                              // widthFactor: 0.7,
-                              // heightFactor: 0.6,
-                              child: CachedNetworkImage(
-                                imageUrl: widget.book.coverPhotoFile,
-                                placeholder: (context, url) =>
-                                    CircularProgressIndicator(),
-                                errorWidget: (context, url, error) =>
-                                    Icon(Icons.error),
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: SafeArea(
+        child: internetAvailabilityNotifier.getInternetAvailability() == false
+            ? InternetChecker()
+            : MultiProvider(
+                providers: [
+                  ChangeNotifierProvider(
+                    create: (_) =>
+                        ReviewProvider()..getReviews(widget.book.bookid),
+                  ),
+                  ChangeNotifierProvider(
+                    create: (_) => BookProvider()..getBook(widget.book.bookid),
+                  )
+                ],
+                child: Scaffold(
+                    appBar: AppBar(
+                        title: const Text('Book Details'),
+                        leading: IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () {
+                            navigateWithNoBack(context, MainScreenUser());
+                          },
+                        )),
+                    body: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          SizedBox(
+                            height: height * 0.56,
+                            width: width * 0.8,
+                            child: ClipRect(
+                              child: Align(
+                                alignment: Alignment.center,
+                                // widthFactor: 0.7,
+                                // heightFactor: 0.6,
+                                child: CachedNetworkImage(
+                                  imageUrl: widget.book.coverPhotoFile,
+                                  placeholder: (context, url) =>
+                                      CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      Icon(Icons.error),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const IconButton(
-                                onPressed: null, icon: Icon(Icons.share)),
-                            IconButton(
-                                onPressed: () {
-                                  navigateWithNoBack(
-                                      context,
-                                      WriteReviewScreen(
-                                        book: widget.book,
-                                      ));
-                                },
-                                icon: const Icon(Icons.comment)),
-                            IconButton(
-                                onPressed: () async {
-                                  final CollectionReference favouritiesRef =
-                                      FirebaseFirestore.instance
-                                          .collection('favourities');
-                                  final QuerySnapshot querySnapshot =
-                                      await favouritiesRef
-                                          .where('bookid',
-                                              isEqualTo: widget.book.bookid)
-                                          .get();
-                                  setState(() {
-                                    if (favourite == false) {
-                                      favouritiesRef.add({
-                                        'bookid': widget.book.bookid,
-                                        'userid': FirebaseAuth
-                                            .instance.currentUser!.uid,
-                                      }).then((value) {
-                                        print('favourities added');
-                                        setState(() {
-                                          favourite = true;
-                                        });
-                                      }).catchError((error) => print(
-                                          'Failed to add favourities: $error'));
-                                    } else {
-                                      querySnapshot.docs.forEach((doc) {
-                                        doc.reference.delete().then((value) {
-                                          print('favourities deleted');
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const IconButton(
+                                  onPressed: null, icon: Icon(Icons.share)),
+                              IconButton(
+                                  onPressed: () {
+                                    navigateWithNoBack(
+                                        context,
+                                        WriteReviewScreen(
+                                          book: widget.book,
+                                        ));
+                                  },
+                                  icon: const Icon(Icons.comment)),
+                              IconButton(
+                                  onPressed: () async {
+                                    final CollectionReference favouritiesRef =
+                                        FirebaseFirestore.instance
+                                            .collection('favourities');
+                                    final QuerySnapshot querySnapshot =
+                                        await favouritiesRef
+                                            .where('bookid',
+                                                isEqualTo: widget.book.bookid)
+                                            .get();
+                                    setState(() {
+                                      if (favourite == false) {
+                                        favouritiesRef.add({
+                                          'bookid': widget.book.bookid,
+                                          'userid': FirebaseAuth
+                                              .instance.currentUser!.uid,
+                                        }).then((value) {
+                                          print('favourities added');
                                           setState(() {
-                                            favourite = false;
+                                            favourite = true;
                                           });
                                         }).catchError((error) => print(
-                                            'Failed to delete favourities: $error'));
-                                      });
+                                            'Failed to add favourities: $error'));
+                                      } else {
+                                        querySnapshot.docs.forEach((doc) {
+                                          doc.reference.delete().then((value) {
+                                            print('favourities deleted');
+                                            setState(() {
+                                              favourite = false;
+                                            });
+                                          }).catchError((error) => print(
+                                              'Failed to delete favourities: $error'));
+                                        });
+                                      }
+                                    });
+                                  },
+                                  icon: Icon(
+                                    favourite == true
+                                        ? Icons.favorite_sharp
+                                        : Icons.favorite_border,
+                                    color: favourite == true
+                                        ? Colors.amber
+                                        : Colors.grey,
+                                  )),
+                              const IconButton(
+                                  onPressed: null, icon: Icon(Icons.download))
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Divider(),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Consumer<BookProvider>(
+                              builder: (context, provider, child) {
+                            Book? book = provider.book;
+                            if (book == null) {
+                              return Container(
+                                child: (Text('Loading...')),
+                              );
+                            } else {
+                              if (book.freeRentPaid == "paid" &&
+                                  book.userid !=
+                                      FirebaseAuth.instance.currentUser!.uid) {
+                                return StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('payments')
+                                      .where('bookId',
+                                          isEqualTo: widget.book.bookid)
+                                      .where('userId',
+                                          isEqualTo: FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                      .snapshots(),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                                    if (snapshot.data != null) {
+                                      if (snapshot.data!.docs.isEmpty) {
+                                        return Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            ElevatedButton.icon(
+                                              onPressed: () {
+                                                _settingModalBottomSheet(
+                                                    context, book.freeRentPaid);
+                                              },
+                                              icon: Icon(Icons.lock),
+                                              label: Text('Buy'),
+                                            ),
+                                          ],
+                                        );
+                                      }
                                     }
-                                  });
-                                },
-                                icon: Icon(
-                                  favourite == true
-                                      ? Icons.favorite_sharp
-                                      : Icons.favorite_border,
-                                  color: favourite == true
-                                      ? Colors.amber
-                                      : Colors.grey,
-                                )),
-                            const IconButton(
-                                onPressed: null, icon: Icon(Icons.download))
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const Divider(),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Consumer<BookProvider>(
-                            builder: (context, provider, child) {
-                          Book? book = provider.book;
-                          if (book == null) {
-                            return Container(
-                              child: (Text('Loading...')),
-                            );
-                          } else {
-                            if (book.freeRentPaid == "paid" &&
-                                book.userid !=
-                                    FirebaseAuth.instance.currentUser!.uid) {
-                              return StreamBuilder<QuerySnapshot>(
-                                stream: FirebaseFirestore.instance
-                                    .collection('payments')
-                                    .where('bookId',
-                                        isEqualTo: widget.book.bookid)
-                                    .where('userId',
-                                        isEqualTo: FirebaseAuth
-                                            .instance.currentUser!.uid)
-                                    .snapshots(),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.data != null) {
-                                    if (snapshot.data!.docs.isEmpty) {
-                                      return Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          ElevatedButton.icon(
-                                            onPressed: () {
-                                              _settingModalBottomSheet(
-                                                  context, book.freeRentPaid);
-                                            },
-                                            icon: Icon(Icons.lock),
-                                            label: Text('Buy'),
-                                          ),
-                                        ],
-                                      );
+                                    return Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        ElevatedButton.icon(
+                                          onPressed: () {
+                                            flutterToast('Loading...');
+                                            navigateWithNoBack(
+                                                context,
+                                                ListenBookScreen(
+                                                  book: widget.book,
+                                                  bookpath: bookpath,
+                                                ));
+                                          },
+                                          icon: Icon(Icons.headphones),
+                                          label: Text('Listen'),
+                                        ),
+                                        ElevatedButton.icon(
+                                          onPressed: () async {
+                                            navigateWithNoBack(
+                                                context,
+                                                BookPdfScreen(
+                                                  book: widget.book,
+                                                  bookpath: bookpath,
+                                                ));
+                                          },
+                                          icon: Icon(Icons.book),
+                                          label: Text('Read'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+
+                              if (book.freeRentPaid == "rent" &&
+                                  book.userid !=
+                                      FirebaseAuth.instance.currentUser!.uid) {
+                                return StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('payments')
+                                      .where('bookId',
+                                          isEqualTo: widget.book.bookid)
+                                      .where('userId',
+                                          isEqualTo: FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                      .snapshots(),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                                    if (snapshot.data != null) {
+                                      Timestamp? paymentCreationTime;
+                                      Duration? difference = null;
+                                      if (snapshot.data!.docs.isNotEmpty) {
+                                        paymentCreationTime = snapshot.data!
+                                            .docs.first['dateTimeCreated'];
+                                        DateTime expirationDate =
+                                            paymentCreationTime!
+                                                .toDate()
+                                                .add(Duration(days: 30));
+                                        WidgetsBinding.instance
+                                            .addPostFrameCallback((_) {
+                                          setState(() {
+                                            _timeLeft = expirationDate
+                                                .difference(DateTime.now());
+                                          });
+                                        });
+                                      }
+
+                                      if (snapshot.data!.docs.length != 0) {
+                                        if (difference != null) {
+                                          if (difference.inDays >= 30) {
+                                            final docsToDelete =
+                                                snapshot.data!.docs;
+                                            for (final doc in docsToDelete) {
+                                              doc.reference.delete();
+                                            }
+                                          }
+                                        }
+                                        return Column(
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                ElevatedButton.icon(
+                                                  onPressed: () {
+                                                    flutterToast('Loading...');
+                                                    navigateWithNoBack(
+                                                        context,
+                                                        ListenBookScreen(
+                                                          book: widget.book,
+                                                          bookpath: bookpath,
+                                                        ));
+                                                  },
+                                                  icon: Icon(Icons.headphones),
+                                                  label: Text('Listen'),
+                                                ),
+                                                ElevatedButton.icon(
+                                                  onPressed: () async {
+                                                    navigateWithNoBack(
+                                                        context,
+                                                        BookPdfScreen(
+                                                          book: widget.book,
+                                                          bookpath: bookpath,
+                                                        ));
+                                                  },
+                                                  icon: Icon(Icons.book),
+                                                  label: Text('Read'),
+                                                ),
+                                              ],
+                                            ),
+                                            Text(
+                                                'Timeleft ${_timeLeft.inDays}d:'
+                                                '${_timeLeft.inHours.remainder(24)}h:'
+                                                '${_timeLeft.inMinutes.remainder(60)}m:'
+                                                '${_timeLeft.inSeconds.remainder(60)}s')
+                                          ],
+                                        );
+                                      }
                                     }
-                                  }
-                                  return Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      ElevatedButton.icon(
+
+                                    return Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        ElevatedButton.icon(
+                                          onPressed: () {
+                                            _settingModalBottomSheet(
+                                                context, book.freeRentPaid);
+                                          },
+                                          icon: Icon(Icons.lock),
+                                          label: Text('Rent'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+                              if (book.freeRentPaid == "free" ||
+                                  book.userid ==
+                                      FirebaseAuth.instance.currentUser!.uid) {
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    ElevatedButton.icon(
                                         onPressed: () {
                                           flutterToast('Loading...');
                                           navigateWithNoBack(
@@ -497,10 +654,11 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                               ));
                                         },
                                         icon: Icon(Icons.headphones),
-                                        label: Text('Listen'),
-                                      ),
-                                      ElevatedButton.icon(
+                                        label: Text('Listen')),
+                                    ElevatedButton.icon(
                                         onPressed: () async {
+                                          // _settingModalBottomSheet(context);
+
                                           navigateWithNoBack(
                                               context,
                                               BookPdfScreen(
@@ -509,519 +667,402 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                               ));
                                         },
                                         icon: Icon(Icons.book),
-                                        label: Text('Read'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
+                                        label: Text('Read')),
+                                  ],
+                                );
+                              }
                             }
-
-                            if (book.freeRentPaid == "rent" &&
-                                book.userid !=
-                                    FirebaseAuth.instance.currentUser!.uid) {
-                              return StreamBuilder<QuerySnapshot>(
-                                stream: FirebaseFirestore.instance
-                                    .collection('payments')
-                                    .where('bookId',
-                                        isEqualTo: widget.book.bookid)
-                                    .where('userId',
-                                        isEqualTo: FirebaseAuth
-                                            .instance.currentUser!.uid)
-                                    .snapshots(),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.data != null) {
-                                    Timestamp? paymentCreationTime;
-                                    Duration? difference = null;
-                                    if (snapshot.data!.docs.isNotEmpty) {
-                                      paymentCreationTime = snapshot
-                                          .data!.docs.first['dateTimeCreated'];
-                                      DateTime expirationDate =
-                                          paymentCreationTime!
-                                              .toDate()
-                                              .add(Duration(days: 30));
-                                      WidgetsBinding.instance
-                                          .addPostFrameCallback((_) {
-                                        setState(() {
-                                          _timeLeft = expirationDate
-                                              .difference(DateTime.now());
-                                        });
-                                      });
-                                    }
-
-                                    if (snapshot.data!.docs.length != 0) {
-                                      if (difference != null) {
-                                        if (difference.inDays >= 30) {
-                                          final docsToDelete =
-                                              snapshot.data!.docs;
-                                          for (final doc in docsToDelete) {
-                                            doc.reference.delete();
-                                          }
-                                        }
-                                      }
-                                      return Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              ElevatedButton.icon(
-                                                onPressed: () {
-                                                  flutterToast('Loading...');
-                                                  navigateWithNoBack(
-                                                      context,
-                                                      ListenBookScreen(
-                                                        book: widget.book,
-                                                        bookpath: bookpath,
-                                                      ));
-                                                },
-                                                icon: Icon(Icons.headphones),
-                                                label: Text('Listen'),
-                                              ),
-                                              ElevatedButton.icon(
-                                                onPressed: () async {
-                                                  navigateWithNoBack(
-                                                      context,
-                                                      BookPdfScreen(
-                                                        book: widget.book,
-                                                        bookpath: bookpath,
-                                                      ));
-                                                },
-                                                icon: Icon(Icons.book),
-                                                label: Text('Read'),
-                                              ),
-                                            ],
-                                          ),
-                                          Text('Timeleft ${_timeLeft.inDays}d:'
-                                              '${_timeLeft.inHours.remainder(24)}h:'
-                                              '${_timeLeft.inMinutes.remainder(60)}m:'
-                                              '${_timeLeft.inSeconds.remainder(60)}s')
-                                        ],
-                                      );
-                                    }
-                                  }
-
-                                  return Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      ElevatedButton.icon(
-                                        onPressed: () {
-                                          _settingModalBottomSheet(
-                                              context, book.freeRentPaid);
-                                        },
-                                        icon: Icon(Icons.lock),
-                                        label: Text('Rent'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            }
-                            if (book.freeRentPaid == "free" ||
-                                book.userid ==
-                                    FirebaseAuth.instance.currentUser!.uid) {
-                              return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  ElevatedButton.icon(
-                                      onPressed: () {
-                                        flutterToast('Loading...');
-                                        navigateWithNoBack(
-                                            context,
-                                            ListenBookScreen(
-                                              book: widget.book,
-                                              bookpath: bookpath,
-                                            ));
-                                      },
-                                      icon: Icon(Icons.headphones),
-                                      label: Text('Listen')),
-                                  ElevatedButton.icon(
-                                      onPressed: () async {
-                                        // _settingModalBottomSheet(context);
-
-                                        navigateWithNoBack(
-                                            context,
-                                            BookPdfScreen(
-                                              book: widget.book,
-                                              bookpath: bookpath,
-                                            ));
-                                      },
-                                      icon: Icon(Icons.book),
-                                      label: Text('Read')),
-                                ],
-                              );
-                            }
-                          }
-                          return Container();
-                        }),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 54.0, vertical: 10),
-                          child: Column(
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Wrap(
-                                children: [
-                                  Text(
-                                    'Title',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  ),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    widget.book.title,
-                                    style: TextStyle(fontSize: 16),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Price',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  ),
-                                  Text(
-                                    "\$" + widget.book.price.toString(),
-                                    style: TextStyle(fontSize: 16),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Wrap(
-                                    // mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Tags',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18),
-                                      ),
-                                      Text(
-                                        widget.book.tag1 +
-                                            ',' +
-                                            widget.book.tag2 +
-                                            ',' +
-                                            widget.book.tag3,
-                                        style: TextStyle(fontSize: 16),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Author',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  ),
-                                  Text(
-                                    widget.book.author,
-                                    style: TextStyle(fontSize: 16),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Published Year',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                  Text(
+                            return Container();
+                          }),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 54.0, vertical: 10),
+                            child: Column(
+                              children: [
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Title',
                                       style: TextStyle(
-                                        fontSize: 16,
-                                      ),
-                                      widget.book.publishyear),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Reviews',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                  TextButton(
-                                      onPressed: () {
-                                        navigateWithNoBack(
-                                            context,
-                                            ViewAllReviewsScreen(
-                                                book: widget.book));
-                                      },
-                                      child: Text(
-                                        'see all',
-                                        style: TextStyle(
-                                          color: themeNotifier.getTheme() ==
-                                                  ThemeData.dark(
-                                                      useMaterial3: true)
-                                              ? Colors.blue
-                                              : primarycolor,
                                           fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Flexible(
+                                      child: Text(
+                                        widget.book.title,
+                                        // overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Price',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                    Text(
+                                      "\$" + widget.book.price.toString(),
+                                      style: TextStyle(fontSize: 16),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Tags',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
                                         ),
-                                      ))
-                                ],
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Consumer<ReviewProvider>(
-                                builder: (context, provider, child) {
-                                  return Column(children: [
-                                    // provider.reviews.length
-                                    provider.reviews.length > 0 &&
-                                            provider.users.length > 0
-                                        ? Card(
-                                            shadowColor: primarycolor[300],
-                                            elevation: 6,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(12.0),
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceAround,
-                                                    children: [
-                                                      CircleAvatar(
-                                                        maxRadius: 20,
-                                                        backgroundImage:
-                                                            NetworkImage(
-                                                                provider
-                                                                    .users[0]
-                                                                    .photo),
-                                                      ),
-                                                      Text(
-                                                        provider.users[0].name
-                                                                    .length >
-                                                                10
-                                                            ? provider.users[0]
-                                                                    .name
-                                                                    .substring(
-                                                                        0, 10) +
-                                                                '...'
-                                                            : provider
-                                                                .users[0].name,
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 16),
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          Icon(
-                                                            Icons.star,
-                                                            color: Colors.amber,
-                                                          ),
-                                                          Text((provider.reviews[0]
-                                                                          .rating +
-                                                                      1)
-                                                                  .toString() +
-                                                              '/5'),
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                            .fromLTRB(
-                                                        10.0, 0, 0, 0),
-                                                    child: Wrap(children: [
-                                                      Text(
+                                        Flexible(
+                                          child: Text(
+                                            widget.book.tag1 +
+                                                ',' +
+                                                widget.book.tag2 +
+                                                ',' +
+                                                widget.book.tag3,
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Author',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                    Text(
+                                      widget.book.author,
+                                      style: TextStyle(fontSize: 16),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Published Year',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                    Text(
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                        ),
+                                        widget.book.publishyear),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Reviews',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                    TextButton(
+                                        onPressed: () {
+                                          navigateWithNoBack(
+                                              context,
+                                              ViewAllReviewsScreen(
+                                                  book: widget.book));
+                                        },
+                                        child: Text(
+                                          'see all',
+                                          style: TextStyle(
+                                            color: themeNotifier.getTheme() ==
+                                                    ThemeData.dark(
+                                                        useMaterial3: true)
+                                                ? Colors.blue
+                                                : primarycolor,
+                                            // fontWeight: FontWeight.bold,
+                                          ),
+                                        ))
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Consumer<ReviewProvider>(
+                                  builder: (context, provider, child) {
+                                    return Column(children: [
+                                      // provider.reviews.length
+                                      provider.reviews.length > 0 &&
+                                              provider.users.length > 0
+                                          ? Card(
+                                              shadowColor: primarycolor[300],
+                                              elevation: 6,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(12.0),
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        CircleAvatar(
+                                                          maxRadius: 20,
+                                                          backgroundImage:
+                                                              NetworkImage(
+                                                                  provider
+                                                                      .users[0]
+                                                                      .photo),
+                                                        ),
+                                                        Text(
+                                                          provider.users[0].name
+                                                                      .length >
+                                                                  10
+                                                              ? provider
+                                                                      .users[0]
+                                                                      .name
+                                                                      .substring(
+                                                                          0,
+                                                                          10) +
+                                                                  '...'
+                                                              : provider
+                                                                  .users[0]
+                                                                  .name,
                                                           style: TextStyle(
-                                                            fontSize: 16,
-                                                          ),
-                                                          provider.reviews[0]
-                                                              .reviewtext)
-                                                    ]),
-                                                  )
-                                                ],
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 16),
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Icon(
+                                                              Icons.star,
+                                                              color:
+                                                                  Colors.amber,
+                                                            ),
+                                                            Text((provider.reviews[0]
+                                                                            .rating +
+                                                                        1)
+                                                                    .toString() +
+                                                                '/5'),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          10.0, 0, 0, 0),
+                                                      child: Wrap(children: [
+                                                        Text(
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                            ),
+                                                            provider.reviews[0]
+                                                                .reviewtext)
+                                                      ]),
+                                                    )
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          )
-                                        : Container(),
-                                    const SizedBox(height: 5),
-                                    provider.reviews.length > 1 &&
-                                            provider.users.length > 1
-                                        ? Card(
-                                            shadowColor: primarycolor[300],
-                                            elevation: 6,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(12.0),
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceAround,
-                                                    children: [
-                                                      CircleAvatar(
-                                                        maxRadius: 20,
-                                                        backgroundImage:
-                                                            NetworkImage(
-                                                                provider
-                                                                    .users[1]
-                                                                    .photo),
-                                                      ),
-                                                      Text(
-                                                        provider.users[1].name,
-                                                        style: const TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 16),
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          const Icon(
-                                                            Icons.star,
-                                                            color: Colors.amber,
-                                                          ),
-                                                          Text(
-                                                              '${provider.reviews[1].rating + 1}/5'),
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                            .fromLTRB(
-                                                        10.0, 0, 0, 0),
-                                                    child: Wrap(children: [
-                                                      Text(
+                                            )
+                                          : const Center(
+                                              child: Text('No Reviews found')),
+                                      const SizedBox(height: 5),
+                                      provider.reviews.length > 1 &&
+                                              provider.users.length > 1
+                                          ? Card(
+                                              shadowColor: primarycolor[300],
+                                              elevation: 6,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(12.0),
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        CircleAvatar(
+                                                          maxRadius: 20,
+                                                          backgroundImage:
+                                                              NetworkImage(
+                                                                  provider
+                                                                      .users[1]
+                                                                      .photo),
+                                                        ),
+                                                        Text(
+                                                          provider
+                                                              .users[1].name,
                                                           style:
                                                               const TextStyle(
-                                                            fontSize: 16,
-                                                          ),
-                                                          provider.reviews[1]
-                                                              .reviewtext)
-                                                    ]),
-                                                  )
-                                                ],
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 16),
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            const Icon(
+                                                              Icons.star,
+                                                              color:
+                                                                  Colors.amber,
+                                                            ),
+                                                            Text(
+                                                                '${provider.reviews[1].rating + 1}/5'),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          10.0, 0, 0, 0),
+                                                      child: Wrap(children: [
+                                                        Text(
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 16,
+                                                            ),
+                                                            provider.reviews[1]
+                                                                .reviewtext)
+                                                      ]),
+                                                    )
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          )
-                                        : Container(),
-                                    const SizedBox(height: 5),
-                                    provider.reviews.length > 2 &&
-                                            provider.users.length > 2
-                                        ? Card(
-                                            shadowColor: primarycolor[300],
-                                            elevation: 6,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(12.0),
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceAround,
-                                                    children: [
-                                                      CircleAvatar(
-                                                        maxRadius: 20,
-                                                        backgroundImage:
-                                                            NetworkImage(
-                                                                provider
-                                                                    .users[2]
-                                                                    .photo),
-                                                      ),
-                                                      Text(
-                                                        provider.users[2].name,
-                                                        style: const TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 16),
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          const Icon(
-                                                            Icons.star,
-                                                            color: Colors.amber,
-                                                          ),
-                                                          Text(
-                                                              '${provider.reviews[2].rating + 1}/5'),
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                            .fromLTRB(
-                                                        10.0, 0, 0, 0),
-                                                    child: Wrap(children: [
-                                                      Text(
+                                            )
+                                          : Container(),
+                                      const SizedBox(height: 5),
+                                      provider.reviews.length > 2 &&
+                                              provider.users.length > 2
+                                          ? Card(
+                                              shadowColor: primarycolor[300],
+                                              elevation: 6,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(12.0),
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        CircleAvatar(
+                                                          maxRadius: 20,
+                                                          backgroundImage:
+                                                              NetworkImage(
+                                                                  provider
+                                                                      .users[2]
+                                                                      .photo),
+                                                        ),
+                                                        Text(
+                                                          provider
+                                                              .users[2].name,
                                                           style:
                                                               const TextStyle(
-                                                            fontSize: 16,
-                                                          ),
-                                                          provider.reviews[2]
-                                                              .reviewtext)
-                                                    ]),
-                                                  )
-                                                ],
-                                              ),
-                                            ))
-                                        : Container()
-                                  ]);
-                                },
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  )),
-            ),
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 16),
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            const Icon(
+                                                              Icons.star,
+                                                              color:
+                                                                  Colors.amber,
+                                                            ),
+                                                            Text(
+                                                                '${provider.reviews[2].rating + 1}/5'),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          10.0, 0, 0, 0),
+                                                      child: Wrap(children: [
+                                                        Text(
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 16,
+                                                            ),
+                                                            provider.reviews[2]
+                                                                .reviewtext)
+                                                      ]),
+                                                    )
+                                                  ],
+                                                ),
+                                              ))
+                                          : Container()
+                                    ]);
+                                  },
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    )),
+              ),
+      ),
     );
   }
 }

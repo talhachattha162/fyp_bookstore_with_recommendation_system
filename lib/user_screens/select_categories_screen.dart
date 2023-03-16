@@ -65,133 +65,155 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
     super.dispose();
   }
 
+  DateTime currentBackPressTime = DateTime.now();
+
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
-    return SafeArea(
-      child: internetAvailabilityNotifier.getInternetAvailability() == false
-          ? InternetChecker()
-          : Scaffold(
-              // appBar: AppBar(
-              //   title: const Text(
-              //     'Select Categories',
-              //   ),
-              // ),
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: SafeArea(
+        child: internetAvailabilityNotifier.getInternetAvailability() == false
+            ? InternetChecker()
+            : Scaffold(
+                // appBar: AppBar(
+                //   title: const Text(
+                //     'Select Categories',
+                //   ),
+                // ),
 
-              body: loading == true
-                  ? Center(child: CircularProgressIndicator())
-                  : Column(children: [
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      StreamBuilder<List<String>>(
-                          stream: getCategories(),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<List<String>> snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                setState(() {
-                                  loading = true;
+                body: loading == true
+                    ? Center(child: CircularProgressIndicator())
+                    : Column(children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        StreamBuilder<List<String>>(
+                            stream: getCategories(),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<List<String>> snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  setState(() {
+                                    loading = true;
+                                  });
                                 });
-                              });
-                            }
-                            if (!snapshot.hasData) {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                setState(() {
-                                  loading = false;
+                              }
+                              if (!snapshot.hasData) {
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  setState(() {
+                                    loading = false;
+                                  });
                                 });
-                              });
-                              return Text('No categories found');
-                            } else if (snapshot.hasError) {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                setState(() {
-                                  loading = false;
+                                return Text('No categories found');
+                              } else if (snapshot.hasError) {
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  setState(() {
+                                    loading = false;
+                                  });
                                 });
-                              });
-                              return Center(
-                                child: Text('Error: ${snapshot.error}'),
-                              );
-                            } else {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                setState(() {
-                                  loading = false;
+                                return Center(
+                                  child: Text('Error: ${snapshot.error}'),
+                                );
+                              } else {
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  setState(() {
+                                    loading = false;
+                                  });
                                 });
-                              });
-                              _categories = snapshot.data!;
-                              return _categories.isEmpty
-                                  ? Text('No categories found')
-                                  : Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(3.0),
-                                        child: _categories.isEmpty
-                                            ? null
-                                            : ChipsChoice<String>.multiple(
-                                                choiceCheckmark: true,
-                                                wrapped: true,
-                                                value: tags,
-                                                onChanged: (val) =>
-                                                    setState(() => tags = val),
-                                                choiceItems: C2Choice.listFrom<
-                                                    String, String>(
-                                                  source: _categories,
-                                                  value: (i, v) => v,
-                                                  label: (i, v) => v,
+                                _categories = snapshot.data!;
+                                return _categories.isEmpty
+                                    ? Text('No categories found')
+                                    : Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(3.0),
+                                          child: _categories.isEmpty
+                                              ? null
+                                              : ChipsChoice<String>.multiple(
+                                                  choiceCheckmark: true,
+                                                  wrapped: true,
+                                                  value: tags,
+                                                  onChanged: (val) => setState(
+                                                      () => tags = val),
+                                                  choiceItems: C2Choice
+                                                      .listFrom<String, String>(
+                                                    source: _categories,
+                                                    value: (i, v) => v,
+                                                    label: (i, v) => v,
+                                                  ),
                                                 ),
-                                              ),
-                                      ));
-                            }
-                            return Container();
-                          }),
-                      const SizedBox(height: 30),
-                      isLoading == true
-                          ? CircularProgressIndicator()
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                isLoading == true
-                                    ? CircularProgressIndicator()
-                                    : ElevatedButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            isLoading = true;
-                                          });
-                                          if (tags.isNotEmpty) {
-                                            Categories category1 =
-                                                Categories(tags);
-                                            var firebaseUser = auth.currentUser;
-                                            try {
-                                              firestoreInstance
-                                                  .collection(
-                                                      "selectedcategories")
-                                                  .doc(firebaseUser!.uid)
-                                                  .set(category1.toMap())
-                                                  .then((value) async {})
-                                                  .onError((error,
-                                                      stackTrace) async {});
-                                            } catch (e) {
-                                              flutterToast(e.toString());
+                                        ));
+                              }
+                              return Container();
+                            }),
+                        const SizedBox(height: 30),
+                        isLoading == true
+                            ? CircularProgressIndicator()
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  isLoading == true
+                                      ? CircularProgressIndicator()
+                                      : ElevatedButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              isLoading = true;
+                                            });
+                                            if (tags.isNotEmpty) {
+                                              Categories category1 =
+                                                  Categories(tags);
+                                              var firebaseUser =
+                                                  auth.currentUser;
+                                              try {
+                                                firestoreInstance
+                                                    .collection(
+                                                        "selectedcategories")
+                                                    .doc(firebaseUser!.uid)
+                                                    .set(category1.toMap())
+                                                    .then((value) async {})
+                                                    .onError((error,
+                                                        stackTrace) async {});
+                                              } catch (e) {
+                                                flutterToast(e.toString());
+                                              }
                                             }
-                                          }
-                                          setState(() {
-                                            isLoading = false;
-                                          });
-                                          navigateWithNoBack(
-                                              context, const MainScreenUser());
-                                        },
-                                        child: const Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 80.0,
-                                                vertical: 12.0),
-                                            child: Text('Next')),
-                                      ),
-                              ],
-                            ),
-                    ])),
+                                            setState(() {
+                                              isLoading = false;
+                                            });
+                                            navigateWithNoBack(context,
+                                                const MainScreenUser());
+                                          },
+                                          child: const Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 80.0,
+                                                  vertical: 12.0),
+                                              child: Text('Next')),
+                                        ),
+                                ],
+                              ),
+                      ])),
+      ),
     );
   }
 }

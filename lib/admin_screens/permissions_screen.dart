@@ -6,10 +6,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../main.dart';
 import '../user_screens/login_screen.dart';
 import '../utils/navigation.dart';
 import 'package:http/http.dart' as http;
+
+import 'package:encrypt/encrypt.dart' as encrypt;
 
 class Permissions extends StatefulWidget {
   const Permissions({super.key});
@@ -55,6 +58,27 @@ class _PermissionsState extends State<Permissions> {
 
   Stream<QuerySnapshot> bookStream =
       FirebaseFirestore.instance.collection('books').snapshots();
+
+  viewPdf(bookid) async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String encryptedPath = '${appDocDir.path}/encrypted';
+    String path = '$encryptedPath/' + bookid + '.pdf';
+    final encryptedFile = File(path);
+    final encryptedPdfData = await encryptedFile.readAsBytes();
+    final key = encrypt.Key.fromLength(32);
+    final iv = encrypt.IV.fromLength(16);
+    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+    final decryptedPdfData = encrypter.decryptBytes(
+      encrypt.Encrypted(encryptedPdfData),
+      iv: iv,
+    );
+
+    // Store decrypted PDF file in cache directory
+    final tempDir = await getTemporaryDirectory();
+    final tempPdfFile = File('${tempDir.path}/decrypted.pdf');
+    await tempPdfFile.writeAsBytes(decryptedPdfData);
+    return tempPdfFile.path;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,11 +136,23 @@ class _PermissionsState extends State<Permissions> {
                                 onPressed: () {
                                   showDialog(
                                       context: context,
-                                      builder: (_) => Dialog(
-                                          child: Container(
-                                              width: width * 0.9,
-                                              height: height * 0.55,
-                                              padding: EdgeInsets.all(8.0),
+                                      builder: (_) => AlertDialog(
+                                          title: Text(
+                                            book['title'],
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(
+                                                    context); // Close the dialog
+                                              },
+                                              child: Text('Close'),
+                                            ),
+                                          ],
+                                          content: Container(
+                                              width: width * 1,
+                                              height: height * 0.5,
+                                              padding: EdgeInsets.all(4.0),
                                               child: Column(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment
@@ -124,34 +160,26 @@ class _PermissionsState extends State<Permissions> {
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
                                                 children: [
-                                                  Wrap(
-                                                    children: [
-                                                      Text(
-                                                        book['title'],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Container(
+                                                  SizedBox(
                                                     height: height * 0.4,
-                                                    width: width * 0.97,
-                                                    child: CachedNetworkImage(
-                                                      imageUrl: book[
-                                                          'copyrightPhotoFile'],
-                                                      placeholder: (context,
-                                                              url) =>
-                                                          Center(
-                                                              child:
-                                                                  new CircularProgressIndicator()),
-                                                      errorWidget: (context,
-                                                              url, error) =>
-                                                          new Icon(Icons.error),
+                                                    width: width * 1,
+                                                    child: InteractiveViewer(
+                                                      child: CachedNetworkImage(
+                                                        fit: BoxFit.contain,
+                                                        imageUrl: book[
+                                                            'copyrightPhotoFile'],
+                                                        placeholder: (context,
+                                                                url) =>
+                                                            Center(
+                                                                child:
+                                                                    new CircularProgressIndicator()),
+                                                        errorWidget: (context,
+                                                                url, error) =>
+                                                            new Icon(
+                                                                Icons.error),
+                                                      ),
                                                     ),
                                                   ),
-                                                  TextButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text('Close'))
                                                 ],
                                               ))));
                                 },
@@ -166,11 +194,23 @@ class _PermissionsState extends State<Permissions> {
                               ),
                               TextButton(
                                   onPressed: () async {
-                                    final pdf = await openPDFfromNetwork('url');
+                                    final _pdfPath = await viewPdf(book['bookid']);
                                     showDialog(
                                         context: context,
-                                        builder: (_) => Dialog(
-                                            child: Container(
+                                        builder: (_) => AlertDialog(
+                                            title: Text(
+                                              book['title'],
+                                            ),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(
+                                                      context); // Close the dialog
+                                                },
+                                                child: Text('Close'),
+                                              ),
+                                            ],
+                                            content: Container(
                                                 height: height * 0.73,
                                                 width: width * 0.95,
                                                 padding: EdgeInsets.all(8.0),
@@ -181,43 +221,19 @@ class _PermissionsState extends State<Permissions> {
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.center,
                                                   children: [
-                                                    Wrap(
-                                                      children: [
-                                                        Text(
-                                                          book['title'],
-                                                        ),
-                                                      ],
+                                                    Container(
+                                                      height: height * 0.60,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 0.05,
+                                                              vertical: 0.05),
+                                                      child: _pdfPath.isNotEmpty
+                                                          ? SfPdfViewer.file(
+                                                              File(_pdfPath))
+                                                          : Center(
+                                                              child: Text(
+                                                                  'Loading...')),
                                                     ),
-                                                    // Container(
-                                                    //   height: height * 0.60,
-                                                    //   width: width * 0.95,
-                                                    //   padding:
-                                                    //       EdgeInsets.symmetric(
-                                                    //           horizontal:
-                                                    //               width * 0.02,
-                                                    //           vertical: height *
-                                                    //               0.015),
-                                                    //   child: PDFView(
-                                                    //     // filePath: pdf,
-                                                    //     // autoSpacing: false,
-                                                    //     // swipeHorizontal: true,
-                                                    //     // pageSnap: false,
-                                                    //     // pageFling: false,
-                                                    //     onRender: (pages) {},
-                                                    //     onViewCreated: (controller) =>
-                                                    //         setState(() =>
-                                                    //             _pdfcontroller =
-                                                    //                 controller),
-                                                    //     onPageChanged:
-                                                    //         (indexPage, _) {},
-                                                    //   ),
-                                                    // ),
-                                                    TextButton(
-                                                        onPressed: () {
-                                                          Navigator.pop(
-                                                              context);
-                                                        },
-                                                        child: Text('Close'))
                                                   ],
                                                 ))));
                                   },

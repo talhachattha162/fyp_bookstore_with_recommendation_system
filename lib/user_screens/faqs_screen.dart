@@ -16,7 +16,7 @@ class FaqScreen extends StatefulWidget {
 }
 
 class _FaqScreenState extends State<FaqScreen> {
-   Timer? timer;
+  Timer? timer;
   @override
   void initState() {
     super.initState();
@@ -44,19 +44,36 @@ class _FaqScreenState extends State<FaqScreen> {
     super.dispose();
   }
 
+  DateTime currentBackPressTime = DateTime.now();
+
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-          appBar: AppBar(
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  navigateWithNoBack(context, const MainScreenUser());
-                },
-              ),
-              title: const Text('FAQS')),
-          body: const Steps()),
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: SafeArea(
+        child: Scaffold(
+            appBar: AppBar(
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    navigateWithNoBack(context, const MainScreenUser());
+                  },
+                ),
+                title: const Text('FAQS')),
+            body: const Steps()),
+      ),
     );
   }
 }
