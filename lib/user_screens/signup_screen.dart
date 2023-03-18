@@ -60,7 +60,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  static Future<User?> signUp(
+  static signUp(
       {required String name,
       required String userEmail,
       required String password,
@@ -87,6 +87,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       } else if (e.code == 'email-already-in-use') {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('The account already exists for that email.')));
+        return 'exist';
       }
       return null;
     } catch (e) {
@@ -108,7 +109,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
     return Future.value(true);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -203,20 +203,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    await signUp(
+                                    final u = await signUp(
                                         name: _nameController.text,
                                         userEmail: _emailController.text,
                                         password: _passwordController.text,
                                         context: context);
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (ctx) =>
-                                                EmailVerificationScreen(
-                                                    email: _emailController.text,
-                                                    password: _passwordController
-                                                        .text)));
-    
+                                    if (u != 'exist') {
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (ctx) =>
+                                                  EmailVerificationScreen(
+                                                      email:
+                                                          _emailController.text,
+                                                      password:
+                                                          _passwordController
+                                                              .text)));
+                                    }
                                     setState(() {
                                       _isLoading = false;
                                     });

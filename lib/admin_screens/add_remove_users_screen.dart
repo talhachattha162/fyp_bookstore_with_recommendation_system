@@ -49,17 +49,44 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
   }
 
   Future<void> _deleteUser(Users users) async {
-    if (users.authenticationmethod == 'email') {
-      User? user;
-      UserCredential userCredential = await auth.signInWithEmailAndPassword(
-        email: users.email,
-        password: users.password,
+    // Check if the user has any book collection
+    final bookCollectionQuery = FirebaseFirestore.instance
+        .collection('books')
+        .where('userid', isEqualTo: users.uid);
+
+    final bookCollectionSnapshot = await bookCollectionQuery.get();
+    if (bookCollectionSnapshot.docs.isNotEmpty) {
+      // If the user has book collections, show an error message
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text('Error'),
+          content: Text(
+              'You cannot delete your account as you have uploaded books.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text('Ok'),
+            ),
+          ],
+        ),
       );
-      user = userCredential.user;
-      await user!.delete();
-      auth.signOut();
+    } else {
+      // If the user hasn't uploaded any book collections, delete their account
+      if (users.authenticationmethod == 'email') {
+        User? user;
+        UserCredential userCredential = await auth.signInWithEmailAndPassword(
+          email: users.email,
+          password: users.password,
+        );
+        user = userCredential.user;
+        await user!.delete();
+        auth.signOut();
+      }
+      FirebaseFirestore.instance.collection('users').doc(users.uid).delete();
     }
-    FirebaseFirestore.instance.collection('users').doc(users.uid).delete();
   }
 
 // Define TextEditingController objects to control the text fields

@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/fluttertoast.dart';
+
 class AddRemoveCategories extends StatefulWidget {
   const AddRemoveCategories({super.key});
 
@@ -37,12 +39,36 @@ class _AddRemoveCategoriesState extends State<AddRemoveCategories> {
     return categoriesRef.snapshots();
   }
 
-  Future<void> deleteCategory(String categoryId) async {
+  Future<void> deleteCategory(String category, String categoryId) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     CollectionReference categoriesRef = firestore.collection('categories');
-    await categoriesRef.doc(categoryId).delete();
-  }
+    QuerySnapshot booksSnapshot = await firestore
+        .collection('books')
+        .where('selectedcategory', isEqualTo: category)
+        .get();
 
+    if (booksSnapshot.docs.isEmpty) {
+      await categoriesRef.doc(categoryId).delete();
+      flutterToast('Category deleted successfully');
+    } else {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text('Error'),
+          content:
+              Text('Cannot delete category. Books with this category exist.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text('Ok'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +109,7 @@ class _AddRemoveCategoriesState extends State<AddRemoveCategories> {
                           icon: Icon(Icons.delete),
                           onPressed: () {
                             // Call a function to delete the category from Firestore
-                            deleteCategory(categoryId);
+                            deleteCategory(categories[index], categoryId);
                           },
                         ),
                       );
