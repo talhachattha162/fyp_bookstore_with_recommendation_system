@@ -288,7 +288,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           'OR',
                           style: TextStyle(
                               color: themeNotifier.getTheme() ==
-                                      ThemeData.dark(useMaterial3: true)
+                                      ThemeData.dark(
+                                                              useMaterial3:
+                                                                  true)
+                                                          .copyWith(
+                                                        colorScheme: ColorScheme
+                                                                .dark()
+                                                            .copyWith(
+                                                                primary:
+                                                                    darkprimarycolor,
+                                                                error:
+                                                                    Colors.red,
+                                                                onPrimary:
+                                                                    darkprimarycolor,
+                                                                outline:
+                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
+                                                      )
                                   ? darkprimarycolor
                                   : primarycolor,
                               fontWeight: FontWeight.bold),

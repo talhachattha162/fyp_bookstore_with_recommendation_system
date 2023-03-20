@@ -128,12 +128,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () {
                     themeNotifier.setTheme(themeNotifier.getTheme() ==
                             ThemeData(
+                                // useMaterial3: true,
                                 appBarTheme:
                                     AppBarTheme(color: Colors.green[300]),
                                 primarySwatch: primarycolor,
                                 fontFamily: 'RobotoMono')
-                        ? ThemeData.dark(
-                            useMaterial3: true,
+                        ? ThemeData.dark(useMaterial3: true).copyWith(
+                            colorScheme: ColorScheme.dark().copyWith(
+                              primary: darkprimarycolor,
+                              error: Colors.red,
+                              onPrimary: darkprimarycolor,
+                              outline: darkprimarycolor,
+                              primaryVariant: darkprimarycolor,
+                              onPrimaryContainer: darkprimarycolor,
+                            ),
                           )
                         : ThemeData(
                             appBarTheme: AppBarTheme(color: Colors.green[300]),

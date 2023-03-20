@@ -14,6 +14,7 @@ import '../Widgets/text_field.dart';
 import '../models/book.dart';
 import '../models/review.dart';
 import '../providers/internetavailabilitynotifier.dart';
+import '../providers/themenotifier.dart';
 import '../utils/InternetChecker.dart';
 import '../utils/firebase_constants.dart';
 import '../utils/fluttertoast.dart';
@@ -77,6 +78,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     return WillPopScope(
       onWillPop: onWillPop,
@@ -119,7 +121,21 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                             //values are from 0 to 4
                             rating = value;
                           },
-                          optionStyle: const TextStyle(color: primarycolor)),
+                          optionStyle: TextStyle(
+                            color: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                          )),
                       const SizedBox(
                         height: 60,
                       ),
@@ -156,7 +172,8 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                                       uploadedByUserId: FirebaseAuth
                                           .instance.currentUser!.uid,
                                       rating: rating,
-                                      reviewtext: _reviewController.text,created_at:  Timestamp.now());
+                                      reviewtext: _reviewController.text,
+                                      created_at: Timestamp.now());
                                   try {
                                     await reviewCollection
                                         .doc(reviewid)

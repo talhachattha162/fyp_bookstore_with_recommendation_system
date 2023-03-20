@@ -13,10 +13,12 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'dart:async';
 import 'dart:io';
 
 import '../models/book.dart';
+import '../providers/themenotifier.dart';
 import '../utils/firebase_constants.dart';
 import '../utils/fluttertoast.dart';
 
@@ -129,6 +131,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     Size screenSize = MediaQuery.of(context).size;
     double width = MediaQuery.of(context).size.width;
     return WillPopScope(
@@ -290,9 +293,28 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                 width: width * 0.305,
                                 child: RadioListTile(
                                   contentPadding: const EdgeInsets.all(0.0),
-                                  title: const Text(
+                                  title:  Text(
                                     "Free",
                                   ),
+                                  activeColor: themeNotifier.getTheme() ==
+                                                   ThemeData.dark(
+                                                              useMaterial3:
+                                                                  true)
+                                                          .copyWith(
+                                                        colorScheme: ColorScheme
+                                                                .dark()
+                                                            .copyWith(
+                                                                primary:
+                                                                    darkprimarycolor,
+                                                                error:
+                                                                    Colors.red,
+                                                                onPrimary:
+                                                                    darkprimarycolor,
+                                                                outline:
+                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
+                                                      )
+                                                ? darkprimarycolor
+                                                : primarycolor,
                                   selected: freeRentPaid == 'free' ? true : false,
                                   value: "free",
                                   groupValue: freeRentPaid,
@@ -311,6 +333,25 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   title: const Text(
                                     "Rent",
                                   ),
+                                  activeColor: themeNotifier.getTheme() ==
+                                                   ThemeData.dark(
+                                                              useMaterial3:
+                                                                  true)
+                                                          .copyWith(
+                                                        colorScheme: ColorScheme
+                                                                .dark()
+                                                            .copyWith(
+                                                                primary:
+                                                                    darkprimarycolor,
+                                                                error:
+                                                                    Colors.red,
+                                                                onPrimary:
+                                                                    darkprimarycolor,
+                                                                outline:
+                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
+                                                      )
+                                                ? darkprimarycolor
+                                                : primarycolor,
                                   selected: freeRentPaid == 'rent' ? true : false,
                                   value: "rent",
                                   groupValue: freeRentPaid,
@@ -329,6 +370,25 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   title: const Text(
                                     "Price",
                                   ),
+                                  activeColor: themeNotifier.getTheme() ==
+                                                   ThemeData.dark(
+                                                              useMaterial3:
+                                                                  true)
+                                                          .copyWith(
+                                                        colorScheme: ColorScheme
+                                                                .dark()
+                                                            .copyWith(
+                                                                primary:
+                                                                    darkprimarycolor,
+                                                                error:
+                                                                    Colors.red,
+                                                                onPrimary:
+                                                                    darkprimarycolor,
+                                                                outline:
+                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
+                                                      )
+                                                ? darkprimarycolor
+                                                : primarycolor,
                                   selected: freeRentPaid == 'paid' ? true : false,
                                   value: "paid",
                                   groupValue: freeRentPaid,

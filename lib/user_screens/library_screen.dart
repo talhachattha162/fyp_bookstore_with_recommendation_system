@@ -66,15 +66,41 @@ class _LibraryScreenState extends State<LibraryScreen> {
                                   size: 20,
                                   color: themeNotifier.getTheme() ==
                                           ThemeData.dark(useMaterial3: true)
-                                      ? Colors.blue
+                                              .copyWith(
+                                            colorScheme:
+                                                ColorScheme.dark().copyWith(
+                                              primary: darkprimarycolor,
+                                              error: Colors.red,
+                                              onPrimary: darkprimarycolor,
+                                              outline: darkprimarycolor,
+                                              primaryVariant: darkprimarycolor,
+                                              onPrimaryContainer:
+                                                  darkprimarycolor,
+                                            ),
+                                          )
+                                      ? darkprimarycolor
                                       : primarycolor,
                                 ),
                                 Text('Downloaded \nBooks',
                                     style: TextStyle(
                                         color: themeNotifier.getTheme() ==
                                                 ThemeData.dark(
-                                                    useMaterial3: true)
-                                            ? null
+                                                        useMaterial3: true)
+                                                    .copyWith(
+                                                  colorScheme:
+                                                      ColorScheme.dark()
+                                                          .copyWith(
+                                                    primary: darkprimarycolor,
+                                                    error: Colors.red,
+                                                    onPrimary: darkprimarycolor,
+                                                    outline: darkprimarycolor,
+                                                    primaryVariant:
+                                                        darkprimarycolor,
+                                                    onPrimaryContainer:
+                                                        darkprimarycolor,
+                                                  ),
+                                                )
+                                            ? darkprimarycolor
                                             : primarycolor,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20)),
@@ -105,15 +131,41 @@ class _LibraryScreenState extends State<LibraryScreen> {
                                   size: 20,
                                   color: themeNotifier.getTheme() ==
                                           ThemeData.dark(useMaterial3: true)
-                                      ? Colors.blue
+                                              .copyWith(
+                                            colorScheme:
+                                                ColorScheme.dark().copyWith(
+                                              primary: darkprimarycolor,
+                                              error: Colors.red,
+                                              onPrimary: darkprimarycolor,
+                                              outline: darkprimarycolor,
+                                              primaryVariant: darkprimarycolor,
+                                              onPrimaryContainer:
+                                                  darkprimarycolor,
+                                            ),
+                                          )
+                                      ? darkprimarycolor
                                       : primarycolor,
                                 ),
                                 Text('Favourties',
                                     style: TextStyle(
                                         color: themeNotifier.getTheme() ==
                                                 ThemeData.dark(
-                                                    useMaterial3: true)
-                                            ? null
+                                                        useMaterial3: true)
+                                                    .copyWith(
+                                                  colorScheme:
+                                                      ColorScheme.dark()
+                                                          .copyWith(
+                                                    primary: darkprimarycolor,
+                                                    error: Colors.red,
+                                                    onPrimary: darkprimarycolor,
+                                                    outline: darkprimarycolor,
+                                                    primaryVariant:
+                                                        darkprimarycolor,
+                                                    onPrimaryContainer:
+                                                        darkprimarycolor,
+                                                  ),
+                                                )
+                                            ? darkprimarycolor
                                             : primarycolor,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20)),

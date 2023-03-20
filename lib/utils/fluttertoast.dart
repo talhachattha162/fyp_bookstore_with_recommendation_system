@@ -9,6 +9,7 @@ Fluttertoast.showToast(
         timeInSecForIosWeb: 1,
         backgroundColor: primarycolor,
         textColor: Colors.white,
-        fontSize: 16.0
+        fontSize: 16.0,
+
     );
 }

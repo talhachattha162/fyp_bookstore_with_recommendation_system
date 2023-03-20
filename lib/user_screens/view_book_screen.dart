@@ -259,6 +259,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   }
 
   void _settingModalBottomSheet(context, freeRentPaid) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
@@ -277,7 +278,15 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.green),
+                                color: themeNotifier.getTheme() ==
+                                        ThemeData.dark(useMaterial3: true)
+                                            .copyWith(
+                                          colorScheme: ColorScheme.dark()
+                                              .copyWith(
+                                                  primary: darkprimarycolor),
+                                        )
+                                    ? darkprimarycolor
+                                    : primarycolor),
                           )
                         : Container(),
                     const Text(
@@ -818,9 +827,23 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                           'see all',
                                           style: TextStyle(
                                             color: themeNotifier.getTheme() ==
-                                                    ThemeData.dark(
-                                                        useMaterial3: true)
-                                                ? Colors.blue
+                                                   ThemeData.dark(
+                                                              useMaterial3:
+                                                                  true)
+                                                          .copyWith(
+                                                        colorScheme: ColorScheme
+                                                                .dark()
+                                                            .copyWith(
+                                                                primary:
+                                                                    darkprimarycolor,
+                                                                error:
+                                                                    Colors.red,
+                                                                onPrimary:
+                                                                    darkprimarycolor,
+                                                                outline:
+                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
+                                                      )
+                                                ? darkprimarycolor
                                                 : primarycolor,
                                             // fontWeight: FontWeight.bold,
                                           ),
@@ -837,7 +860,26 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       provider.reviews.length > 0 &&
                                               provider.users.length > 0
                                           ? Card(
-                                              shadowColor: primarycolor[300],
+                                              shadowColor: themeNotifier
+                                                          .getTheme() ==
+                                                      ThemeData.dark(
+                                                              useMaterial3:
+                                                                  true)
+                                                          .copyWith(
+                                                        colorScheme: ColorScheme
+                                                                .dark()
+                                                            .copyWith(
+                                                                primary:
+                                                                    darkprimarycolor,
+                                                                error:
+                                                                    Colors.red,
+                                                                onPrimary:
+                                                                    darkprimarycolor,
+                                                                outline:
+                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
+                                                      )
+                                                  ? darkprimarycolor
+                                                  : primarycolor,
                                               elevation: 6,
                                               child: Padding(
                                                 padding:
@@ -919,7 +961,25 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       provider.reviews.length > 1 &&
                                               provider.users.length > 1
                                           ? Card(
-                                              shadowColor: primarycolor[300],
+                                              shadowColor: themeNotifier.getTheme() ==
+                                                   ThemeData.dark(
+                                                              useMaterial3:
+                                                                  true)
+                                                          .copyWith(
+                                                        colorScheme: ColorScheme
+                                                                .dark()
+                                                            .copyWith(
+                                                                primary:
+                                                                    darkprimarycolor,
+                                                                error:
+                                                                    Colors.red,
+                                                                onPrimary:
+                                                                    darkprimarycolor,
+                                                                outline:
+                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
+                                                      )
+                                                ? darkprimarycolor
+                                                : primarycolor,
                                               elevation: 6,
                                               child: Padding(
                                                 padding:
@@ -999,7 +1059,25 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       provider.reviews.length > 2 &&
                                               provider.users.length > 2
                                           ? Card(
-                                              shadowColor: primarycolor[300],
+                                              shadowColor: themeNotifier.getTheme() ==
+                                                   ThemeData.dark(
+                                                              useMaterial3:
+                                                                  true)
+                                                          .copyWith(
+                                                        colorScheme: ColorScheme
+                                                                .dark()
+                                                            .copyWith(
+                                                                primary:
+                                                                    darkprimarycolor,
+                                                                error:
+                                                                    Colors.red,
+                                                                onPrimary:
+                                                                    darkprimarycolor,
+                                                                outline:
+                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
+                                                      )
+                                                ? darkprimarycolor
+                                                : primarycolor,
                                               elevation: 6,
                                               child: Padding(
                                                 padding:
