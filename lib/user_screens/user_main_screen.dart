@@ -68,7 +68,6 @@ class _MainScreenUserState extends State<MainScreenUser> {
 
   @override
   Widget build(BuildContext context) {
-    print('hel');
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     return Scaffold(

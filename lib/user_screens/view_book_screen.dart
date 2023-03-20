@@ -940,8 +940,19 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                                       .photo),
                                                         ),
                                                         Text(
-                                                          provider
-                                                              .users[1].name,
+                                                          provider.users[1].name
+                                                                      .length >
+                                                                  10
+                                                              ? provider
+                                                                      .users[1]
+                                                                      .name
+                                                                      .substring(
+                                                                          0,
+                                                                          10) +
+                                                                  '...'
+                                                              : provider
+                                                                  .users[1]
+                                                                  .name,
                                                           style:
                                                               const TextStyle(
                                                                   fontWeight:
@@ -1009,8 +1020,19 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                                       .photo),
                                                         ),
                                                         Text(
-                                                          provider
-                                                              .users[2].name,
+                                                          provider.users[2].name
+                                                                      .length >
+                                                                  10
+                                                              ? provider
+                                                                      .users[2]
+                                                                      .name
+                                                                      .substring(
+                                                                          0,
+                                                                          10) +
+                                                                  '...'
+                                                              : provider
+                                                                  .users[2]
+                                                                  .name,
                                                           style:
                                                               const TextStyle(
                                                                   fontWeight:

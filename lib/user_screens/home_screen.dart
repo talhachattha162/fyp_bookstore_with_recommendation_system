@@ -90,7 +90,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-
   DateTime currentBackPressTime = DateTime.now();
 
   Future<bool> onWillPop() async {
@@ -104,7 +103,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     return Future.value(true);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -120,10 +118,11 @@ class _HomeScreenState extends State<HomeScreen> {
         //   child:
         WillPopScope(
       onWillPop: onWillPop,
-          child: SafeArea(
-              child: Scaffold(
+      child: SafeArea(
+        child: Scaffold(
           appBar: AppBar(
             title: const Text('Book Store'),
+            automaticallyImplyLeading: false,
             actions: [
               IconButton(
                   onPressed: () {
@@ -199,8 +198,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (snapshot.hasError) {
                           return Text('Error: ${snapshot.error}');
                         }
-        
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return Center(child: Text('Loading...'));
                         }
                         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -220,8 +220,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       mainAxisExtent: 230),
                               itemCount: snapshot.data!.docs.length,
                               itemBuilder: (context, index) {
-                                Book book =
-                                    Book.fromSnapshot(snapshot.data!.docs[index]);
+                                Book book = Book.fromSnapshot(
+                                    snapshot.data!.docs[index]);
                                 return InkWell(
                                   onTap: () {
                                     navigateWithNoBack(
@@ -242,12 +242,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                             placeholder: (context, url) => Center(
                                                 child:
                                                     CircularProgressIndicator()),
-                                            errorWidget: (context, url, error) =>
-                                                new Icon(Icons.error),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    new Icon(Icons.error),
                                           ),
                                           SizedBox(
                                             child: Padding(
-                                              padding: const EdgeInsets.all(4.0),
+                                              padding:
+                                                  const EdgeInsets.all(4.0),
                                               child: Row(
                                                 children: [
                                                   Flexible(
@@ -260,7 +262,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           book.title.length > 20
                                                               ? book.title
                                                                       .substring(
-                                                                          0, 20) +
+                                                                          0,
+                                                                          20) +
                                                                   '...'
                                                               : book.title,
                                                           style: TextStyle(
@@ -276,7 +279,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     book.freeRentPaid == 'free'
                                                         ? 'Free'
                                                         : '\$' +
-                                                            book.price.toString(),
+                                                            book.price
+                                                                .toString(),
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
@@ -297,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                     ),
-        
+
                     //stack
                   )
                 ]
@@ -305,9 +309,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ),
                 ),
           ),
-              ),
-            ),
-        );
+        ),
+      ),
+    );
     // );
   }
 }

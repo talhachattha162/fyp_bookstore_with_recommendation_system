@@ -70,6 +70,17 @@ class _MyAppState extends State<MyApp> {
         internetAvailabilityNotifier.setInternetAvailability(false);
       }
     });
+
+print('chatthasohail8'+auth.currentUser.toString());
+    Future.microtask(() {
+      if (auth.currentUser != null) {
+        context.read<AuthState>().user = 1;
+        print('chatthasohail');
+      } else {
+        context.read<AuthState>().user = null;
+        print('chatthasohail7');
+      }
+    });
   }
 
   @override
@@ -83,6 +94,8 @@ class _MyAppState extends State<MyApp> {
     var firebaseUser = auth.currentUser;
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
+
+    print(Provider.of<AuthState>(context, listen: true).user);
     return MaterialApp(
         title: 'FYP',
         theme: ThemeData(
@@ -106,15 +119,19 @@ class _MyAppState extends State<MyApp> {
                       // if (snapshot.hasError) {
                       //   return Text('Error: ${snapshot.error}');
                       // }
+                      print('chatthasohail2');
                       if (snapshot.data != null) {
                         List<QueryDocumentSnapshot> docs = snapshot.data!.docs;
 
+                        print('chatthasohail3');
                         for (var doc in docs) {
                           if (doc.id == firebaseUser!.uid) {
+                            print('chatthasohail4');
                             return MainScreenUser();
                           }
                         }
                       }
+                      print('chatthasohail5');
                       return SelectCategoriesScreen();
                     },
                   )

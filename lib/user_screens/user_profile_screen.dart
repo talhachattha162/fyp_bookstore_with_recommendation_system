@@ -151,13 +151,25 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               leading: const Icon(Icons.logout_outlined),
                               title: const Text('Log out'),
                               trailing: const Icon(Icons.chevron_right_sharp),
-                              onTap: () {
-                                auth.signOut();
-                                _googleSignIn.signOut();
+                              onTap: () async {
+                                try {
+                                  // sign out of Firebase
+                                  await auth.signOut();
+
+                                  // sign out of Google Sign-In
+                                  await _googleSignIn.signOut();
+
+                                  // clear the cache
+                                  await _googleSignIn.disconnect();
+                                } catch (e) {
+                                  // handle error
+                                  print('error' + e.toString());
+                                }
                                 User? user;
-                                context.read<AuthState>().user = null;
                                 // navigateWithNoBackplus(context, LoginScreen());
                                 if (user == null) {
+                                  print('hello');
+                                  context.read<AuthState>().user = null;
                                   navigateWithNoBack(context, MyApp());
                                 }
                               }),

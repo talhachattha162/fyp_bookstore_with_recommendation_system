@@ -21,12 +21,12 @@ class ReviewProvider with ChangeNotifier {
       for (var doc in querySnapshot.docs) {
         if (bookid == doc['bookId']) {
           var review = Review(
-            reviewId: doc['reviewId'],
-            bookId: doc['bookId'],
-            rating: doc['rating'],
-            uploadedByUserId: doc['uploadedByUserId'],
-            reviewtext: doc['reviewtext'],
-          );
+              reviewId: doc['reviewId'],
+              bookId: doc['bookId'],
+              rating: doc['rating'],
+              uploadedByUserId: doc['uploadedByUserId'],
+              reviewtext: doc['reviewtext'],
+              created_at: doc['created_at']);
           _reviews.add(review);
           final snapshot = await FirebaseFirestore.instance
               .collection('users')
