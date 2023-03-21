@@ -71,14 +71,14 @@ class _MyAppState extends State<MyApp> {
       }
     });
 
-print('chatthasohail8'+auth.currentUser.toString());
+// print('chatthasohail8'+auth.currentUser.toString());
     Future.microtask(() {
       if (auth.currentUser != null) {
         context.read<AuthState>().user = 1;
-        print('chatthasohail');
+        // print('chatthasohail');
       } else {
         context.read<AuthState>().user = null;
-        print('chatthasohail7');
+        // print('chatthasohail7');
       }
     });
   }
@@ -95,7 +95,7 @@ print('chatthasohail8'+auth.currentUser.toString());
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
 
-    print(Provider.of<AuthState>(context, listen: true).user);
+    // print(Provider.of<AuthState>(context, listen: true).user);
     return MaterialApp(
         title: 'FYP',
         theme: ThemeData(
@@ -119,19 +119,19 @@ print('chatthasohail8'+auth.currentUser.toString());
                       // if (snapshot.hasError) {
                       //   return Text('Error: ${snapshot.error}');
                       // }
-                      print('chatthasohail2');
+                      // print('chatthasohail2');
                       if (snapshot.data != null) {
                         List<QueryDocumentSnapshot> docs = snapshot.data!.docs;
 
-                        print('chatthasohail3');
+                        // print('chatthasohail3');
                         for (var doc in docs) {
                           if (doc.id == firebaseUser!.uid) {
-                            print('chatthasohail4');
+                            // print('chatthasohail4');
                             return MainScreenUser();
                           }
                         }
                       }
-                      print('chatthasohail5');
+                      // print('chatthasohail5');
                       return SelectCategoriesScreen();
                     },
                   )

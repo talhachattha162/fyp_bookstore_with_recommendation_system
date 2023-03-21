@@ -113,7 +113,6 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
     return '';
   }
 
-
   DateTime currentBackPressTime = DateTime.now();
 
   Future<bool> onWillPop() async {
@@ -127,7 +126,6 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
     }
     return Future.value(true);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -204,8 +202,10 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                           ),
                           ButtonTheme(
                             alignedDropdown: true,
-                            child: DropdownButton(
+                            height: 20,
+                            child: DropdownButton(elevation: 20,
                               isExpanded: true,
+                              iconEnabledColor: primarycolor,
                               value: selectedCategory == ''
                                   ? 'Select Category'
                                   : selectedCategory,
@@ -293,29 +293,27 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                 width: width * 0.305,
                                 child: RadioListTile(
                                   contentPadding: const EdgeInsets.all(0.0),
-                                  title:  Text(
+                                  title: Text(
                                     "Free",
                                   ),
                                   activeColor: themeNotifier.getTheme() ==
-                                                   ThemeData.dark(
-                                                              useMaterial3:
-                                                                  true)
-                                                          .copyWith(
-                                                        colorScheme: ColorScheme
-                                                                .dark()
-                                                            .copyWith(
-                                                                primary:
-                                                                    darkprimarycolor,
-                                                                error:
-                                                                    Colors.red,
-                                                                onPrimary:
-                                                                    darkprimarycolor,
-                                                                outline:
-                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
-                                                      )
-                                                ? darkprimarycolor
-                                                : primarycolor,
-                                  selected: freeRentPaid == 'free' ? true : false,
+                                          ThemeData.dark(useMaterial3: true)
+                                              .copyWith(
+                                            colorScheme:
+                                                ColorScheme.dark().copyWith(
+                                              primary: darkprimarycolor,
+                                              error: Colors.red,
+                                              onPrimary: darkprimarycolor,
+                                              outline: darkprimarycolor,
+                                              primaryVariant: darkprimarycolor,
+                                              onPrimaryContainer:
+                                                  darkprimarycolor,
+                                            ),
+                                          )
+                                      ? darkprimarycolor
+                                      : primarycolor,
+                                  selected:
+                                      freeRentPaid == 'free' ? true : false,
                                   value: "free",
                                   groupValue: freeRentPaid,
                                   onChanged: (value) {
@@ -334,25 +332,23 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                     "Rent",
                                   ),
                                   activeColor: themeNotifier.getTheme() ==
-                                                   ThemeData.dark(
-                                                              useMaterial3:
-                                                                  true)
-                                                          .copyWith(
-                                                        colorScheme: ColorScheme
-                                                                .dark()
-                                                            .copyWith(
-                                                                primary:
-                                                                    darkprimarycolor,
-                                                                error:
-                                                                    Colors.red,
-                                                                onPrimary:
-                                                                    darkprimarycolor,
-                                                                outline:
-                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
-                                                      )
-                                                ? darkprimarycolor
-                                                : primarycolor,
-                                  selected: freeRentPaid == 'rent' ? true : false,
+                                          ThemeData.dark(useMaterial3: true)
+                                              .copyWith(
+                                            colorScheme:
+                                                ColorScheme.dark().copyWith(
+                                              primary: darkprimarycolor,
+                                              error: Colors.red,
+                                              onPrimary: darkprimarycolor,
+                                              outline: darkprimarycolor,
+                                              primaryVariant: darkprimarycolor,
+                                              onPrimaryContainer:
+                                                  darkprimarycolor,
+                                            ),
+                                          )
+                                      ? darkprimarycolor
+                                      : primarycolor,
+                                  selected:
+                                      freeRentPaid == 'rent' ? true : false,
                                   value: "rent",
                                   groupValue: freeRentPaid,
                                   onChanged: (value) {
@@ -371,25 +367,23 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                     "Price",
                                   ),
                                   activeColor: themeNotifier.getTheme() ==
-                                                   ThemeData.dark(
-                                                              useMaterial3:
-                                                                  true)
-                                                          .copyWith(
-                                                        colorScheme: ColorScheme
-                                                                .dark()
-                                                            .copyWith(
-                                                                primary:
-                                                                    darkprimarycolor,
-                                                                error:
-                                                                    Colors.red,
-                                                                onPrimary:
-                                                                    darkprimarycolor,
-                                                                outline:
-                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
-                                                      )
-                                                ? darkprimarycolor
-                                                : primarycolor,
-                                  selected: freeRentPaid == 'paid' ? true : false,
+                                          ThemeData.dark(useMaterial3: true)
+                                              .copyWith(
+                                            colorScheme:
+                                                ColorScheme.dark().copyWith(
+                                              primary: darkprimarycolor,
+                                              error: Colors.red,
+                                              onPrimary: darkprimarycolor,
+                                              outline: darkprimarycolor,
+                                              primaryVariant: darkprimarycolor,
+                                              onPrimaryContainer:
+                                                  darkprimarycolor,
+                                            ),
+                                          )
+                                      ? darkprimarycolor
+                                      : primarycolor,
+                                  selected:
+                                      freeRentPaid == 'paid' ? true : false,
                                   value: "paid",
                                   groupValue: freeRentPaid,
                                   onChanged: (value) {
@@ -442,7 +436,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   _file1 = file.bytes!;
                                 } catch (err) {
                                   if (_filename1 == "<5 mb image allowed") {
-                                    showSnackBar(context, 'Please reselect file');
+                                    showSnackBar(
+                                        context, 'Please reselect file');
                                   }
                                 }
                               },
@@ -476,7 +471,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   _file2 = file.bytes!;
                                 } catch (err) {
                                   if (_filename2 == "<25 mb pdf allowed") {
-                                    showSnackBar(context, 'Please reselect file');
+                                    showSnackBar(
+                                        context, 'Please reselect file');
                                   }
                                 }
                               },
@@ -510,7 +506,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   _file3 = file.bytes!;
                                 } catch (err) {
                                   if (_filename3 == "<5 mb image allowed") {
-                                    showSnackBar(context, 'Please reselect file');
+                                    showSnackBar(
+                                        context, 'Please reselect file');
                                   }
                                 }
                               },
@@ -529,7 +526,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               isLoading
-                                  ? Container(child: CircularProgressIndicator())
+                                  ? Container(
+                                      child: CircularProgressIndicator())
                                   : ElevatedButton(
                                       onPressed: () async {
                                         if (_formKey.currentState!.validate() &&
@@ -562,8 +560,9 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                               // createAudioScript();
                                               // _showResult(text);
                                               // await createAudioScript(text);
-    
-                                              CollectionReference bookCollection =
+
+                                              CollectionReference
+                                                  bookCollection =
                                                   firestoreInstance
                                                       .collection("books");
                                               String bookid =
@@ -630,7 +629,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                       error.toString());
                                                 }).then((_) {
                                                   _controller.play();
-                                                  Timer(Duration(seconds: 2), () {
+                                                  Timer(Duration(seconds: 2),
+                                                      () {
                                                     _controller.stop();
                                                   });
                                                   // flutterToast('Book Added');

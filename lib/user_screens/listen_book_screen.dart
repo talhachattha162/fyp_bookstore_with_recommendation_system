@@ -239,8 +239,9 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
                         child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Please wait'),
-                      Text('Loading...'),
+                      // Text('Please wait'),
+                      // Text('Loading...'),
+                      CircularProgressIndicator.adaptive()
                     ],
                   )))
                 : Scaffold(

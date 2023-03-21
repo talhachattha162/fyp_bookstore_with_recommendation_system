@@ -120,6 +120,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     } else {}
   }
 
+  bool hasDataf = false;
   @override
   void initState() {
     _razorpay = Razorpay();
@@ -127,6 +128,13 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     _razorpay?.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay?.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
     super.initState();
+    _paymentsStreamSubscription = paymentsStream().listen((hasData) {
+      if (hasData) {
+        setState(() {
+          hasDataf = true;
+        });
+      }
+    });
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
@@ -155,9 +163,12 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     });
   }
 
+  StreamSubscription<bool>? _paymentsStreamSubscription;
+
   @override
   void dispose() {
     timer?.cancel();
+    _paymentsStreamSubscription!.cancel();
     super.dispose();
   }
 
@@ -340,12 +351,28 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   //   }
   // }
 
+  Stream<bool> paymentsStream() async* {
+    while (true) {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('payments')
+          .where('bookId', isEqualTo: widget.book.bookid)
+          .where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .get();
+      bool hasData = snapshot.docs.isNotEmpty;
+      // print('hasData' + hasData.toString());
+      yield hasData;
+      await Future.delayed(
+          Duration(seconds: 1)); // Wait for 1 second before checking again
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+    // print(hasDataf);
     return WillPopScope(
       onWillPop: onWillPop,
       child: SafeArea(
@@ -404,13 +431,15 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                               const IconButton(
                                   onPressed: null, icon: Icon(Icons.share)),
                               IconButton(
-                                  onPressed: () {
-                                    navigateWithNoBack(
-                                        context,
-                                        WriteReviewScreen(
-                                          book: widget.book,
-                                        ));
-                                  },
+                                  onPressed: hasDataf == false
+                                      ? null
+                                      : () {
+                                          navigateWithNoBack(
+                                              context,
+                                              WriteReviewScreen(
+                                                book: widget.book,
+                                              ));
+                                        },
                                   icon: const Icon(Icons.comment)),
                               IconButton(
                                   onPressed: () async {
@@ -827,22 +856,25 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                           'see all',
                                           style: TextStyle(
                                             color: themeNotifier.getTheme() ==
-                                                   ThemeData.dark(
-                                                              useMaterial3:
-                                                                  true)
-                                                          .copyWith(
-                                                        colorScheme: ColorScheme
-                                                                .dark()
-                                                            .copyWith(
-                                                                primary:
-                                                                    darkprimarycolor,
-                                                                error:
-                                                                    Colors.red,
-                                                                onPrimary:
-                                                                    darkprimarycolor,
-                                                                outline:
-                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
-                                                      )
+                                                    ThemeData.dark(
+                                                            useMaterial3: true)
+                                                        .copyWith(
+                                                      colorScheme:
+                                                          ColorScheme.dark()
+                                                              .copyWith(
+                                                        primary:
+                                                            darkprimarycolor,
+                                                        error: Colors.red,
+                                                        onPrimary:
+                                                            darkprimarycolor,
+                                                        outline:
+                                                            darkprimarycolor,
+                                                        primaryVariant:
+                                                            darkprimarycolor,
+                                                        onPrimaryContainer:
+                                                            darkprimarycolor,
+                                                      ),
+                                                    )
                                                 ? darkprimarycolor
                                                 : primarycolor,
                                             // fontWeight: FontWeight.bold,
@@ -866,17 +898,21 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                               useMaterial3:
                                                                   true)
                                                           .copyWith(
-                                                        colorScheme: ColorScheme
-                                                                .dark()
-                                                            .copyWith(
-                                                                primary:
-                                                                    darkprimarycolor,
-                                                                error:
-                                                                    Colors.red,
-                                                                onPrimary:
-                                                                    darkprimarycolor,
-                                                                outline:
-                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
+                                                        colorScheme:
+                                                            ColorScheme.dark()
+                                                                .copyWith(
+                                                          primary:
+                                                              darkprimarycolor,
+                                                          error: Colors.red,
+                                                          onPrimary:
+                                                              darkprimarycolor,
+                                                          outline:
+                                                              darkprimarycolor,
+                                                          primaryVariant:
+                                                              darkprimarycolor,
+                                                          onPrimaryContainer:
+                                                              darkprimarycolor,
+                                                        ),
                                                       )
                                                   ? darkprimarycolor
                                                   : primarycolor,
@@ -961,25 +997,30 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       provider.reviews.length > 1 &&
                                               provider.users.length > 1
                                           ? Card(
-                                              shadowColor: themeNotifier.getTheme() ==
-                                                   ThemeData.dark(
+                                              shadowColor: themeNotifier
+                                                          .getTheme() ==
+                                                      ThemeData.dark(
                                                               useMaterial3:
                                                                   true)
                                                           .copyWith(
-                                                        colorScheme: ColorScheme
-                                                                .dark()
-                                                            .copyWith(
-                                                                primary:
-                                                                    darkprimarycolor,
-                                                                error:
-                                                                    Colors.red,
-                                                                onPrimary:
-                                                                    darkprimarycolor,
-                                                                outline:
-                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
+                                                        colorScheme:
+                                                            ColorScheme.dark()
+                                                                .copyWith(
+                                                          primary:
+                                                              darkprimarycolor,
+                                                          error: Colors.red,
+                                                          onPrimary:
+                                                              darkprimarycolor,
+                                                          outline:
+                                                              darkprimarycolor,
+                                                          primaryVariant:
+                                                              darkprimarycolor,
+                                                          onPrimaryContainer:
+                                                              darkprimarycolor,
+                                                        ),
                                                       )
-                                                ? darkprimarycolor
-                                                : primarycolor,
+                                                  ? darkprimarycolor
+                                                  : primarycolor,
                                               elevation: 6,
                                               child: Padding(
                                                 padding:
@@ -1059,25 +1100,30 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       provider.reviews.length > 2 &&
                                               provider.users.length > 2
                                           ? Card(
-                                              shadowColor: themeNotifier.getTheme() ==
-                                                   ThemeData.dark(
+                                              shadowColor: themeNotifier
+                                                          .getTheme() ==
+                                                      ThemeData.dark(
                                                               useMaterial3:
                                                                   true)
                                                           .copyWith(
-                                                        colorScheme: ColorScheme
-                                                                .dark()
-                                                            .copyWith(
-                                                                primary:
-                                                                    darkprimarycolor,
-                                                                error:
-                                                                    Colors.red,
-                                                                onPrimary:
-                                                                    darkprimarycolor,
-                                                                outline:
-                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
+                                                        colorScheme:
+                                                            ColorScheme.dark()
+                                                                .copyWith(
+                                                          primary:
+                                                              darkprimarycolor,
+                                                          error: Colors.red,
+                                                          onPrimary:
+                                                              darkprimarycolor,
+                                                          outline:
+                                                              darkprimarycolor,
+                                                          primaryVariant:
+                                                              darkprimarycolor,
+                                                          onPrimaryContainer:
+                                                              darkprimarycolor,
+                                                        ),
                                                       )
-                                                ? darkprimarycolor
-                                                : primarycolor,
+                                                  ? darkprimarycolor
+                                                  : primarycolor,
                                               elevation: 6,
                                               child: Padding(
                                                 padding:

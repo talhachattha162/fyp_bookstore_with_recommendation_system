@@ -128,7 +128,9 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
                             horizontal: width * 0.05, vertical: height * 0.015),
                         child: _pdfPath.isNotEmpty
                             ? SfPdfViewer.file(File(_pdfPath))
-                            : Center(child: Text('Loading...')),
+                            : Center(child: CircularProgressIndicator.adaptive()
+                                // Text('Loading...')
+                                ),
                       ),
                       SizedBox(height: 5),
                       Text(
