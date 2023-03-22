@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:bookstore_recommendation_system_fyp/user_screens/home_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/library_screen.dart';
-import 'package:bookstore_recommendation_system_fyp/user_screens/recommendation_screen.dart';
+import 'package:bookstore_recommendation_system_fyp/user_screens/trending_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/upload_book_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/InternetChecker.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,7 +26,7 @@ class _MainScreenUserState extends State<MainScreenUser> {
   int _selectedIndex = 0;
   static const List<Widget> _bottomNavigationItems = <Widget>[
     HomeScreen(),
-    RecommendationScreen(),
+    TrendingScreen(),
     UploadBookScreen(),
     LibraryScreen(),
     UserProfileScreen()
@@ -87,118 +87,92 @@ class _MainScreenUserState extends State<MainScreenUser> {
                   : BottomNavigationBar(
                       items: <BottomNavigationBarItem>[
                           BottomNavigationBarItem(
-                              icon: Icon(
-                                CupertinoIcons.home,
-                              ),
-                              label: 'Home',
-                              backgroundColor: themeNotifier.getTheme() ==
-                                                   ThemeData.dark(
-                                                              useMaterial3:
-                                                                  true)
-                                                          .copyWith(
-                                                        colorScheme: ColorScheme
-                                                                .dark()
-                                                            .copyWith(
-                                                                primary:
-                                                                    darkprimarycolor,
-                                                                error:
-                                                                    Colors.red,
-                                                                onPrimary:
-                                                                    darkprimarycolor,
-                                                                outline:
-                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
-                                                      )
-                                                ? darkprimarycolor
-                                                : primarycolor,),
+                            icon: Icon(
+                              CupertinoIcons.home,
+                            ),
+                            label: 'Home',
+                            backgroundColor: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                          ),
                           BottomNavigationBarItem(
-                              icon: Icon(Icons.recommend_outlined),
-                              label: 'Recommendation',
-                              backgroundColor: themeNotifier.getTheme() ==
-                                                   ThemeData.dark(
-                                                              useMaterial3:
-                                                                  true)
-                                                          .copyWith(
-                                                        colorScheme: ColorScheme
-                                                                .dark()
-                                                            .copyWith(
-                                                                primary:
-                                                                    darkprimarycolor,
-                                                                error:
-                                                                    Colors.red,
-                                                                onPrimary:
-                                                                    darkprimarycolor,
-                                                                outline:
-                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
-                                                      )
-                                                ? darkprimarycolor
-                                                : primarycolor,),
+                            icon: Icon(Icons.recommend_outlined),
+                            label: 'Trendings',
+                            backgroundColor: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                          ),
                           BottomNavigationBarItem(
-                              icon: Icon(Icons.upload_outlined),
-                              label: 'Upload Book',
-                              backgroundColor: themeNotifier.getTheme() ==
-                                                   ThemeData.dark(
-                                                              useMaterial3:
-                                                                  true)
-                                                          .copyWith(
-                                                        colorScheme: ColorScheme
-                                                                .dark()
-                                                            .copyWith(
-                                                                primary:
-                                                                    darkprimarycolor,
-                                                                error:
-                                                                    Colors.red,
-                                                                onPrimary:
-                                                                    darkprimarycolor,
-                                                                outline:
-                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
-                                                      )
-                                                ? darkprimarycolor
-                                                : primarycolor,),
+                            icon: Icon(Icons.upload_outlined),
+                            label: 'Upload Book',
+                            backgroundColor: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                          ),
                           BottomNavigationBarItem(
-                              icon: Icon(Icons.library_books_outlined),
-                              label: 'Library',
-                              backgroundColor: themeNotifier.getTheme() ==
-                                                   ThemeData.dark(
-                                                              useMaterial3:
-                                                                  true)
-                                                          .copyWith(
-                                                        colorScheme: ColorScheme
-                                                                .dark()
-                                                            .copyWith(
-                                                                primary:
-                                                                    darkprimarycolor,
-                                                                error:
-                                                                    Colors.red,
-                                                                onPrimary:
-                                                                    darkprimarycolor,
-                                                                outline:
-                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
-                                                      )
-                                                ? darkprimarycolor
-                                                : primarycolor,
-                                  ),
+                            icon: Icon(Icons.library_books_outlined),
+                            label: 'Library',
+                            backgroundColor: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                          ),
                           BottomNavigationBarItem(
-                              icon: Icon(Icons.person_outline_outlined),
-                              label: 'Profile',
-                              backgroundColor: themeNotifier.getTheme() ==
-                                                   ThemeData.dark(
-                                                              useMaterial3:
-                                                                  true)
-                                                          .copyWith(
-                                                        colorScheme: ColorScheme
-                                                                .dark()
-                                                            .copyWith(
-                                                                primary:
-                                                                    darkprimarycolor,
-                                                                error:
-                                                                    Colors.red,
-                                                                onPrimary:
-                                                                    darkprimarycolor,
-                                                                outline:
-                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
-                                                      )
-                                                ? darkprimarycolor
-                                                : primarycolor,),
+                            icon: Icon(Icons.person_outline_outlined),
+                            label: 'Profile',
+                            backgroundColor: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                          ),
                         ],
                       type: BottomNavigationBarType.shifting,
                       currentIndex: _selectedIndex,
