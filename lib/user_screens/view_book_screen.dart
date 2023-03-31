@@ -29,6 +29,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:http/http.dart' as http;
 import '../models/razorpay_response.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ViewBookScreen extends StatefulWidget {
   Book book;
@@ -46,7 +47,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   Razorpay? _razorpay;
   Timer? timer;
   var bookpath;
-
+  String nobooksmsg = '';
   Duration _timeLeft = Duration.zero;
 
   DateTime currentBackPressTime = DateTime.now();
@@ -123,6 +124,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   bool hasDataf = false;
   @override
   void initState() {
+    _getRecommendations(widget.book.title);
     _razorpay = Razorpay();
     _razorpay?.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay?.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
@@ -164,6 +166,26 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   }
 
   StreamSubscription<bool>? _paymentsStreamSubscription;
+
+  List<dynamic> _recommendations = [];
+
+  Future<void> _getRecommendations(String bookname) async {
+    final response = await http.get(Uri.parse(
+        'http://talha1623.pythonanywhere.com/recommend?book_name=$bookname'));
+    if (response.statusCode == 200) {
+      if (response.body is List) {
+      } else if (response.body is String) {
+        nobooksmsg = response.body;
+      }
+      if (mounted) {
+        setState(() {
+          _recommendations = jsonDecode(response.body);
+        });
+      }
+    } else {
+      flutterToast('Request failed with status: ${response.statusCode}.');
+    }
+  }
 
   @override
   void dispose() {
@@ -372,6 +394,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+
+    print('recommendation2' + _recommendations.toString());
     // print(hasDataf);
     return WillPopScope(
       onWillPop: onWillPop,
@@ -428,18 +452,20 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const IconButton(
-                                  onPressed: null, icon: Icon(Icons.share)),
+                              //  IconButton(
+                              //     onPressed: null, icon: Icon(Icons.share)),
                               IconButton(
-                                  onPressed: hasDataf == false
-                                      ? null
-                                      : () {
+                                  onPressed: hasDataf == true ||
+                                          widget.book.freeRentPaid == 'free' || widget.book.userid ==
+                                      FirebaseAuth.instance.currentUser!.uid
+                                      ? () {
                                           navigateWithNoBack(
                                               context,
                                               WriteReviewScreen(
                                                 book: widget.book,
                                               ));
-                                        },
+                                        }
+                                      : null,
                                   icon: const Icon(Icons.comment)),
                               IconButton(
                                   onPressed: () async {
@@ -485,8 +511,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                         ? Colors.amber
                                         : Colors.grey,
                                   )),
-                              const IconButton(
-                                  onPressed: null, icon: Icon(Icons.download))
+                              //  IconButton(
+                              //     onPressed: null, icon: Icon(Icons.download))
                             ],
                           ),
                           const SizedBox(
@@ -777,16 +803,35 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                               fontWeight: FontWeight.bold,
                                               fontSize: 18),
                                         ),
-                                        Flexible(
-                                          child: Text(
-                                            widget.book.tag1 +
-                                                ',' +
-                                                widget.book.tag2 +
-                                                ',' +
-                                                widget.book.tag3,
+                                        Row(children: [
+                                          Text(
+                                            widget.book.tag1.length < 6
+                                                ? widget.book.tag1 + ','
+                                                : widget.book.tag1
+                                                        .substring(0, 6) +
+                                                    '..' +
+                                                    ' ,',
                                             style: TextStyle(fontSize: 16),
                                           ),
-                                        )
+                                          Text(
+                                            widget.book.tag2.length < 6
+                                                ? widget.book.tag2 + ','
+                                                : widget.book.tag2
+                                                        .substring(0, 6) +
+                                                    '..' +
+                                                    ' ,',
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                          Text(
+                                            widget.book.tag3.length < 6
+                                                ? widget.book.tag3 + ','
+                                                : widget.book.tag3
+                                                        .substring(0, 6) +
+                                                    '..' +
+                                                    '',
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        ])
                                       ],
                                     ),
                                   ],
@@ -1203,7 +1248,74 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                 ),
                               ],
                             ),
-                          )
+                          ),
+                          Text(
+                            'Recommended Books',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 10),
+                          _recommendations.length == 0
+                              ? nobooksmsg == ''
+                                  ? Text('Loading...')
+                                  : Text('No Similar Books Found')
+                              : Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: SizedBox(
+                                    height: 40,
+                                    width: width * 0.9,
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: _recommendations.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        return InkWell(
+                                            onTap: () {
+                                              // flutterToast(_recommendations[index][0]);
+                                              RegExp regExp =
+                                                  RegExp(r'[^\w\s]+');
+                                              String search = _recommendations[
+                                                          index][0]
+                                                      .replaceAll(regExp, '') +
+                                                  ' by ' +
+                                                  _recommendations[index][1]
+                                                      .replaceAll(regExp, '');
+                                              var url =
+                                                  'https://www.google.com/search?tbm=bks&q=' +
+                                                      search;
+                                              launchUrl(Uri.parse(url));
+                                            },
+                                            child: SizedBox(
+                                              height: 40,
+                                              child: Card(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          18.0),
+                                                ),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          18.0),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            6.0),
+                                                    child: Text(
+                                                      _recommendations[index]
+                                                          [0],
+                                                      style: TextStyle(
+                                                          fontSize: 14.0),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ));
+                                      },
+                                    ),
+                                  ),
+                                )
                         ],
                       ),
                     )),
