@@ -67,9 +67,11 @@ class _TrendingScreenState extends State<TrendingScreen> {
     } catch (e) {
       print('Failed to retrieve trending book ids: $e');
     }
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   bool isLoading = false;

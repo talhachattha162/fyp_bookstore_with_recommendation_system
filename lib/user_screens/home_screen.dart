@@ -59,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     getCategories();
     getBooks();
+    // print('homeinit');
   }
 
   Stream<List<Book>> getBooksByCategory(String category) {
@@ -106,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // print('home');
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     return

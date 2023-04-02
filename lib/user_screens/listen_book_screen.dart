@@ -40,44 +40,34 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
   bool isLoading = false;
   FlutterTts flutterTts = FlutterTts();
   var guidemsg = '';
-  bool _isSpeaking = false;
+  int chunckincrement = 0;
+  int endOffSet = 0;
+  String dropdownValue = '1x';
+  DateTime currentBackPressTime = DateTime.now();
 
-  bool _isPaused = false;
+  String textabc = '';
 
-
- DateTime currentBackPressTime = DateTime.now();
-
-
-   Future<bool> onWillPop() async {
+  Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
         now.difference(currentBackPressTime) > Duration(seconds: 2)) {
       currentBackPressTime = now;
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Press back again to exit')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
   }
-
 
   Future<void> speak(String text) async {
     await flutterTts.setLanguage('en-US');
     await flutterTts.setPitch(1);
     await flutterTts.setSpeechRate(0.4);
     await flutterTts.speak(text);
-    if (mounted) {
-      setState(() {
-        _isSpeaking = true;
-        _isPaused = false;
-      });
-    }
   }
 
-
-
   void _speak(String text) async {
-    int chunkSize = 1000;
+    int chunkSize = 3000;
     List<String> chunks = [];
     while (text.isNotEmpty) {
       if (text.length > chunkSize) {
@@ -88,18 +78,43 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
         text = "";
       }
     }
-
+    flutterTts.setProgressHandler(
+        (String text, int startOffset, int endOffset, String word) {
+      print(
+          'text: $text, startOffset: $startOffset, endOffset: $endOffset, word: $word');
+      endOffSet = endOffset;
+      textabc = text;
+    });
+    int i = 0;
     for (String chunk in chunks) {
       await flutterTts.speak(chunk);
+      if (_ttsState == TtsState.paused) {
+        chunckincrement = i;
+        break;
+      }
       if (_ttsState == TtsState.stopped) break;
+      i++;
+    }
+  }
+
+  Future<void> resume(text, increment, endOffSet, findtext) async {
+    // int sindex = (increment * 3000) + endOffSet;
+    int sindex2 = text.indexOf(findtext) + endOffSet;
+    _speak(text.substring(sindex2));
+    if (mounted) {
+      setState(() {
+        _ttsState = TtsState.playing;
+      });
     }
   }
 
   Future<void> pause() async {
     await flutterTts.pause();
-    setState(() {
-      _isPaused = true;
-    });
+    if (mounted) {
+      setState(() {
+        _ttsState = TtsState.paused;
+      });
+    }
   }
 
   Future stop() async {
@@ -229,7 +244,7 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return WillPopScope(
-      onWillPop:onWillPop,
+      onWillPop: onWillPop,
       child: SafeArea(
         child: internetAvailabilityNotifier.getInternetAvailability() == false
             ? InternetChecker()
@@ -302,9 +317,53 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [button()],
+                          children: [
+                            button(),
+                            DropdownButton<String>(
+                              value: dropdownValue,
+                              onChanged: _ttsState ==TtsState.playing?null:(String? newValue) async {
+                                if (mounted) {
+                                  setState(() {
+                                    dropdownValue = newValue!;
+                                  });
+                                }
+                                if (newValue == '0.25x') {
+                                  await flutterTts.setSpeechRate(0.105);
+                                } else if (newValue == '0.5x') {
+                                  await flutterTts.setSpeechRate(0.22);
+                                } else if (newValue == '0.75x') {
+                                  await flutterTts.setSpeechRate(0.315);
+                                } else if (newValue == '1x') {
+                                  await flutterTts.setSpeechRate(0.4);
+                                } else if (newValue == '1.25x') {
+                                  await flutterTts.setSpeechRate(0.555);
+                                } else if (newValue == '1.5x') {
+                                  await flutterTts.setSpeechRate(0.71);
+                                } else if (newValue == '1.75x') {
+                                  await flutterTts.setSpeechRate(0.845);
+                                } else if (newValue == '2x') {
+                                  await flutterTts.setSpeechRate(1.0);
+                                }
+                              },
+                              items: <String>[
+                                '0.25x',
+                                '0.5x',
+                                '0.75x',
+                                '1x',
+                                '1.25x',
+                                '1.5x',
+                                '1.75x',
+                                '2x'
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            )
+                          ],
                         ),
-                        Text(guidemsg)
+                        // Text(guidemsg)
                       ],
                     )),
                   ),
@@ -326,17 +385,42 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
         ),
         child: Text('Play'),
       );
-    } else {
+    } else if (_ttsState == TtsState.paused) {
       return ElevatedButton(
-        onPressed: stop,
+        onPressed: () async {
+          resume(textToConvert, chunckincrement, endOffSet, textabc);
+        },
         style: OutlinedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           side: BorderSide(width: 2, color: primarycolor),
         ),
-        child: Text('Stop'),
+        child: Text('Resume'),
       );
+    } else {
+      return Column(children: [
+        ElevatedButton(
+          onPressed: pause,
+          style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            side: BorderSide(width: 2, color: primarycolor),
+          ),
+          child: Text('Pause'),
+        ),
+        ElevatedButton(
+          onPressed: stop,
+          style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            side: BorderSide(width: 2, color: primarycolor),
+          ),
+          child: Text('Stop'),
+        )
+      ]);
     }
   }
 }

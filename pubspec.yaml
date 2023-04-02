@@ -93,7 +93,7 @@ flutter:
       - lib/assets/images/welcome.svg
       - lib/assets/images/signinblue.svg
       - lib/assets/images/signupblue.svg
-
+      - lib/assets/images/logo.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

@@ -160,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('login');
+    // print('login');
     User? user = _auth.currentUser;
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     final themeNotifier = Provider.of<ThemeNotifier>(context);

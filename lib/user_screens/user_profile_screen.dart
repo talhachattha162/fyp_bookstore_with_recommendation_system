@@ -168,7 +168,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 User? user;
                                 // navigateWithNoBackplus(context, LoginScreen());
                                 if (user == null) {
-                                  print('hello');
+                                  // print('hello');
                                   context.read<AuthState>().user = null;
                                   navigateWithNoBack(context, MyApp());
                                 }

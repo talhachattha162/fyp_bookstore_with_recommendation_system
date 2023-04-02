@@ -42,6 +42,7 @@ class _MainScreenUserState extends State<MainScreenUser> {
   @override
   void initState() {
     super.initState();
+    // print('usermaininit');
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
@@ -68,6 +69,7 @@ class _MainScreenUserState extends State<MainScreenUser> {
 
   @override
   Widget build(BuildContext context) {
+    // print('usermain');
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     return Scaffold(
