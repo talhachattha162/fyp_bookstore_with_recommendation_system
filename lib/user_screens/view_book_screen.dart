@@ -246,7 +246,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    Fluttertoast.showToast(msg: "Payment Successful2 ");
+    Fluttertoast.showToast(msg: "Payment Successful ");
   }
 
   Future<dynamic> createOrder() async {

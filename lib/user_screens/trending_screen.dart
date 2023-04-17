@@ -128,10 +128,11 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                           width: double.infinity,
                                           fit: BoxFit.fill,
                                           imageUrl: book.coverPhotoFile,
-                                          placeholder: (context, url) =>
-                                              new CircularProgressIndicator(),
+                                          placeholder: (context, url) => Center(
+                                              child:
+                                                  CircularProgressIndicator()),
                                           errorWidget: (context, url, error) =>
-                                              new Icon(Icons.error),
+                                              Center(child: Icon(Icons.error)),
                                         ),
                                         SizedBox(
                                           child: Padding(

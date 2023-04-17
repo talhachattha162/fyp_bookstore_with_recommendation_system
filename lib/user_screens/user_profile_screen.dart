@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/user.dart';
 import '../providers/authstatenotifier.dart';
@@ -125,25 +126,27 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               navigateWithNoBack(context, const FaqScreen());
                             },
                           ),
-                          const Divider(),
-                          ListTile(
-                            leading: const Icon(Icons.mode_night_outlined),
-                            title: const Text('Dark Mode'),
-                            trailing: Switch(
-                                value: _isSwitched,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _isSwitched = value;
-                                  });
-                                }),
-                          ),
+                          // const Divider(),
+                          // ListTile(
+                          //   leading: const Icon(Icons.mode_night_outlined),
+                          //   title: const Text('Dark Mode'),
+                          //   trailing: Switch(
+                          //       value: _isSwitched,
+                          //       onChanged: (value) {
+                          //         setState(() {
+                          //           _isSwitched = value;
+                          //         });
+                          //       }),
+                          // ),
                           const Divider(),
                           ListTile(
                             leading: const Icon(Icons.privacy_tip_outlined),
                             title: const Text('Privacy Policy'),
                             trailing: const Icon(Icons.chevron_right_sharp),
                             onTap: () {
-                              // navigateWithNoBack(context, PrivacyPolicyScreen());
+                              var url =
+                                  'https://doc-hosting.flycricket.io/booksavvy-privacy-policy/1c26b399-2650-460b-aae0-a2fc294cc458/privacy';
+                              launchUrl(Uri.parse(url));
                             },
                           ),
                           const Divider(),

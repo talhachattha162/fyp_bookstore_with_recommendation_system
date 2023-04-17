@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:bookstore_recommendation_system_fyp/utils/fluttertoast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
@@ -21,15 +22,19 @@ class Permissions extends StatefulWidget {
 }
 
 class _PermissionsState extends State<Permissions> {
-  // PDFViewController? _pdfcontroller;
+  Uint8List? _documentBytes;
+  @override
+  void initState() {
+    super.initState();
+  }
 
-  static Future<File> openPDFfromNetwork(String url) async {
-    final response = await http.get(Uri.parse(url));
-    final bytes = response.bodyBytes;
-    final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/$url');
-    await file.writeAsBytes(bytes, flush: true);
-    return file;
+  void getPdfBytes(String path) async {
+    HttpClient client = HttpClient();
+    final Uri url = Uri.base.resolve(path);
+    final HttpClientRequest request = await client.getUrl(url);
+    final HttpClientResponse response = await request.close();
+    _documentBytes = await consolidateHttpClientResponseBytes(response);
+    setState(() {});
   }
 
 // Reference to the Firestore collection
@@ -134,85 +139,16 @@ class _PermissionsState extends State<Permissions> {
                               TextButton(
                                 onPressed: () {
                                   showDialog(
-                                      context: context,
-                                      builder: (_) => AlertDialog(
-                                          title: Text(
-                                            book['title'],
-                                          ),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(
-                                                    context); // Close the dialog
-                                              },
-                                              child: Text('Close'),
-                                            ),
-                                          ],
-                                          content: Container(
-                                              width: width * 1,
-                                              height: height * 0.5,
-                                              padding: EdgeInsets.all(4.0),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  SizedBox(
-                                                    height: height * 0.4,
-                                                    width: width * 1,
-                                                    child: InteractiveViewer(
-                                                      child: CachedNetworkImage(
-                                                        fit: BoxFit.contain,
-                                                        imageUrl: book[
-                                                            'copyrightPhotoFile'],
-                                                        placeholder: (context,
-                                                                url) =>
-                                                            Center(
-                                                                child:
-                                                                    new CircularProgressIndicator()),
-                                                        errorWidget: (context,
-                                                                url, error) =>
-                                                            new Icon(
-                                                                Icons.error),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ))));
-                                },
-                                child: SizedBox(
-                                    width: width * 0.15,
-                                    child: Wrap(children: [
-                                      Text(
-                                        'Copyright Photo',
-                                        style: TextStyle(fontSize: 12),
-                                      )
-                                    ])),
-                              ),
-                              TextButton(
-                                  onPressed: () async {
-                                    final _pdfPath = await viewPdf(book['bookid']);
-                                    showDialog(
-                                        context: context,
-                                        builder: (_) => AlertDialog(
-                                            title: Text(
-                                              book['title'],
-                                            ),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(
-                                                      context); // Close the dialog
-                                                },
-                                                child: Text('Close'),
-                                              ),
-                                            ],
-                                            content: Container(
-                                                height: height * 0.73,
-                                                width: width * 0.95,
-                                                padding: EdgeInsets.all(8.0),
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text(book['title']),
+                                        content: Builder(
+                                          builder: (BuildContext context) {
+                                            return Container(
+                                                width: width * 1,
+                                                height: height * 0.5,
+                                                padding: EdgeInsets.all(4.0),
                                                 child: Column(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
@@ -220,31 +156,87 @@ class _PermissionsState extends State<Permissions> {
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.center,
                                                   children: [
-                                                    Container(
-                                                      height: height * 0.60,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 0.05,
-                                                              vertical: 0.05),
-                                                      child: _pdfPath.isNotEmpty
-                                                          ? SfPdfViewer.file(
-                                                              File(_pdfPath))
-                                                          : Center(
-                                                              child: Text(
-                                                                  'Loading...')),
+                                                    SizedBox(
+                                                      height: height * 0.4,
+                                                      width: width * 1,
+                                                      child: InteractiveViewer(
+                                                        child:
+                                                            CachedNetworkImage(
+                                                          fit: BoxFit.contain,
+                                                          imageUrl: book[
+                                                              'copyrightPhotoFile'],
+                                                          placeholder: (context,
+                                                                  url) =>
+                                                              Center(
+                                                                  child:
+                                                                      new CircularProgressIndicator()),
+                                                          errorWidget: (context,
+                                                                  url, error) =>
+                                                              new Icon(
+                                                                  Icons.error),
+                                                        ),
+                                                      ),
                                                     ),
                                                   ],
-                                                ))));
-                                  },
-                                  child: SizedBox(
-                                    width: width * 0.15,
-                                    child: Wrap(children: [
-                                      Text(
-                                        'Check Book',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ]),
-                                  )),
+                                                ));
+                                          },
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(
+                                                  context); // close the dialog
+                                            },
+                                            child: Text('Close'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Text('Copyright'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text(book['title']),
+                                        content: Builder(
+                                          builder: (BuildContext context) {
+                                            getPdfBytes(book['bookFile']);
+                                            Widget child1 = const Center(
+                                                child:
+                                                    CircularProgressIndicator());
+                                            if (_documentBytes != null) {
+                                              print(_documentBytes);
+                                              child1 = Container(
+                                                  height: height * 0.73,
+                                                  width: width * 0.95,
+                                                  padding: EdgeInsets.all(8.0),
+                                                  child: SfPdfViewer.memory(
+                                                    _documentBytes!,
+                                                  ));
+                                            }
+                                            return child1;
+                                          },
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(
+                                                  context); // close the dialog
+                                            },
+                                            child: Text('Close'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Text('check book'),
+                              ),
                               book['isPermitted'] == true
                                   ? Text('Permitted')
                                   : Row(

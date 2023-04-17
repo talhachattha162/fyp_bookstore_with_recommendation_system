@@ -227,8 +227,13 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
         internetAvailabilityNotifier.setInternetAvailability(false);
       }
     });
-    initTts();
-    decryptAndConvertToText();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      // Add a delay of 100 milliseconds before executing heavy operations
+      Future.delayed(Duration(milliseconds: 50), () {
+        initTts();
+        decryptAndConvertToText();
+      });
+    });
   }
 
   @override
@@ -321,30 +326,32 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
                             button(),
                             DropdownButton<String>(
                               value: dropdownValue,
-                              onChanged: _ttsState ==TtsState.playing?null:(String? newValue) async {
-                                if (mounted) {
-                                  setState(() {
-                                    dropdownValue = newValue!;
-                                  });
-                                }
-                                if (newValue == '0.25x') {
-                                  await flutterTts.setSpeechRate(0.105);
-                                } else if (newValue == '0.5x') {
-                                  await flutterTts.setSpeechRate(0.22);
-                                } else if (newValue == '0.75x') {
-                                  await flutterTts.setSpeechRate(0.315);
-                                } else if (newValue == '1x') {
-                                  await flutterTts.setSpeechRate(0.4);
-                                } else if (newValue == '1.25x') {
-                                  await flutterTts.setSpeechRate(0.555);
-                                } else if (newValue == '1.5x') {
-                                  await flutterTts.setSpeechRate(0.71);
-                                } else if (newValue == '1.75x') {
-                                  await flutterTts.setSpeechRate(0.845);
-                                } else if (newValue == '2x') {
-                                  await flutterTts.setSpeechRate(1.0);
-                                }
-                              },
+                              onChanged: _ttsState == TtsState.playing
+                                  ? null
+                                  : (String? newValue) async {
+                                      if (mounted) {
+                                        setState(() {
+                                          dropdownValue = newValue!;
+                                        });
+                                      }
+                                      if (newValue == '0.25x') {
+                                        await flutterTts.setSpeechRate(0.105);
+                                      } else if (newValue == '0.5x') {
+                                        await flutterTts.setSpeechRate(0.22);
+                                      } else if (newValue == '0.75x') {
+                                        await flutterTts.setSpeechRate(0.315);
+                                      } else if (newValue == '1x') {
+                                        await flutterTts.setSpeechRate(0.4);
+                                      } else if (newValue == '1.25x') {
+                                        await flutterTts.setSpeechRate(0.555);
+                                      } else if (newValue == '1.5x') {
+                                        await flutterTts.setSpeechRate(0.71);
+                                      } else if (newValue == '1.75x') {
+                                        await flutterTts.setSpeechRate(0.845);
+                                      } else if (newValue == '2x') {
+                                        await flutterTts.setSpeechRate(1.0);
+                                      }
+                                    },
                               items: <String>[
                                 '0.25x',
                                 '0.5x',

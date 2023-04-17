@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:bookstore_recommendation_system_fyp/providers/internetavailabilitynotifier.dart';
+import 'package:bookstore_recommendation_system_fyp/user_screens/intro_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/login_screen.dart';
 // import 'package:bookstore_recommendation_system_fyp/user_screens/select_categories_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_screen.dart';
@@ -10,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'providers/authstatenotifier.dart';
 import 'providers/themenotifier.dart';
 // import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -35,7 +37,13 @@ Future<void> main() async {
         ChangeNotifierProvider<AuthState>(create: (context) => AuthState()),
         // Other providers here
       ],
-      child: Splash(),
+      child: MaterialApp(
+        theme: ThemeData(
+          primarySwatch: Colors.green,
+        ),
+        home: Splash(),
+        debugShowCheckedModeBanner: false,
+      ),
     ),
   );
 //   } else {
@@ -44,16 +52,22 @@ Future<void> main() async {
 // }
 }
 
-class Splash extends StatelessWidget {
+class Splash extends StatefulWidget {
+  const Splash({super.key});
+
+  @override
+  State<Splash> createState() => _SplashState();
+}
+
+class _SplashState extends State<Splash> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: MyHomePage(),
-      debugShowCheckedModeBanner: false,
-    );
+    return MyHomePage();
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 }
 
@@ -63,12 +77,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  
   Timer? timer;
   @override
   void initState() {
     super.initState();
-     timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
       try {
@@ -88,9 +101,9 @@ class _MyHomePageState extends State<MyHomePage> {
         Duration(seconds: 3),
         () => Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => MyApp())));
-            
   }
-    @override
+
+  @override
   void dispose() {
     timer?.cancel();
     super.dispose();
@@ -119,14 +132,22 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   Timer? timer;
+  bool _isFirstTime = true;
+  bool _isLoggedIn = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _checkAuthStatus();
+  }
+
 
   @override
   void initState() {
     super.initState();
-   
-timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    _checkFirstTime();
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
       try {
@@ -142,7 +163,7 @@ timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
         internetAvailabilityNotifier.setInternetAvailability(false);
       }
     });
-  
+
     Future.microtask(() {
       if (auth.currentUser != null) {
         context.read<AuthState>().user = 1;
@@ -151,6 +172,22 @@ timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
         context.read<AuthState>().user = null;
         // print('chatthasohail7');
       }
+    });
+  }
+
+  Future<void> _checkFirstTime() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isFirstTime = prefs.getBool('isFirstTime') ?? true;
+      if (_isFirstTime) {
+        prefs.setBool('isFirstTime', false);
+      }
+    });
+  }
+
+  void _checkAuthStatus() {
+    setState(() {
+      _isLoggedIn = Provider.of<AuthState>(context, listen: true).user != null;
     });
   }
 
@@ -168,19 +205,19 @@ timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
 
     // print('main');
     return MaterialApp(
-        title: 'FYP',
-        theme: ThemeData(
-            appBarTheme: AppBarTheme(color: Colors.green[300]),
-            primarySwatch: primarycolor,
-            primaryColor: primarycolor,
-            fontFamily: 'RobotoMono'),
-        darkTheme: themeNotifier.getTheme(),
-        debugShowCheckedModeBanner: false,
-        home:
-            //  internetAvailabilityNotifier.getInternetAvailability() == true?
-
-            Provider.of<AuthState>(context, listen: true).user == null
-                ? const LoginScreen()
-                : MainScreenUser());
+      title: 'FYP',
+      theme: ThemeData(
+          appBarTheme: AppBarTheme(color: Colors.green[300]),
+          primarySwatch: primarycolor,
+          primaryColor: primarycolor,
+          fontFamily: 'RobotoMono'),
+      darkTheme: themeNotifier.getTheme(),
+      debugShowCheckedModeBanner: false,
+      home:
+          //  internetAvailabilityNotifier.getInternetAvailability() == true?
+          _isFirstTime
+              ? IntroScreen()
+              : (_isLoggedIn ? MainScreenUser() : LoginScreen()),
+    );
   }
 }

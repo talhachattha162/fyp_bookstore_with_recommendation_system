@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.bookstore_recommendation_system_fyp">
    <application
-        android:label="bookstore_recommendation_system_fyp"
+        android:label="Book Savvy"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
