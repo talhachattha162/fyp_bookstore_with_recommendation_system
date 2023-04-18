@@ -213,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             hintText: 'Enter Password',
                             textInputType: TextInputType.visiblePassword,
                             textEditingController: _passwordController,
-                            isPassword: false,
+                            isPassword: true,
                             validator: (value) {
                               String password = value.trim();
                               if (!pass_valid.hasMatch(password)) {
@@ -288,22 +288,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           'OR',
                           style: TextStyle(
                               color: themeNotifier.getTheme() ==
-                                      ThemeData.dark(
-                                                              useMaterial3:
-                                                                  true)
-                                                          .copyWith(
-                                                        colorScheme: ColorScheme
-                                                                .dark()
-                                                            .copyWith(
-                                                                primary:
-                                                                    darkprimarycolor,
-                                                                error:
-                                                                    Colors.red,
-                                                                onPrimary:
-                                                                    darkprimarycolor,
-                                                                outline:
-                                                                    darkprimarycolor,primaryVariant: darkprimarycolor,onPrimaryContainer:darkprimarycolor, ),
-                                                      )
+                                      ThemeData.dark(useMaterial3: true)
+                                          .copyWith(
+                                        colorScheme:
+                                            ColorScheme.dark().copyWith(
+                                          primary: darkprimarycolor,
+                                          error: Colors.red,
+                                          onPrimary: darkprimarycolor,
+                                          outline: darkprimarycolor,
+                                          primaryVariant: darkprimarycolor,
+                                          onPrimaryContainer: darkprimarycolor,
+                                        ),
+                                      )
                                   ? darkprimarycolor
                                   : primarycolor,
                               fontWeight: FontWeight.bold),

@@ -203,7 +203,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                           ButtonTheme(
                             alignedDropdown: true,
                             height: 20,
-                            child: DropdownButton(elevation: 20,
+                            child: DropdownButton(
+                              elevation: 20,
                               isExpanded: true,
                               iconEnabledColor: primarycolor,
                               value: selectedCategory == ''
@@ -641,6 +642,20 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                             } else {
                                               flutterToast('No categories');
                                             }
+                                            _titleController.clear();
+                                            _tag1Controller.clear();
+                                            _tag2Controller.clear();
+                                            _tag3Controller.clear();
+                                            _publishyearController.clear();
+                                            _priceController.clear();
+                                            _authorController.clear();
+                                            _categoryController.clear();
+                                            _filename1 = "<5 mb image allowed";
+                                            _filename2 = "<25 mb pdf allowed";
+                                            _filename3 = "<5 mb image allowed";
+                                            _file1 = null;
+                                            _file2 = null;
+                                            _file3 = null;
                                             setState(() {
                                               isLoading = false;
                                             });

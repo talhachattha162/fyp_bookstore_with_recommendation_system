@@ -179,7 +179,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             hintText: 'Enter Password',
                             textInputType: TextInputType.text,
                             textEditingController: _passwordController,
-                            isPassword: false,
+                            isPassword: true,
                             validator: (value) {
                               String password = value.trim();
                               if (!pass_valid.hasMatch(password)) {

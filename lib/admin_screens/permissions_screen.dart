@@ -28,13 +28,19 @@ class _PermissionsState extends State<Permissions> {
     super.initState();
   }
 
+  String error = '';
   void getPdfBytes(String path) async {
-    HttpClient client = HttpClient();
-    final Uri url = Uri.base.resolve(path);
-    final HttpClientRequest request = await client.getUrl(url);
-    final HttpClientResponse response = await request.close();
-    _documentBytes = await consolidateHttpClientResponseBytes(response);
-    setState(() {});
+    try {
+      HttpClient client = HttpClient();
+      final Uri url = Uri.base.resolve(path);
+      final HttpClientRequest request = await client.getUrl(url);
+      final HttpClientResponse response = await request.close();
+      _documentBytes = await consolidateHttpClientResponseBytes(response);
+      setState(() {});
+    } catch (e) {
+      error = 'Error fetching PDF bytes: $e';
+      // handle the error here, such as showing an error message to the user
+    }
   }
 
 // Reference to the Firestore collection
@@ -206,11 +212,14 @@ class _PermissionsState extends State<Permissions> {
                                         content: Builder(
                                           builder: (BuildContext context) {
                                             getPdfBytes(book['bookFile']);
-                                            Widget child1 = const Center(
-                                                child:
-                                                    CircularProgressIndicator());
+                                            Widget child1 = error == ''
+                                                ? Center(
+                                                    child: Text(error),
+                                                  )
+                                                : Center(
+                                                    child:
+                                                        CircularProgressIndicator());
                                             if (_documentBytes != null) {
-                                              print(_documentBytes);
                                               child1 = Container(
                                                   height: height * 0.73,
                                                   width: width * 0.95,

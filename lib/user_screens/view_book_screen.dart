@@ -14,6 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import '../Widgets/text_field.dart';
 import '../models/book.dart';
 import '../models/payment.dart';
 import '../providers/bookprovider.dart';
@@ -49,7 +50,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   var bookpath;
   String nobooksmsg = '';
   Duration _timeLeft = Duration.zero;
-
+  int _durationDays = 0;
   DateTime currentBackPressTime = DateTime.now();
 
   Future<bool> onWillPop() async {
@@ -203,7 +204,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
         widget.book.bookid,
         widget.book.freeRentPaid,
         widget.book.price,
-        DateTime.now());
+        DateTime.now(),
+        _durationDays);
     await bookCollection
         .doc(paymentid)
         .set(payment.toMap())
@@ -291,13 +293,16 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     }
   }
 
-  void _settingModalBottomSheet(context, freeRentPaid) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
+  final TextEditingController _durationdaysController = TextEditingController();
+  final RegExp _durationdays_valid = RegExp(r"^\d+$");
+
+  void _settingModalBottomSheetForpayment(
+      context, freeRentPaid, themeNotifier) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
           return SizedBox(
-            height: 140,
+            height: 260,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -306,20 +311,34 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     freeRentPaid == "rent"
-                        ? Text(
-                            'Book Will be Rented for 30 days',
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: themeNotifier.getTheme() ==
-                                        ThemeData.dark(useMaterial3: true)
-                                            .copyWith(
-                                          colorScheme: ColorScheme.dark()
-                                              .copyWith(
-                                                  primary: darkprimarycolor),
-                                        )
-                                    ? darkprimarycolor
-                                    : primarycolor),
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text('Enter Duration in days to rent',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              SizedBox(height: 10),
+                              SizedBox(
+                                height: 40,
+                                width: 210,
+                                child: TextInputField(
+                                  hintText: 'Enter Duration',
+                                  isPassword: false,
+                                  textEditingController:
+                                      _durationdaysController,
+                                  validator: (value) {
+                                    if (value.isEmpty || value == "0") {
+                                      return 'Enter valid Duration';
+                                    }
+                                    if (!_durationdays_valid.hasMatch(value)) {
+                                      return 'only digits allowed';
+                                    }
+                                  },
+                                  textInputType: TextInputType.number,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                            ],
                           )
                         : Container(),
                     const Text(
@@ -330,6 +349,10 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                     const Divider(thickness: 30),
                     ElevatedButton(
                       onPressed: () {
+                        setState(() {
+                          _durationDays =
+                              int.parse(_durationdaysController.text);
+                        });
                         createOrder();
                         Navigator.pop(context);
                       },
@@ -395,7 +418,6 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
 
-    print('recommendation2' + _recommendations.toString());
     // print(hasDataf);
     return WillPopScope(
       onWillPop: onWillPop,
@@ -452,12 +474,22 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              //  IconButton(
-                              //     onPressed: null, icon: Icon(Icons.share)),
+                              IconButton(
+                                  onPressed: (hasDataf == true &&
+                                              widget.book.freeRentPaid ==
+                                                  'paid') ||
+                                          widget.book.freeRentPaid == 'free'
+                                      ? () {
+                                          flutterToast('download');
+                                        }
+                                      : null,
+                                  icon: Icon(Icons.download)),
                               IconButton(
                                   onPressed: hasDataf == true ||
-                                          widget.book.freeRentPaid == 'free' || widget.book.userid ==
-                                      FirebaseAuth.instance.currentUser!.uid
+                                          widget.book.freeRentPaid == 'free' ||
+                                          widget.book.userid ==
+                                              FirebaseAuth
+                                                  .instance.currentUser!.uid
                                       ? () {
                                           navigateWithNoBack(
                                               context,
@@ -552,8 +584,12 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                           children: [
                                             ElevatedButton.icon(
                                               onPressed: () {
-                                                _settingModalBottomSheet(
-                                                    context, book.freeRentPaid);
+                                                _settingModalBottomSheetForpayment(
+                                                    context,
+                                                    book.freeRentPaid,
+                                                    Provider.of<ThemeNotifier>(
+                                                        context,
+                                                        listen: false));
                                               },
                                               icon: Icon(Icons.lock),
                                               label: Text('Buy'),
@@ -613,14 +649,19 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       AsyncSnapshot<QuerySnapshot> snapshot) {
                                     if (snapshot.data != null) {
                                       Timestamp? paymentCreationTime;
-                                      Duration? difference = null;
+                                      int duration = 0;
+
+                                      Duration? difference = Duration.zero;
                                       if (snapshot.data!.docs.isNotEmpty) {
+                                        duration = snapshot
+                                            .data!.docs.first['durationDays'];
                                         paymentCreationTime = snapshot.data!
                                             .docs.first['dateTimeCreated'];
+
                                         DateTime expirationDate =
                                             paymentCreationTime!
                                                 .toDate()
-                                                .add(Duration(days: 30));
+                                                .add(Duration(days: duration));
                                         WidgetsBinding.instance
                                             .addPostFrameCallback((_) {
                                           setState(() {
@@ -631,55 +672,51 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       }
 
                                       if (snapshot.data!.docs.length != 0) {
-                                        if (difference != null) {
-                                          if (difference.inDays >= 30) {
-                                            final docsToDelete =
-                                                snapshot.data!.docs;
-                                            for (final doc in docsToDelete) {
-                                              doc.reference.delete();
-                                            }
-                                          }
+                                        if (!_timeLeft.isNegative) {
+                                          return Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  ElevatedButton.icon(
+                                                    onPressed: () {
+                                                      flutterToast(
+                                                          'Loading...');
+                                                      navigateWithNoBack(
+                                                          context,
+                                                          ListenBookScreen(
+                                                            book: widget.book,
+                                                            bookpath: bookpath,
+                                                          ));
+                                                    },
+                                                    icon:
+                                                        Icon(Icons.headphones),
+                                                    label: Text('Listen'),
+                                                  ),
+                                                  ElevatedButton.icon(
+                                                    onPressed: () async {
+                                                      navigateWithNoBack(
+                                                          context,
+                                                          BookPdfScreen(
+                                                            book: widget.book,
+                                                            bookpath: bookpath,
+                                                          ));
+                                                    },
+                                                    icon: Icon(Icons.book),
+                                                    label: Text('Read'),
+                                                  ),
+                                                ],
+                                              ),
+                                              Text(
+                                                  'Timeleft ${_timeLeft.inDays}d:'
+                                                  '${_timeLeft.inHours.remainder(24)}h:'
+                                                  '${_timeLeft.inMinutes.remainder(60)}m:'
+                                                  '${_timeLeft.inSeconds.remainder(60)}s')
+                                            ],
+                                          );
                                         }
-                                        return Column(
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                ElevatedButton.icon(
-                                                  onPressed: () {
-                                                    flutterToast('Loading...');
-                                                    navigateWithNoBack(
-                                                        context,
-                                                        ListenBookScreen(
-                                                          book: widget.book,
-                                                          bookpath: bookpath,
-                                                        ));
-                                                  },
-                                                  icon: Icon(Icons.headphones),
-                                                  label: Text('Listen'),
-                                                ),
-                                                ElevatedButton.icon(
-                                                  onPressed: () async {
-                                                    navigateWithNoBack(
-                                                        context,
-                                                        BookPdfScreen(
-                                                          book: widget.book,
-                                                          bookpath: bookpath,
-                                                        ));
-                                                  },
-                                                  icon: Icon(Icons.book),
-                                                  label: Text('Read'),
-                                                ),
-                                              ],
-                                            ),
-                                            Text(
-                                                'Timeleft ${_timeLeft.inDays}d:'
-                                                '${_timeLeft.inHours.remainder(24)}h:'
-                                                '${_timeLeft.inMinutes.remainder(60)}m:'
-                                                '${_timeLeft.inSeconds.remainder(60)}s')
-                                          ],
-                                        );
                                       }
                                     }
 
@@ -689,8 +726,12 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       children: [
                                         ElevatedButton.icon(
                                           onPressed: () {
-                                            _settingModalBottomSheet(
-                                                context, book.freeRentPaid);
+                                            _settingModalBottomSheetForpayment(
+                                                context,
+                                                book.freeRentPaid,
+                                                Provider.of<ThemeNotifier>(
+                                                    context,
+                                                    listen: false));
                                           },
                                           icon: Icon(Icons.lock),
                                           label: Text('Rent'),
