@@ -21,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int tag = 0;
   List<String> categories = [];
-  List<String> options = ['no categories'];
+  List<String> options = ['loading'];
 
   List<Book> books = [];
 
@@ -214,10 +214,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           return Center(child: Text('Loading...'));
                         }
                         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                          return Visibility(
-                            visible: true,
-                            child: Center(child: Text('No books found')),
-                          );
+                          return  Center(
+        child: Visibility(
+          visible: true,
+          child: Text('No books found'),
+        ),
+      );
                         }
                         return Stack(
                           children: [

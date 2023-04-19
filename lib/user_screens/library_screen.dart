@@ -1,10 +1,11 @@
+import 'package:bookstore_recommendation_system_fyp/user_screens/order_history.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/themenotifier.dart';
 import '../utils/global_variables.dart';
-import 'rent_books.dart';
+import 'rented_books.dart';
 import 'favourites_screen.dart';
 
 class LibraryScreen extends StatefulWidget {
@@ -40,6 +41,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
         child: Scaffold(
             appBar: AppBar(title: const Text('Library')),
             body: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(
                   height: 30,
@@ -81,7 +83,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                                       ? darkprimarycolor
                                       : primarycolor,
                                 ),
-                                Text('Downloaded \nBooks',
+                                Text('Rented \nBooks',
                                     style: TextStyle(
                                         color: themeNotifier.getTheme() ==
                                                 ThemeData.dark(
@@ -177,7 +179,69 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       ),
                     ),
                   ],
-                )
+                ),
+                InkWell(
+                  onTap: () {
+                    navigateWithNoBack(context, OrderHistory());
+                  },
+                  child: SizedBox(
+                    width: width * 0.49,
+                    height: height * 0.3,
+                    child: Card(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 26.0,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.history,
+                              size: 20,
+                              color: themeNotifier.getTheme() ==
+                                      ThemeData.dark(useMaterial3: true)
+                                          .copyWith(
+                                        colorScheme:
+                                            ColorScheme.dark().copyWith(
+                                          primary: darkprimarycolor,
+                                          error: Colors.red,
+                                          onPrimary: darkprimarycolor,
+                                          outline: darkprimarycolor,
+                                          primaryVariant: darkprimarycolor,
+                                          onPrimaryContainer: darkprimarycolor,
+                                        ),
+                                      )
+                                  ? darkprimarycolor
+                                  : primarycolor,
+                            ),
+                            Text('Orders History',
+                                style: TextStyle(
+                                    color: themeNotifier.getTheme() ==
+                                            ThemeData.dark(useMaterial3: true)
+                                                .copyWith(
+                                              colorScheme:
+                                                  ColorScheme.dark().copyWith(
+                                                primary: darkprimarycolor,
+                                                error: Colors.red,
+                                                onPrimary: darkprimarycolor,
+                                                outline: darkprimarycolor,
+                                                primaryVariant:
+                                                    darkprimarycolor,
+                                                onPrimaryContainer:
+                                                    darkprimarycolor,
+                                              ),
+                                            )
+                                        ? darkprimarycolor
+                                        : primarycolor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20)),
+                          ],
+                        ),
+                      ),
+                      elevation: 50,
+                    ),
+                  ),
+                ),
               ],
             )),
       ),

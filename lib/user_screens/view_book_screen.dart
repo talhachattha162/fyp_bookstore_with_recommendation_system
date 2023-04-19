@@ -31,6 +31,10 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:http/http.dart' as http;
 import '../models/razorpay_response.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:downloads_path_provider/downloads_path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+import '../utils/snackbar.dart';
 
 class ViewBookScreen extends StatefulWidget {
   Book book;
@@ -53,6 +57,10 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   int _durationDays = 0;
   DateTime currentBackPressTime = DateTime.now();
 
+  bool isDownloading = false;
+
+  String downloadString = '';
+
   Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
@@ -74,6 +82,96 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
         .get();
 
     return querySnapshot.docs.isNotEmpty;
+  }
+
+  Future<void> downloadFile(
+      BuildContext context, String url, String fileName) async {
+    // Request permission to access storage if not already granted.
+    final status = await Permission.storage.request();
+    if (status.isDenied) {
+      // Permission denied, show an error message and return.
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Permission denied.')));
+      return;
+    }
+
+    try {
+      // Get the downloads directory on Android.
+      // On iOS, use getApplicationDocumentsDirectory instead.
+      final dir = await DownloadsPathProvider.downloadsDirectory;
+      final file = File('${dir.path}/$fileName.pdf');
+      HttpClient httpClient = HttpClient();
+      HttpClientRequest request = await httpClient.getUrl(Uri.parse(url));
+      HttpClientResponse response = await request.close();
+      await response.pipe(file.openWrite());
+      httpClient.close();
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Download Successful', style: TextStyle(fontSize: 20)),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Column(
+                    children: [
+                      Icon(Icons.check_circle_outline),
+                      Text('Downloaded at /Download folder',
+                          style: TextStyle(fontSize: 12))
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+
+      // Show a SnackBar with a message if the download was successful.
+      // showSnackBar(context,'Downloaded at Downloads folder');
+    } catch (e) {
+      // Show an error message if the download failed.
+      // showSnackBar(context,'Download failed: $e');
+     showDialog(
+  context: context,
+  barrierDismissible: false,
+  builder: (BuildContext context) {
+    return AlertDialog(
+      title: Text('Download Failed', style: TextStyle(fontSize: 20)),
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: <Widget>[
+            Column(
+              children: [
+                Icon(Icons.error),
+                Text('$e', style: TextStyle(fontSize: 12))
+              ],
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text('Close'),
+        ),
+      ],
+    );
+  },
+);
+
+    }
   }
 
   storeFile() async {
@@ -395,7 +493,6 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   //     return null;
   //   }
   // }
-
   Stream<bool> paymentsStream() async* {
     while (true) {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -408,6 +505,27 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
       yield hasData;
       await Future.delayed(
           Duration(seconds: 1)); // Wait for 1 second before checking again
+    }
+  }
+
+  void _startDownload() async {
+    setState(() {
+      isDownloading = true;
+    });
+
+    try {
+      await downloadFile(context, widget.book.bookFile, widget.book.title);
+      setState(() {
+        downloadString = 'Download Successful';
+      });
+    } catch (e) {
+      setState(() {
+        downloadString = 'Download failed';
+      });
+    } finally {
+      setState(() {
+        isDownloading = false;
+      });
     }
   }
 
@@ -479,11 +597,17 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                               widget.book.freeRentPaid ==
                                                   'paid') ||
                                           widget.book.freeRentPaid == 'free'
-                                      ? () {
-                                          flutterToast('download');
-                                        }
+                                      ? _startDownload
                                       : null,
-                                  icon: Icon(Icons.download)),
+                                  icon: isDownloading
+                                      ? Center(
+                                          child: SizedBox(
+                                            height: 10,
+                                            width: 10,
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        )
+                                      : Icon(Icons.download)),
                               IconButton(
                                   onPressed: hasDataf == true ||
                                           widget.book.freeRentPaid == 'free' ||
@@ -604,7 +728,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       children: [
                                         ElevatedButton.icon(
                                           onPressed: () {
-                                            flutterToast('Loading...');
+                                            // flutterToast('Loading...');
                                             navigateWithNoBack(
                                                 context,
                                                 ListenBookScreen(

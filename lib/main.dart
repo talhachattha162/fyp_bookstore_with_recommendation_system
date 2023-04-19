@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'providers/paymentprovider.dart';
 import 'providers/authstatenotifier.dart';
 import 'providers/themenotifier.dart';
 // import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -35,6 +36,7 @@ Future<void> main() async {
         ChangeNotifierProvider<InternetNotifier>(
             create: (_) => InternetNotifier(false)),
         ChangeNotifierProvider<AuthState>(create: (context) => AuthState()),
+        ChangeNotifierProvider(create: (_) => PaymentProvider())
         // Other providers here
       ],
       child: MaterialApp(

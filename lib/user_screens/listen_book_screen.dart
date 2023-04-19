@@ -37,7 +37,7 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
   double currentduration = 0;
   Duration? duration = Duration(hours: 0);
   Timer? timer;
-  bool isLoading = false;
+  bool isLoading = true;
   FlutterTts flutterTts = FlutterTts();
   var guidemsg = '';
   int chunckincrement = 0;
@@ -227,11 +227,17 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
         internetAvailabilityNotifier.setInternetAvailability(false);
       }
     });
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       // Add a delay of 100 milliseconds before executing heavy operations
+      setState(() {
+        isLoading = true;
+      });
       Future.delayed(Duration(milliseconds: 50), () {
         initTts();
         decryptAndConvertToText();
+      });
+      setState(() {
+        isLoading = false;
       });
     });
   }
@@ -259,9 +265,8 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
                         child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Text('Please wait'),
-                      // Text('Loading...'),
-                      CircularProgressIndicator.adaptive()
+                      Text('Please wait'),
+                      Text('Loading...'),
                     ],
                   )))
                 : Scaffold(

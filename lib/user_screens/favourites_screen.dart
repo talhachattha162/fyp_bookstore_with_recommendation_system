@@ -24,30 +24,6 @@ class FavouritesScreen extends StatefulWidget {
 class _FavouritesScreenState extends State<FavouritesScreen> {
   Timer? timer;
 
-  getBooks() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    Query favouritesQuery = firestore.collection('favourites');
-    QuerySnapshot favouritesQuerySnapshot = await favouritesQuery.get();
-    List<String> bookIds = [];
-    for (QueryDocumentSnapshot favourite in favouritesQuerySnapshot.docs) {
-      bookIds.add(favourite.get('bookid'));
-    }
-    // Query booksQuery = firestore
-    //     .collectionGroup('books')
-    //     .where('bookid', whereIn: bookIds);
-    // QuerySnapshot booksQuerySnapshot = await booksQuery.get();
-
-    // List<Map<String, dynamic>> matchingBooks = [];
-    // for (QueryDocumentSnapshot book in booksQuerySnapshot.docs) {
-    //   matchingBooks.add(book.data());
-    // }
-
-    // print('Matching books:');
-    // for (Map<String, dynamic> matchingBook in matchingBooks) {
-    //   print(matchingBook);
-    // }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -67,7 +43,6 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
         internetAvailabilityNotifier.setInternetAvailability(false);
       }
     });
-    // getBooks();
   }
 
   @override
@@ -112,7 +87,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                     )),
                 body: SizedBox(
                   width: double.infinity,
-                  height: height * 0.73,
+                  height: height * 0.89,
                   child: StreamBuilder<QuerySnapshot>(
                     stream: firestore
                         .collection('favourities')
@@ -125,9 +100,11 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                         return Text('Error: ${snapshot.error}');
                       }
                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                        return Visibility(
-                          visible: true,
-                          child: Center(child: Text('No favourites found')),
+                        return Center(
+                          child: Visibility(
+                            visible: true,
+                            child: Text('No favourites found'),
+                          ),
                         );
                       }
                       if (snapshot.hasData) {
@@ -159,7 +136,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                                   return Text('Error: ${snapshot.error}');
                                 }
                                 if (!snapshot.hasData) {
-                                  return Text('No favourites found');
+                                  return Container();
                                 }
                                 Map<String, dynamic>? bookData = snapshot.data!
                                     .data() as Map<String, dynamic>?;
@@ -233,7 +210,12 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                                     ),
                                   );
                                 } else {
-                                  return Text('No favourites found');
+                                  return Center(
+                                    child: Visibility(
+                                      visible: true,
+                                      child: Text('No favourites found'),
+                                    ),
+                                  );
                                 }
                               },
                             );
@@ -241,7 +223,12 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                         );
                       }
 
-                      return Text('No favourites found');
+                      return Center(
+                        child: Visibility(
+                          visible: true,
+                          child: Text('No favourites found'),
+                        ),
+                      );
                     },
                   ),
                 )),

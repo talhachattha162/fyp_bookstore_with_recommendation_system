@@ -85,7 +85,11 @@ class _TrendingScreenState extends State<TrendingScreen> {
           appBar: AppBar(title: const Text('Trendings')),
           resizeToAvoidBottomInset: false,
           body: isLoading
-              ? Center(child: CircularProgressIndicator.adaptive())
+              ? Center(
+                  child: Visibility(
+                  child: Text('Loading...'),
+                  visible: true,
+                ))
               : _trendingBookIds.isEmpty
                   ? Center(child: Text('No trendings found'))
                   : StreamBuilder<List<Book>?>(
@@ -96,7 +100,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         }
 
                         if (!snapshot.hasData) {
-                          return Center(child: CircularProgressIndicator());
+                          return Center(child: Text('Loading...'));
                         }
                         if (snapshot.hasData) {
                           final books = snapshot.data!;

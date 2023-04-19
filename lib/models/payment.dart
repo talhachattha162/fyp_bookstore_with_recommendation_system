@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class Payment {
   String _userId = '';
@@ -7,9 +8,34 @@ class Payment {
   int _pricePaid = 0;
   DateTime _dateTimeCreated;
   int _durationDays = 0;
+  String formattedDate = '';
+  String formattedTime = '';
 
   Payment(this._userId, this._bookId, this._freeRentPaid, this._pricePaid,
-      this._dateTimeCreated, this._durationDays);
+      [
+      DateTime? dateTimeCreated,this._durationDays = 0,
+      this.formattedDate = '',
+      this.formattedTime = ''])
+      : _dateTimeCreated = dateTimeCreated ?? DateTime.now();
+
+  factory Payment.fromSnapshot(DocumentSnapshot snapshot) {
+    final data = snapshot.data() as Map<String, dynamic>;
+    final paymentCreationTime =
+        data['dateTimeCreated']?.toDate() ?? DateTime.now();
+    final formattedDate = DateFormat("MMMM d, y").format(paymentCreationTime);
+    final formattedTime = DateFormat("h:mm a").format(paymentCreationTime);
+
+    return Payment(
+      data['userId'],
+      data['bookId'],
+      data['freeRentPaid'],
+      data['pricePaid'],
+      paymentCreationTime,
+      data['durationDays'],
+      formattedDate,
+      formattedTime,
+    );
+  }
 
   Payment.fromMap(Map<String, dynamic> map)
       : _userId = map['userId'],
