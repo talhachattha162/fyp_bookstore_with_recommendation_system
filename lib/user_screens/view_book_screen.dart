@@ -141,36 +141,35 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     } catch (e) {
       // Show an error message if the download failed.
       // showSnackBar(context,'Download failed: $e');
-     showDialog(
-  context: context,
-  barrierDismissible: false,
-  builder: (BuildContext context) {
-    return AlertDialog(
-      title: Text('Download Failed', style: TextStyle(fontSize: 20)),
-      content: SingleChildScrollView(
-        child: ListBody(
-          children: <Widget>[
-            Column(
-              children: [
-                Icon(Icons.error),
-                Text('$e', style: TextStyle(fontSize: 12))
-              ],
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Download Failed', style: TextStyle(fontSize: 20)),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Column(
+                    children: [
+                      Icon(Icons.error),
+                      Text('$e', style: TextStyle(fontSize: 12))
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text('Close'),
-        ),
-      ],
-    );
-  },
-);
-
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -421,6 +420,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                 width: 210,
                                 child: TextInputField(
                                   hintText: 'Enter Duration',
+                                  suffixIcon: Text(''),
                                   isPassword: false,
                                   textEditingController:
                                       _durationdaysController,
@@ -874,7 +874,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                   children: [
                                     ElevatedButton.icon(
                                         onPressed: () {
-                                          flutterToast('Loading...');
+                                          // flutterToast('Loading...');
                                           navigateWithNoBack(
                                               context,
                                               ListenBookScreen(
@@ -1137,13 +1137,28 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                           MainAxisAlignment
                                                               .spaceAround,
                                                       children: [
-                                                        CircleAvatar(
-                                                          maxRadius: 20,
-                                                          backgroundImage:
-                                                              NetworkImage(
-                                                                  provider
-                                                                      .users[0]
-                                                                      .photo),
+                                                        SizedBox(
+                                                          height: 30,
+                                                          width: 30,
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                            child:
+                                                                Image.network(
+                                                              provider.users[0]
+                                                                  .photo,
+                                                              errorBuilder:
+                                                                  (context,
+                                                                      error,
+                                                                      stackTrace) {
+                                                                return Icon(
+                                                                    Icons.error,
+                                                                    size: 20);
+                                                              },
+                                                            ),
+                                                          ),
                                                         ),
                                                         Text(
                                                           provider.users[0].name
@@ -1242,13 +1257,28 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                           MainAxisAlignment
                                                               .spaceAround,
                                                       children: [
-                                                        CircleAvatar(
-                                                          maxRadius: 20,
-                                                          backgroundImage:
-                                                              NetworkImage(
-                                                                  provider
-                                                                      .users[1]
-                                                                      .photo),
+                                                        SizedBox(
+                                                          height: 30,
+                                                          width: 30,
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                            child:
+                                                                Image.network(
+                                                              provider.users[1]
+                                                                  .photo,
+                                                              errorBuilder:
+                                                                  (context,
+                                                                      error,
+                                                                      stackTrace) {
+                                                                return Icon(
+                                                                    Icons.error,
+                                                                    size: 20);
+                                                              },
+                                                            ),
+                                                          ),
                                                         ),
                                                         Text(
                                                           provider.users[1].name
@@ -1345,13 +1375,28 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                           MainAxisAlignment
                                                               .spaceAround,
                                                       children: [
-                                                        CircleAvatar(
-                                                          maxRadius: 20,
-                                                          backgroundImage:
-                                                              NetworkImage(
-                                                                  provider
-                                                                      .users[2]
-                                                                      .photo),
+                                                        SizedBox(
+                                                          height: 30,
+                                                          width: 30,
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                            child:
+                                                                Image.network(
+                                                              provider.users[2]
+                                                                  .photo,
+                                                              errorBuilder:
+                                                                  (context,
+                                                                      error,
+                                                                      stackTrace) {
+                                                                return Icon(
+                                                                    Icons.error,
+                                                                    size: 20);
+                                                              },
+                                                            ),
+                                                          ),
                                                         ),
                                                         Text(
                                                           provider.users[2].name

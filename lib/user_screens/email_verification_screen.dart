@@ -99,6 +99,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       onWillPop: onWillPop,
       child: SafeArea(
         child: Scaffold(
+          appBar: AppBar(
+              title: const Text('Verify Email'),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  navigateWithNoBack(context, const LoginScreen());
+                },
+              )),
           body: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,

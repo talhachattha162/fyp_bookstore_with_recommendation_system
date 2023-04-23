@@ -8,6 +8,7 @@ class TextInputField extends StatelessWidget {
   const TextInputField(
       {Key? key,
       required this.hintText,
+      required this.suffixIcon,
       required this.textInputType,
       required this.textEditingController,
       required this.isPassword,
@@ -18,7 +19,7 @@ class TextInputField extends StatelessWidget {
   final String hintText;
   final TextInputType textInputType;
   final FormFieldValidator validator;
-
+final Widget suffixIcon;
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
@@ -45,6 +46,7 @@ class TextInputField extends StatelessWidget {
       controller: textEditingController,
       decoration: InputDecoration(
           hintText: hintText,
+          suffixIcon:suffixIcon,
           border: border,
           enabledBorder: border,
           focusedBorder: focusedborder,
@@ -55,3 +57,5 @@ class TextInputField extends StatelessWidget {
     );
   }
 }
+
+

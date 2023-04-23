@@ -42,6 +42,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isLoading = false;
   bool isGoogleLoading = false;
   Timer? timer;
+  bool _obscureText = true;
+
   @override
   void initState() {
     super.initState();
@@ -192,6 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               horizontal: 16.0, vertical: 4.0),
                           child: TextInputField(
                             hintText: 'Enter Email',
+                            suffixIcon: Text(''),
                             textInputType: TextInputType.emailAddress,
                             textEditingController: _emailController,
                             isPassword: false,
@@ -211,9 +214,21 @@ class _LoginScreenState extends State<LoginScreen> {
                               horizontal: 16.0, vertical: 4.0),
                           child: TextInputField(
                             hintText: 'Enter Password',
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureText
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscureText = !_obscureText;
+                                });
+                              },
+                            ),
                             textInputType: TextInputType.visiblePassword,
                             textEditingController: _passwordController,
-                            isPassword: true,
+                            isPassword: _obscureText,
                             validator: (value) {
                               String password = value.trim();
                               if (!pass_valid.hasMatch(password)) {
@@ -239,7 +254,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     });
 
                                     if (_emailController.text ==
-                                        'talhachattha162@gmail.com') {
+                                        'abctalhachattha162@gmail.com') {
                                       navigateWithNoBack(context,
                                           const MainScreenAdmin()); //admin data will not be stored to firebase
                                     } else {

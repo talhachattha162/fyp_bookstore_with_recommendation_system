@@ -32,6 +32,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   Timer? timer;
   bool _isLoading = false;
+  bool _obscureText = true;
 
   @override
   void initState() {
@@ -139,6 +140,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               horizontal: 16.0, vertical: 4.0),
                           child: TextInputField(
                             hintText: 'Enter Name',
+                            suffixIcon: Text(''),
                             textInputType: TextInputType.name,
                             textEditingController: _nameController,
                             isPassword: false,
@@ -158,6 +160,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               horizontal: 16.0, vertical: 4.0),
                           child: TextInputField(
                             hintText: 'Enter Email',
+                            suffixIcon: Text(''),
                             textInputType: TextInputType.emailAddress,
                             textEditingController: _emailController,
                             isPassword: false,
@@ -177,9 +180,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               horizontal: 16.0, vertical: 4.0),
                           child: TextInputField(
                             hintText: 'Enter Password',
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureText
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscureText = !_obscureText;
+                                });
+                              },
+                            ),
                             textInputType: TextInputType.text,
                             textEditingController: _passwordController,
-                            isPassword: true,
+                            isPassword: _obscureText,
                             validator: (value) {
                               String password = value.trim();
                               if (!pass_valid.hasMatch(password)) {

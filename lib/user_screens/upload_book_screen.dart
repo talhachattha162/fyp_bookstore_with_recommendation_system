@@ -160,6 +160,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                         children: [
                           TextInputField(
                             hintText: 'Enter title',
+                                  suffixIcon: Text(''),
                             isPassword: false,
                             textInputType: TextInputType.text,
                             textEditingController: _titleController,
@@ -172,6 +173,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                           ),
                           TextInputField(
                             hintText: 'Enter Author Name',
+                                  suffixIcon: Text(''),
                             isPassword: false,
                             textInputType: TextInputType.name,
                             textEditingController: _authorController,
@@ -187,6 +189,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                           ),
                           TextInputField(
                             hintText: 'Enter Published Year',
+                                  suffixIcon: Text(''),
                             isPassword: false,
                             textInputType: TextInputType.text,
                             textEditingController: _publishyearController,
@@ -234,6 +237,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   width: width * 0.305,
                                   child: TextInputField(
                                     hintText: 'Tag1',
+                                  suffixIcon: Text(''),
                                     isPassword: false,
                                     textInputType: TextInputType.text,
                                     textEditingController: _tag1Controller,
@@ -252,6 +256,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   width: width * 0.305,
                                   child: TextInputField(
                                     hintText: 'Tag2',
+                                  suffixIcon: Text(''),
                                     isPassword: false,
                                     textInputType: TextInputType.text,
                                     textEditingController: _tag2Controller,
@@ -270,6 +275,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   width: width * 0.305,
                                   child: TextInputField(
                                     hintText: 'Tag3',
+                                  suffixIcon: Text(''),
                                     isPassword: false,
                                     textInputType: TextInputType.text,
                                     textEditingController: _tag3Controller,
@@ -403,6 +409,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                 padding: const EdgeInsets.only(bottom: 10.0),
                                 child: TextInputField(
                                   hintText: 'Enter Price',
+                                  suffixIcon: Text(''),
                                   isPassword: false,
                                   textEditingController: _priceController,
                                   validator: (value) {

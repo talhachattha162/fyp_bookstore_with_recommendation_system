@@ -103,6 +103,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                       ),
                       TextInputField(
                         hintText: 'Enter Review',
+                                  suffixIcon: Text(''),
                         isPassword: false,
                         textInputType: TextInputType.text,
                         textEditingController: _reviewController,

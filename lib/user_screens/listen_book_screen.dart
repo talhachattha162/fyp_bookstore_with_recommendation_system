@@ -160,15 +160,14 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
   }
 
   decryptAndConvertToText() async {
-    setState(() {
-      isLoading = true;
-    });
     Uint8List decryptedData = await _decryptFile();
     var texttoConvert = await extractTextFromPDF(decryptedData);
+    if(mounted){
+      
     setState(() {
       textToConvert = texttoConvert;
-      isLoading = false;
     });
+    }
   }
 
   initTts() async {
@@ -235,10 +234,11 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
       Future.delayed(Duration(milliseconds: 50), () {
         initTts();
         decryptAndConvertToText();
-      });
-      setState(() {
+         setState(() {
         isLoading = false;
       });
+      });
+     
     });
   }
 

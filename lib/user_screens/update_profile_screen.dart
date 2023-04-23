@@ -174,6 +174,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                               horizontal: 16.0, vertical: 4.0),
                           child: TextInputField(
                             hintText: 'Enter Name',
+                                  suffixIcon: Text(''),
                             textInputType: TextInputType.name,
                             textEditingController: _nameController,
                             isPassword: false,
@@ -196,6 +197,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                               horizontal: 16.0, vertical: 4.0),
                           child: TextInputField(
                             hintText: 'Enter Age',
+                                  suffixIcon: Text(''),
                             textInputType: TextInputType.number,
                             textEditingController: _ageController,
                             isPassword: false,

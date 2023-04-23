@@ -7,7 +7,6 @@ import 'package:bookstore_recommendation_system_fyp/user_screens/login_screen.da
 import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/firebase_constants.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,13 +16,34 @@ import 'providers/authstatenotifier.dart';
 import 'providers/themenotifier.dart';
 // import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_svg/svg.dart';
+import '../utils/navigation.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  // FlutterError.onError = (FlutterErrorDetails details) {
+  //   if (navigatorKey.currentContext != null) {
+  //     showDialog(
+  //       context: navigatorKey.currentContext!,
+  //       builder: (context) {
+  //         return AlertDialog(
+  //           title: Text('Error'),
+  //           content: Text('An error occurred. Please reload.'),
+  //           actions: [
+  //             ElevatedButton(
+  //               child: Text('Reload'),
+  //               onPressed: () {
+  //                 // Dismiss the AlertDialog
+  //                 navigateWithNoBack(context, MainScreenUser());
+  //               },
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //   }
+  // };
 
-  // Request permission again
-  // if (await Permission.contacts.request().isGranted) {
   runApp(
     MultiProvider(
       providers: [
@@ -52,6 +72,38 @@ Future<void> main() async {
 //   // Permission is not granted
 // SystemNavigator.pop();
 // }
+}
+
+class ErrorPage extends StatefulWidget {
+  @override
+  _ErrorPageState createState() => _ErrorPageState();
+}
+
+class _ErrorPageState extends State<ErrorPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Error'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('An error occurred. Please Reload the screen.'),
+            SizedBox(height: 16),
+            ElevatedButton(
+              child: Text('Reload'),
+              onPressed: () {
+                // Reload the current screen
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class Splash extends StatefulWidget {
@@ -126,6 +178,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -143,7 +197,6 @@ class _MyAppState extends State<MyApp> {
     super.didChangeDependencies();
     _checkAuthStatus();
   }
-
 
   @override
   void initState() {
@@ -201,25 +254,14 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    var firebaseUser = auth.currentUser;
     final themeNotifier = Provider.of<ThemeNotifier>(context);
-    final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
 
     // print('main');
-    return MaterialApp(
-      title: 'FYP',
-      theme: ThemeData(
-          appBarTheme: AppBarTheme(color: Colors.green[300]),
-          primarySwatch: primarycolor,
-          primaryColor: primarycolor,
-          fontFamily: 'RobotoMono'),
-      darkTheme: themeNotifier.getTheme(),
-      debugShowCheckedModeBanner: false,
-      home:
+    return 
           //  internetAvailabilityNotifier.getInternetAvailability() == true?
           _isFirstTime
               ? IntroScreen()
-              : (_isLoggedIn ? MainScreenUser() : LoginScreen()),
-    );
+              : (_isLoggedIn ? MainScreenUser() : LoginScreen())
+    ;
   }
 }
