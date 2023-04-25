@@ -82,7 +82,10 @@ class _TrendingScreenState extends State<TrendingScreen> {
       onWillPop: onWillPop,
       child: SafeArea(
         child: Scaffold(
-          appBar: AppBar(title: const Text('Trendings')),
+          appBar: AppBar(
+            title: const Text('Trendings'),
+            automaticallyImplyLeading: false,
+          ),
           resizeToAvoidBottomInset: false,
           body: isLoading
               ? Center(

@@ -39,7 +39,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
       onWillPop: onWillPop,
       child: SafeArea(
         child: Scaffold(
-            appBar: AppBar(title: const Text('Library')),
+            appBar: AppBar(title: const Text('Library'),
+            automaticallyImplyLeading: false,),
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

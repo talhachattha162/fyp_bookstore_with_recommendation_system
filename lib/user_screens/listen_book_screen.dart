@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import '../models/book.dart';
 import '../providers/internetavailabilitynotifier.dart';
+import '../providers/themenotifier.dart';
 import '../utils/InternetChecker.dart';
 import '../utils/navigation.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
@@ -162,11 +163,10 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
   decryptAndConvertToText() async {
     Uint8List decryptedData = await _decryptFile();
     var texttoConvert = await extractTextFromPDF(decryptedData);
-    if(mounted){
-      
-    setState(() {
-      textToConvert = texttoConvert;
-    });
+    if (mounted) {
+      setState(() {
+        textToConvert = texttoConvert;
+      });
     }
   }
 
@@ -234,11 +234,10 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
       Future.delayed(Duration(milliseconds: 50), () {
         initTts();
         decryptAndConvertToText();
-         setState(() {
-        isLoading = false;
+        setState(() {
+          isLoading = false;
+        });
       });
-      });
-     
     });
   }
 
@@ -384,6 +383,7 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
   }
 
   Widget button() {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     if (_ttsState == TtsState.stopped) {
       return ElevatedButton(
         onPressed: () async {
@@ -393,7 +393,21 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          side: BorderSide(width: 2, color: primarycolor),
+          side: BorderSide(
+              width: 2,
+              color: themeNotifier.getTheme() ==
+                      ThemeData.dark(useMaterial3: true).copyWith(
+                        colorScheme: ColorScheme.dark().copyWith(
+                          primary: darkprimarycolor,
+                          error: Colors.red,
+                          onPrimary: darkprimarycolor,
+                          outline: darkprimarycolor,
+                          primaryVariant: darkprimarycolor,
+                          onPrimaryContainer: darkprimarycolor,
+                        ),
+                      )
+                  ? darkprimarycolor
+                  : primarycolor),
         ),
         child: Text('Play'),
       );
@@ -406,7 +420,21 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          side: BorderSide(width: 2, color: primarycolor),
+          side: BorderSide(
+              width: 2,
+              color: themeNotifier.getTheme() ==
+                      ThemeData.dark(useMaterial3: true).copyWith(
+                        colorScheme: ColorScheme.dark().copyWith(
+                          primary: darkprimarycolor,
+                          error: Colors.red,
+                          onPrimary: darkprimarycolor,
+                          outline: darkprimarycolor,
+                          primaryVariant: darkprimarycolor,
+                          onPrimaryContainer: darkprimarycolor,
+                        ),
+                      )
+                  ? darkprimarycolor
+                  : primarycolor),
         ),
         child: Text('Resume'),
       );
@@ -418,7 +446,21 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
-            side: BorderSide(width: 2, color: primarycolor),
+            side: BorderSide(
+                width: 2,
+                color: themeNotifier.getTheme() ==
+                        ThemeData.dark(useMaterial3: true).copyWith(
+                          colorScheme: ColorScheme.dark().copyWith(
+                            primary: darkprimarycolor,
+                            error: Colors.red,
+                            onPrimary: darkprimarycolor,
+                            outline: darkprimarycolor,
+                            primaryVariant: darkprimarycolor,
+                            onPrimaryContainer: darkprimarycolor,
+                          ),
+                        )
+                    ? darkprimarycolor
+                    : primarycolor),
           ),
           child: Text('Pause'),
         ),
@@ -428,7 +470,21 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
-            side: BorderSide(width: 2, color: primarycolor),
+            side: BorderSide(
+                width: 2,
+                color: themeNotifier.getTheme() ==
+                        ThemeData.dark(useMaterial3: true).copyWith(
+                          colorScheme: ColorScheme.dark().copyWith(
+                            primary: darkprimarycolor,
+                            error: Colors.red,
+                            onPrimary: darkprimarycolor,
+                            outline: darkprimarycolor,
+                            primaryVariant: darkprimarycolor,
+                            onPrimaryContainer: darkprimarycolor,
+                          ),
+                        )
+                    ? darkprimarycolor
+                    : primarycolor),
           ),
           child: Text('Stop'),
         )

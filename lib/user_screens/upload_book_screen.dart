@@ -136,7 +136,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
       onWillPop: onWillPop,
       child: SafeArea(
         child: Scaffold(
-            appBar: AppBar(title: const Text('Book Details')),
+            appBar: AppBar(title: const Text('Book Details'),
+            automaticallyImplyLeading: false,),
             resizeToAvoidBottomInset: false,
             body: Stack(
               children: [

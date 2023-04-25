@@ -80,7 +80,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       onWillPop: onWillPop,
       child: SafeArea(
         child: Scaffold(
-          appBar: AppBar(title: Text('Balance: \$$balance')),
+          appBar: AppBar(
+            title: Text('Balance: \$$balance'),
+            automaticallyImplyLeading: false,
+          ),
           body: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

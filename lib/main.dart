@@ -45,33 +45,48 @@ Future<void> main() async {
   // };
 
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider<ThemeNotifier>(
-          create: (_) => ThemeNotifier(ThemeData(
-              appBarTheme: AppBarTheme(color: Colors.green[300]),
-              primarySwatch: primarycolor,
-              fontFamily: 'RobotoMono')),
-        ),
-        ChangeNotifierProvider<InternetNotifier>(
-            create: (_) => InternetNotifier(false)),
-        ChangeNotifierProvider<AuthState>(create: (context) => AuthState()),
-        ChangeNotifierProvider(create: (_) => PaymentProvider())
-        // Other providers here
-      ],
-      child: MaterialApp(
-        theme: ThemeData(
-          primarySwatch: Colors.green,
-        ),
-        home: Splash(),
-        debugShowCheckedModeBanner: false,
+    MultiProvider(providers: [
+      ChangeNotifierProvider<ThemeNotifier>(
+        create: (_) => ThemeNotifier(ThemeData(
+            appBarTheme: AppBarTheme(color: Colors.green[300]),
+            primarySwatch: primarycolor,
+            fontFamily: 'RobotoMono')),
       ),
-    ),
+      ChangeNotifierProvider<InternetNotifier>(
+          create: (_) => InternetNotifier(false)),
+      ChangeNotifierProvider<AuthState>(create: (context) => AuthState()),
+      ChangeNotifierProvider(create: (_) => PaymentProvider())
+      // Other providers here
+    ], child: beforeSplash()),
   );
 //   } else {
 //   // Permission is not granted
 // SystemNavigator.pop();
 // }
+}
+
+class beforeSplash extends StatefulWidget {
+  const beforeSplash({super.key});
+
+  @override
+  State<beforeSplash> createState() => _beforeSplashState();
+}
+
+class _beforeSplashState extends State<beforeSplash> {
+  @override
+  Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    return MaterialApp(
+      theme: ThemeData(
+          appBarTheme: AppBarTheme(color: Colors.green[300]),
+          primarySwatch: primarycolor,
+          primaryColor: primarycolor,
+          fontFamily: 'RobotoMono'),
+      darkTheme: themeNotifier.getTheme(),
+      debugShowCheckedModeBanner: false,
+      home: Splash(),
+    );
+  }
 }
 
 class ErrorPage extends StatefulWidget {
@@ -257,11 +272,10 @@ class _MyAppState extends State<MyApp> {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
 
     // print('main');
-    return 
-          //  internetAvailabilityNotifier.getInternetAvailability() == true?
-          _isFirstTime
-              ? IntroScreen()
-              : (_isLoggedIn ? MainScreenUser() : LoginScreen())
-    ;
+    return
+        //  internetAvailabilityNotifier.getInternetAvailability() == true?
+        _isFirstTime
+            ? IntroScreen()
+            : (_isLoggedIn ? MainScreenUser() : LoginScreen());
   }
 }

@@ -214,12 +214,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           return Center(child: Text('Loading...'));
                         }
                         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                          return  Center(
-        child: Visibility(
-          visible: true,
-          child: Text('No books found'),
-        ),
-      );
+                          return Center(
+                            child: Visibility(
+                              visible: true,
+                              child: Text('No books found'),
+                            ),
+                          );
                         }
                         return Stack(
                           children: [
