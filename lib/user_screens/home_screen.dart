@@ -1,9 +1,11 @@
+import 'package:bookstore_recommendation_system_fyp/user_screens/notification_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chips_choice/chips_choice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<String> titles = [];
   List<String> searchData = [];
+
+  int notificationLength = 0;
 
   intialize() {
     titles = books.map((book) {
@@ -59,6 +63,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     getCategories();
     getBooks();
+
+    _fetchNotifications();
     // print('homeinit');
   }
 
@@ -105,20 +111,36 @@ class _HomeScreenState extends State<HomeScreen> {
     return Future.value(true);
   }
 
+  void _fetchNotifications() async {
+    final usersCollection = FirebaseFirestore.instance.collection('users');
+    final notificationsCollection =
+        FirebaseFirestore.instance.collection('notifications');
+
+    notificationsCollection
+        .where('forUserId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .snapshots()
+        .listen((snapshots) {
+      usersCollection
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get()
+          .then((doc) {
+        final notificationAttribute = doc['notifications'] ?? 0;
+        if (mounted) {
+          setState(() {
+            notificationLength =
+                (snapshots.docs.length - notificationAttribute).toInt();
+          });
+        }
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // print('home');
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
     double height = MediaQuery.of(context).size.height;
-    return
-        // MultiProvider(
-        //   providers: [
-        //     ChangeNotifierProvider<BooksProvider>(
-        //         create: (_) => BooksProvider()
-        //           ..fetchBooks(categories.isNotEmpty ? categories[tag] : ' '))
-        //   ],
-        //   child:
-        WillPopScope(
+    // _fetchNotifications(context);
+    return WillPopScope(
       onWillPop: onWillPop,
       child: SafeArea(
         child: Scaffold(
@@ -126,31 +148,35 @@ class _HomeScreenState extends State<HomeScreen> {
             title: const Text('Book Store'),
             automaticallyImplyLeading: false,
             actions: [
-              IconButton(
-                  onPressed: () {
-                    themeNotifier.setTheme(themeNotifier.getTheme() ==
-                            ThemeData(
-                                // useMaterial3: true,
-                                appBarTheme:
-                                    AppBarTheme(color: Colors.green[300]),
-                                primarySwatch: primarycolor,
-                                fontFamily: 'RobotoMono')
-                        ? ThemeData.dark(useMaterial3: true).copyWith(
-                            colorScheme: ColorScheme.dark().copyWith(
-                              primary: darkprimarycolor,
-                              error: Colors.red,
-                              onPrimary: darkprimarycolor,
-                              outline: darkprimarycolor,
-                              primaryVariant: darkprimarycolor,
-                              onPrimaryContainer: darkprimarycolor,
-                            ),
-                          )
-                        : ThemeData(
-                            appBarTheme: AppBarTheme(color: Colors.green[300]),
-                            primarySwatch: primarycolor,
-                            fontFamily: 'RobotoMono'));
-                  },
-                  icon: const Icon(CupertinoIcons.moon)),
+              Stack(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      navigateWithNoBack(context, NotificationScreen());
+                    },
+                    icon: const Icon(Icons.notifications),
+                  ),
+                  Positioned(
+                    top: 22.0,
+                    right: 5.0,
+                    child: Container(
+                      padding: EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.red,
+                      ),
+                      child: Text(
+                        notificationLength.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               IconButton(
                 onPressed: () {
                   // method to show the search bar
@@ -161,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           searchData: searchData, books: books));
                 },
                 icon: const Icon(CupertinoIcons.search),
-              )
+              ),
             ],
           ),
           resizeToAvoidBottomInset: false,

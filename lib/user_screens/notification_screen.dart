@@ -1,116 +1,97 @@
+import 'package:bookstore_recommendation_system_fyp/models/notificationitem.dart';
+import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class NotificationScreen extends StatelessWidget {
-  final List<NotificationItem> notifications = [
-    NotificationItem(
-      avatarUrl: 'https://picsum.photos/50/50',
-      username: 'John Doe',
-      message: 'liked your photo',
-      time: DateTime.now().subtract(Duration(minutes: 15)),
-    ),
-    NotificationItem(
-      avatarUrl: 'https://picsum.photos/50/50',
-      username: 'Jane Doe',
-      message: 'started following you',
-      time: DateTime.now().subtract(Duration(hours: 2)),
-    ),
-    NotificationItem(
-      avatarUrl: 'https://picsum.photos/50/50',
-      username: 'Jack Smith',
-      message: 'commented on your post',
-      time: DateTime.now().subtract(Duration(days: 1)),
-    ),
-  ];
+import '../utils/navigation.dart';
+
+class NotificationScreen extends StatefulWidget {
+  const NotificationScreen({Key? key});
+
+  @override
+  State<NotificationScreen> createState() => _NotificationScreenState();
+}
+
+class _NotificationScreenState extends State<NotificationScreen> {
+  List<NotificationItem> notifications = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getNotifications();
+  }
+
+  Future<void> _getNotifications() async {
+    try {
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('notifications')
+          .where('forUserId', isEqualTo: userId)
+          .orderBy('notificationDateTime', descending: true)
+          .get();
+      final docs = querySnapshot.docs;
+      final notifications1 =
+          docs.map((doc) => NotificationItem.fromSnapshot(doc)).toList();
+      setState(() {
+        notifications = notifications1;
+      });
+
+      updateNotificationLength(notifications.length);
+    } catch (e) {
+      print('Error fetching notifications: $e');
+    }
+  }
+
+  updateNotificationLength(len) {
+    // Get a reference to the document to update
+    final DocumentReference documentReference = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid);
+
+// Update the attribute
+    documentReference
+        .update({'notifications': len})
+        .then((value) => print("notification updated successfully!"))
+        .catchError((error) => print("Failed to update notification: $error"));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications'),
-      ),
-      body: ListView.builder(
-        itemCount: notifications.length,
-        itemBuilder: (BuildContext context, int index) {
-          return InkWell(
-            onTap: () {
-              // Navigate to post or profile based on the notification type
+          title: Text('Notifications'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              navigateWithNoBack(context, const MainScreenUser());
             },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundImage:
-                            NetworkImage(notifications[index].avatarUrl),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              notifications[index].username,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              notifications[index].message,
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              notifications[index].timeAgo,
-                              style: TextStyle(
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Icon(Icons.arrow_forward_ios),
-                    ],
-                  ),
-                ),
+          )),
+      body: notifications.isEmpty
+          ? Center(
+              child: Center(
+                child: Text('No Notifications'),
               ),
+            )
+          : ListView.builder(
+              itemCount: notifications.length,
+              itemBuilder: (BuildContext context, int index) {
+                final notification = notifications[index];
+                DateTime dateTime = notification.notificationDateTime!.toDate();
+                String formattedDateTime =
+                    '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}';
+                print(formattedDateTime);
+                return Column(
+                  children: [
+                    ListTile(
+                      title: Text(notification.notificationMsg.toString()),
+                      subtitle: Text(formattedDateTime),
+                    ),
+                    Divider()
+                  ],
+                );
+              },
             ),
-          );
-        },
-      ),
     );
-  }
-}
-
-class NotificationItem {
-  final String avatarUrl;
-  final String username;
-  final String message;
-  final DateTime time;
-
-  NotificationItem({
-    required this.avatarUrl,
-    required this.username,
-    required this.message,
-    required this.time,
-  });
-
-  String get timeAgo {
-    final now = DateTime.now();
-    final difference = now.difference(time);
-
-    if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
-    } else {
-      return 'just now';
-    }
   }
 }

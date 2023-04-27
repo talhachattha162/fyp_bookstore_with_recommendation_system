@@ -11,7 +11,7 @@ import '../main.dart';
 import '../user_screens/login_screen.dart';
 import '../utils/navigation.dart';
 import 'package:http/http.dart' as http;
-
+import '../models/notificationitem.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 
 class Permissions extends StatefulWidget {
@@ -64,6 +64,66 @@ class _PermissionsState extends State<Permissions> {
         .delete() // Delete the document
         .then((value) => flutterToast("Book deleted successfully"))
         .catchError((error) => print("Failed to delete book: $error"));
+  }
+
+  Future<String> getName(String userId) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final DocumentReference documentReference =
+        firestore.collection('users').doc(userId);
+    final DocumentSnapshot snapshot = await documentReference.get();
+    final String name = snapshot.get('name');
+    return name;
+  }
+
+  void subscriptionNotification(
+    String booktitle,
+    String bookUserId,
+  ) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final CollectionReference subscriptionsReference =
+        firestore.collection('Subscriptions');
+    final QuerySnapshot subscriptionsSnapshot =
+        await subscriptionsReference.get();
+
+    for (final QueryDocumentSnapshot subscription
+        in subscriptionsSnapshot.docs) {
+      final String toUserId = subscription.get('ToUserId');
+
+      if (toUserId == bookUserId) {
+        final String fromUserId = subscription.get('FromUserId');
+        final name = await getName(toUserId);
+        final notificationMsg = '$booktitle book is uploaded by $name.';
+        final notificationItem =
+            NotificationItem(notificationMsg, fromUserId, Timestamp.now());
+
+        final CollectionReference notificationsReference =
+            firestore.collection('notifications');
+        final Map<String, dynamic> notificationData = notificationItem.toMap();
+        await notificationsReference.add(notificationData);
+
+        print('notification:' + notificationItem.toMap().toString());
+      }
+    }
+  }
+
+  admitNotification(title, userid) async {
+    NotificationItem item =
+        NotificationItem(title + ' book is admitted', userid, Timestamp.now());
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final CollectionReference collectionReference =
+        firestore.collection('notifications');
+    await collectionReference.add(item.toMap());
+    print('notification2:' + item.toMap().toString());
+  }
+
+  deleteNotification(title, userid) async {
+    NotificationItem item =
+        NotificationItem(title + ' book is denied', userid, Timestamp.now());
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final CollectionReference collectionReference =
+        firestore.collection('notifications');
+    await collectionReference.add(item.toMap());
+    print('notification:' + item.toMap().toString());
   }
 
   Stream<QuerySnapshot> bookStream =
@@ -137,7 +197,7 @@ class _PermissionsState extends State<Permissions> {
                                   children: [
                                     Text(
                                       book['title'],
-                                      style: TextStyle(fontSize: 12),
+                                      style: TextStyle(fontSize: 11),
                                     ),
                                   ],
                                 ),
@@ -200,7 +260,10 @@ class _PermissionsState extends State<Permissions> {
                                     },
                                   );
                                 },
-                                child: Text('Copyright'),
+                                child: Text(
+                                  'Copyright',
+                                  style: TextStyle(fontSize: 10),
+                                ),
                               ),
                               TextButton(
                                 onPressed: () {
@@ -244,25 +307,39 @@ class _PermissionsState extends State<Permissions> {
                                     },
                                   );
                                 },
-                                child: Text('check book'),
+                                child: Text(
+                                  'check book',
+                                  style: TextStyle(fontSize: 10),
+                                ),
                               ),
                               book['isPermitted'] == true
-                                  ? Text('Permitted')
+                                  ? Text(
+                                      'Permitted',
+                                      style: TextStyle(fontSize: 11),
+                                    )
                                   : Row(
                                       children: [
                                         Padding(
                                           padding: const EdgeInsets.all(0.0),
                                           child: IconButton(
-                                              onPressed: () {
+                                              onPressed: () async {
                                                 updatePermission(
                                                     book['bookid'], true);
+                                                admitNotification(book['title'],
+                                                    book['userid']);
+                                                subscriptionNotification(
+                                                    book['title'],
+                                                    book['userid']);
                                               },
                                               icon: Icon(Icons.check)),
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.all(0.0),
                                           child: IconButton(
-                                              onPressed: () {
+                                              onPressed: () async {
+                                                deleteNotification(
+                                                    book['title'],
+                                                    book['userid']);
                                                 deleteBook(book['bookid']);
                                               },
                                               icon: Icon(Icons.clear)),

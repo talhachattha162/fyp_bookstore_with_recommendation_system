@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
             '',
             user.photoURL.toString(),
             0,
-            'google');
+            'google',0);
         var firebaseUser = auth.currentUser;
         firestoreInstance
             .collection("users")

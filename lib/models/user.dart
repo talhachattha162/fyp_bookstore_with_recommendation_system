@@ -6,9 +6,10 @@ class Users {
   String photo = '';
   String age = '';
   int balance = 0;
+  int notifications = 0;
   String authenticationmethod = '';
   Users(this.uid, this.name, this.age, this.email, this.password, this.photo,
-      this.balance, this.authenticationmethod);
+      this.balance, this.authenticationmethod, this.notifications);
 
   // setters
 
@@ -65,6 +66,10 @@ class Users {
 
   get getBalance => this.balance;
 
+  int getNotifications() {
+    return notifications;
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
@@ -74,7 +79,8 @@ class Users {
       'password': password,
       'photo': photo,
       'balance': balance,
-      'authenticationmethod': authenticationmethod
+      'authenticationmethod': authenticationmethod,
+      'notifications': notifications
     };
   }
 
@@ -87,6 +93,7 @@ class Users {
         map['password'],
         map['photo'],
         map['balance'],
-        map['authenticationmethod']);
+        map['authenticationmethod'],
+        map['notifications']);
   }
 }

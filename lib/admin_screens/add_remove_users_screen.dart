@@ -44,7 +44,7 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
                 doc['password'],
                 doc['photo'],
                 doc['balance'],
-                doc['authenticationmethod']))
+                doc['authenticationmethod'],doc['notifications']))
             .toList());
   }
 
@@ -138,7 +138,7 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
                     password: password,
                   );
                   Users u = Users(userCredential.user!.uid, '', '', email,
-                      password, '', 0, 'email');
+                      password, '', 0, 'email',0);
                   // Add user to Firestore
                   await FirebaseFirestore.instance
                       .collection('users')

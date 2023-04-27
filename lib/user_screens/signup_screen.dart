@@ -70,7 +70,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: userEmail, password: password);
       Users users = Users(
-          auth.currentUser!.uid, name, '', userEmail, password, '', 0, 'email');
+          auth.currentUser!.uid, name, '', userEmail, password, '', 0, 'email',0);
       var firebaseUser = auth.currentUser;
       firestoreInstance
           .collection("users")

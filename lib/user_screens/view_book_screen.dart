@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:bookstore_recommendation_system_fyp/models/user.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:bookstore_recommendation_system_fyp/user_screens/book_pdf_screen.dart';
@@ -16,6 +17,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../Widgets/text_field.dart';
 import '../models/book.dart';
+import '../models/notificationitem.dart';
 import '../models/payment.dart';
 import '../providers/bookprovider.dart';
 import '../providers/internetavailabilitynotifier.dart';
@@ -71,6 +73,15 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
       return Future.value(false);
     }
     return Future.value(true);
+  }
+
+  Future<String> getName(String userId) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final DocumentReference documentReference =
+        firestore.collection('users').doc(userId);
+    final DocumentSnapshot snapshot = await documentReference.get();
+    final String name = snapshot.get('name');
+    return name;
   }
 
   Future<bool> isBookFavorited() async {
@@ -223,6 +234,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   @override
   void initState() {
     _getRecommendations(widget.book.title);
+    getUserData();
+    subscriptionChecker();
     _razorpay = Razorpay();
     _razorpay?.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay?.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
@@ -289,6 +302,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   void dispose() {
     timer?.cancel();
     _paymentsStreamSubscription!.cancel();
+    _subscriptionsStream.cancel();
+    // _razorpay!.clear();
     super.dispose();
   }
 
@@ -349,35 +364,58 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   }
 
   Future<dynamic> createOrder() async {
-    var mapHeader = <String, String>{};
-    mapHeader['Authorization'] =
-        "Basic cnpwX3Rlc3RfU2RHQmFoV3RsS1dNd2I6Mlh2WElOSDlMcG9xTHdyU3F5cDFzam5y";
-    mapHeader['Accept'] = "application/json";
-    mapHeader['Content-Type'] = "application/x-www-form-urlencoded";
-    var map = <String, String>{};
-    setState(() {
-      map['amount'] = '2000';
-    });
-    map['currency'] = "USD";
-    map['receipt'] = "receipt1";
-    var response = await http.post(Uri.https("api.razorpay.com", "/v1/orders"),
-        headers: mapHeader, body: map);
-    if (response.statusCode == 200) {
-      RazorpayOrderResponse data =
-          RazorpayOrderResponse.fromJson(json.decode(response.body));
-      openCheckout(data);
-    } else {
-      Fluttertoast.showToast(msg: 'error:${response.reasonPhrase}');
-    }
+    // var mapHeader = <String, String>{};
+
+    // String apiKey = "rzp_test_tlNELsTTfVj6JA";
+    // String apiSecret = "BZCGXLmKoYMRXwE2rplvQZGO";
+
+    // String credentials = base64.encode(utf8.encode('$apiKey:$apiSecret'));
+    // mapHeader['Authorization'] = "Basic $credentials";
+    // mapHeader['Accept'] = "application/json";
+    // mapHeader['Content-Type'] = "application/x-www-form-urlencoded";
+    // var map = <String, String>{};
+    // setState(() {
+    //   map['amount'] = '${widget.book.price}';
+    // });
+    // map['currency'] = "USD";
+    // var response = await http.post(Uri.https("api.razorpay.com", "/v1/orders"),
+    //     headers: mapHeader, body: map);
+    // if (response.statusCode == 200) {
+    //   RazorpayOrderResponse data =
+    //       RazorpayOrderResponse.fromJson(json.decode(response.body));
+    //   // print('repo2:' + response.body.toString());
+    //   // print('repo2:' + data.toString());
+    openCheckout();
+    // } else {
+    //   Fluttertoast.showToast(msg: 'error:${response.reasonPhrase}');
+    // }
   }
 
-  void openCheckout(RazorpayOrderResponse data) async {
+  void openCheckout() async {
+    // print('hello');
+// Card Number: 4111 1111 1111 1111
+// Expiry Date: Any future date
+// CVV: Any 3-digit number
+// Name on Card: Any name
+    final name = await getName(FirebaseAuth.instance.currentUser!.uid);
     var options = {
-      'key': 'rzp_test_NNbwJ9tmM0fbxj',
-      'amount': 20000,
-      'name': 'Shaiq',
-      'description': 'Payment',
-      'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
+      'key': 'rzp_test_tlNELsTTfVj6JA',
+      'amount': widget.book.price.toInt() * 100, //* 82
+      'currency': 'USD', //'INR'
+      'name': name,
+      'description': widget.book.title,
+      'prefill': {
+        'name': name,
+        'email': FirebaseAuth.instance.currentUser!.email,
+        'contact': FirebaseAuth.instance.currentUser!.phoneNumber,
+        'card[number]': '4111111111111111',
+        'card[expiry]': '12/24',
+        'card[cvv]': '123',
+        'notes': {
+          'address': '123 Main Street, Anytown USA',
+          'shipping_method': 'Express'
+        }
+      },
       'external': {
         'wallets': ['paytm']
       }
@@ -411,6 +449,11 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
+                              // Text(
+                              //   'Use: \nCard Number: 4111 1111 1111 1111\nExpiry Date: 12/23\nCVV: 123\nName on Card: John Doe',
+                              //   style: TextStyle(
+                              //       fontSize: 10, color: Colors.redAccent),
+                              // ),
                               Text('Enter Duration in days to rent',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
@@ -465,13 +508,42 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                           ],
                         ),
                       ),
-                    )
+                    ),
+                    // ElevatedButton(
+                    //     onPressed: () {
+                    //       navigateWithNoBack(context, GooglePayInit());
+                    //     },
+                    //     child: Text('Pay with Google'))
                   ],
                 ),
               ],
             ),
           );
         });
+  }
+
+  late CollectionReference<Map<String, dynamic>> _subscriptionsRef;
+  late StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
+      _subscriptionsStream;
+  bool _isSubscribed = false;
+
+  subscriptionChecker() {
+    _subscriptionsRef = FirebaseFirestore.instance.collection('Subscriptions');
+    _subscriptionsStream = _subscriptionsRef
+        .where('FromUserId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .where('ToUserId', isEqualTo: widget.book.userid)
+        .snapshots()
+        .listen((QuerySnapshot<Map<String, dynamic>> snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        setState(() {
+          _isSubscribed = true;
+        });
+      } else {
+        setState(() {
+          _isSubscribed = false;
+        });
+      }
+    });
   }
 
   // static Future<File> _storeFile(String url, List<int> bytes) async {
@@ -527,6 +599,64 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
         isDownloading = false;
       });
     }
+  }
+
+  Users? _userData;
+
+  getUserData() {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.book.userid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        setState(() {
+          _userData = Users.fromMap(
+              (documentSnapshot.data() as Map<String, dynamic>?)!);
+        });
+      }
+    });
+  }
+
+  Future<void> _subscribe() async {
+    _subscriptionsRef
+        .doc(widget.book.userid + FirebaseAuth.instance.currentUser!.uid)
+        .set({
+      'FromUserId': FirebaseAuth.instance.currentUser!.uid,
+      'ToUserId': widget.book.userid,
+    }).then((value) {
+      setState(() {
+        _isSubscribed = true;
+      });
+    });
+    final name = await getName(FirebaseAuth.instance.currentUser!.uid);
+    NotificationItem item = NotificationItem(
+        '$name subscribed you', widget.book.userid, Timestamp.now());
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final CollectionReference collectionReference =
+        firestore.collection('notifications');
+    final Map<String, dynamic> data = item.toMap();
+    await collectionReference.add(data);
+  }
+
+  void _unsubscribe() async {
+    _subscriptionsRef
+        .doc(widget.book.userid + FirebaseAuth.instance.currentUser!.uid)
+        .delete()
+        .then((_) {
+      setState(() {
+        _isSubscribed = false;
+      });
+    }).catchError((error) => print('Error unsubscribing: $error'));
+
+    final name = await getName(FirebaseAuth.instance.currentUser!.uid);
+    NotificationItem item = NotificationItem(
+        '$name unsubscribed you ', widget.book.userid, Timestamp.now());
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final CollectionReference collectionReference =
+        firestore.collection('notifications');
+    final Map<String, dynamic> data = item.toMap();
+    await collectionReference.add(data);
   }
 
   @override
@@ -1525,7 +1655,31 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       },
                                     ),
                                   ),
-                                )
+                                ),
+                          FirebaseAuth.instance.currentUser!.uid ==
+                                  widget.book.userid
+                              ? Container()
+                              : Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                      Text(_userData != null
+                                          ? _userData!.name.length > 10
+                                              ? 'Username:' +
+                                                  'Username:' +
+                                                  _userData!.name
+                                                      .substring(0, 10)
+                                              : 'Uploaded by ' + _userData!.name
+                                          : 'Uploaded by Admin'),
+                                      ElevatedButton(
+                                        onPressed: _isSubscribed
+                                            ? _unsubscribe
+                                            : _subscribe,
+                                        child: Text(_isSubscribed
+                                            ? 'Unsubscribe'
+                                            : 'Subscribe'),
+                                      )
+                                    ]),
                         ],
                       ),
                     )),

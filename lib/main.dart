@@ -17,6 +17,7 @@ import 'providers/themenotifier.dart';
 // import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_svg/svg.dart';
 import '../utils/navigation.dart';
+// import 'package:flutter_stripe/flutter_stripe.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,6 +44,8 @@ Future<void> main() async {
   //     );
   //   }
   // };
+  // Stripe.publishableKey =
+  //     "pk_test_51MWx8OAVMyklfe3CsjEzA1CiiY0XBTlHYbZ8jQlGtVFIwQi4aNeGv8J1HUw4rgSavMTLzTwgn0XRlwoTVRFXyu2h00mRUeWmAf";
 
   runApp(
     MultiProvider(providers: [
@@ -55,7 +58,8 @@ Future<void> main() async {
       ChangeNotifierProvider<InternetNotifier>(
           create: (_) => InternetNotifier(false)),
       ChangeNotifierProvider<AuthState>(create: (context) => AuthState()),
-      ChangeNotifierProvider(create: (_) => PaymentProvider())
+      ChangeNotifierProvider(create: (_) => PaymentProvider()),
+
       // Other providers here
     ], child: beforeSplash()),
   );

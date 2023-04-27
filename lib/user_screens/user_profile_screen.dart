@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../models/user.dart';
 import '../providers/authstatenotifier.dart';
+import '../providers/themenotifier.dart';
 import '../utils/firebase_constants.dart';
 import 'faqs_screen.dart';
 import 'update_profile_screen.dart';
@@ -74,6 +75,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return WillPopScope(
@@ -129,18 +131,44 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               navigateWithNoBack(context, const FaqScreen());
                             },
                           ),
-                          // const Divider(),
-                          // ListTile(
-                          //   leading: const Icon(Icons.mode_night_outlined),
-                          //   title: const Text('Dark Mode'),
-                          //   trailing: Switch(
-                          //       value: _isSwitched,
-                          //       onChanged: (value) {
-                          //         setState(() {
-                          //           _isSwitched = value;
-                          //         });
-                          //       }),
-                          // ),
+                          const Divider(),
+                          ListTile(
+                            leading: const Icon(Icons.mode_night_outlined),
+                            title: const Text('Dark Mode'),
+                            trailing: Switch(
+                                value: _isSwitched,
+                                onChanged: (value) {
+                                  themeNotifier.setTheme(themeNotifier
+                                              .getTheme() ==
+                                          ThemeData(
+                                              // useMaterial3: true,
+                                              appBarTheme: AppBarTheme(
+                                                  color: Colors.green[300]),
+                                              primarySwatch: primarycolor,
+                                              fontFamily: 'RobotoMono')
+                                      ? ThemeData.dark(useMaterial3: true)
+                                          .copyWith(
+                                          colorScheme:
+                                              ColorScheme.dark().copyWith(
+                                            primary: darkprimarycolor,
+                                            error: Colors.red,
+                                            onPrimary: darkprimarycolor,
+                                            outline: darkprimarycolor,
+                                            primaryVariant: darkprimarycolor,
+                                            onPrimaryContainer:
+                                                darkprimarycolor,
+                                          ),
+                                        )
+                                      : ThemeData(
+                                          appBarTheme: AppBarTheme(
+                                              color: Colors.green[300]),
+                                          primarySwatch: primarycolor,
+                                          fontFamily: 'RobotoMono'));
+                                  setState(() {
+                                    _isSwitched = value;
+                                  });
+                                }),
+                          ),
                           const Divider(),
                           ListTile(
                             leading: const Icon(Icons.privacy_tip_outlined),
