@@ -44,7 +44,8 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
                 doc['password'],
                 doc['photo'],
                 doc['balance'],
-                doc['authenticationmethod'],doc['notifications']))
+                doc['authenticationmethod'],
+                doc['notifications']))
             .toList());
   }
 
@@ -138,7 +139,7 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
                     password: password,
                   );
                   Users u = Users(userCredential.user!.uid, '', '', email,
-                      password, '', 0, 'email',0);
+                      password, '', 0, 'email', 0);
                   // Add user to Firestore
                   await FirebaseFirestore.instance
                       .collection('users')
@@ -170,6 +171,7 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Users'),
+            automaticallyImplyLeading: false,
         actions: [
           IconButton(
               onPressed: () {
@@ -178,8 +180,15 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
                             appBarTheme: AppBarTheme(color: Colors.green[300]),
                             primarySwatch: primarycolor,
                             fontFamily: 'RobotoMono')
-                    ? ThemeData.dark(
-                        useMaterial3: true,
+                    ? ThemeData.dark(useMaterial3: true).copyWith(
+                        colorScheme: ColorScheme.dark().copyWith(
+                          primary: darkprimarycolor,
+                          error: Colors.red,
+                          onPrimary: darkprimarycolor,
+                          outline: darkprimarycolor,
+                          primaryVariant: darkprimarycolor,
+                          onPrimaryContainer: darkprimarycolor,
+                        ),
                       )
                     : ThemeData(
                         appBarTheme: AppBarTheme(color: Colors.green[300]),

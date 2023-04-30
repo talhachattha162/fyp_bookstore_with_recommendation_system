@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'admin_screens/admin_main_screen.dart';
 import 'providers/paymentprovider.dart';
 import 'providers/authstatenotifier.dart';
 import 'providers/themenotifier.dart';
@@ -208,7 +209,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Timer? timer;
-  bool _isFirstTime = true;
+  bool _isFirstTime = false;
   bool _isLoggedIn = false;
 
   @override
@@ -217,10 +218,11 @@ class _MyAppState extends State<MyApp> {
     _checkAuthStatus();
   }
 
+  bool isAdminLoggedIn = false;
+
   @override
   void initState() {
     super.initState();
-    _checkFirstTime();
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
@@ -238,11 +240,21 @@ class _MyAppState extends State<MyApp> {
       }
     });
 
-    Future.microtask(() {
+    Future.microtask(() async {
+      await _checkFirstTime();
       if (auth.currentUser != null) {
         context.read<AuthState>().user = 1;
+
+        print('admin:::' + isAdminLoggedIn.toString());
         // print('chatthasohail');
       } else {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        bool? isLogged = prefs.getBool('isLoggedIn');
+        if (isLogged == true) {
+          setState(() {
+            isAdminLoggedIn = isLogged!;
+          });
+        }
         context.read<AuthState>().user = null;
         // print('chatthasohail7');
       }
@@ -280,6 +292,8 @@ class _MyAppState extends State<MyApp> {
         //  internetAvailabilityNotifier.getInternetAvailability() == true?
         _isFirstTime
             ? IntroScreen()
-            : (_isLoggedIn ? MainScreenUser() : LoginScreen());
+            : (_isLoggedIn
+                ? MainScreenUser()
+                : (isAdminLoggedIn ? MainScreenAdmin() : LoginScreen()));
   }
 }

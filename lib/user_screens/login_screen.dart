@@ -25,6 +25,7 @@ import '../utils/navigation.dart';
 import '../utils/snackbar.dart';
 import 'reset_password_screen.dart';
 import 'signup_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -102,7 +103,8 @@ class _LoginScreenState extends State<LoginScreen> {
             '',
             user.photoURL.toString(),
             0,
-            'google',0);
+            'google',
+            0);
         var firebaseUser = auth.currentUser;
         firestoreInstance
             .collection("users")
@@ -252,9 +254,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                     setState(() {
                                       isLoading = true;
                                     });
-
                                     if (_emailController.text ==
                                         'abctalhachattha162@gmail.com') {
+                                      SharedPreferences prefs =
+                                          await SharedPreferences.getInstance();
+                                      bool isLoggedIn = true;
+                                      prefs.setBool('isLoggedIn', isLoggedIn);
                                       navigateWithNoBack(context,
                                           const MainScreenAdmin()); //admin data will not be stored to firebase
                                     } else {

@@ -62,7 +62,7 @@ class _RentedBooksState extends State<RentedBooks> {
       child: SafeArea(
         child: Scaffold(
             appBar: AppBar(
-                title: const Text('Rented Books'),
+                title: const Text('Purchased Books'),
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () {
@@ -70,125 +70,136 @@ class _RentedBooksState extends State<RentedBooks> {
                   },
                 )),
             body: SizedBox(
-  width: double.infinity,
-  height: height * 0.93,
-  child: FutureBuilder<QuerySnapshot>(
-    future: firestore
-        .collection('payments')
-        .where('freeRentPaid', isEqualTo: 'rent')
-        .where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-        .get(),
-    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-      if (snapshot.hasError) {
-        return Center(child: Text('Error: ${snapshot.error}'));
-      }
-      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-        return Visibility(
-          visible: true,
-          child: Center(child: Text('No Rented books found')),
-        );
-      }
-      return GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 6,
-            mainAxisSpacing: 6,
-            mainAxisExtent: 230),
-        padding: const EdgeInsets.all(8.0),
-        itemCount: snapshot.data!.docs.length,
-        itemBuilder: (BuildContext context, int index) {
-          QueryDocumentSnapshot payments = snapshot.data!.docs[index];
-          DateTime paymentCreationTime =
-              payments.get('dateTimeCreated').toDate();
-          int duration = payments.get('durationDays');
-          DateTime expirationDate =
-              paymentCreationTime.add(Duration(days: duration));
-          Duration timeLeft = expirationDate.difference(DateTime.now());
-          if (timeLeft.isNegative) {
-            return Container();
-          }
-         return FutureBuilder<DocumentSnapshot>(
-  future: firestore
-      .collection('books')
-      .doc(payments.get('bookId'))
-      .get(),
-  builder:
-      (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-    if (snapshot.hasError) {
-      return Text('Error: ${snapshot.error}');
-    }
-    if (snapshot.hasData) {
-      Map<String, dynamic>? bookData =
-          snapshot.data!.data() as Map<String, dynamic>?;
-      if (bookData != null) {
-        return InkWell(
-          onTap: () {
-            navigateWithNoBack(
-                context,
-                ViewBookScreen(
-                  book: Book.fromMap(bookData),
-                ));
-          },
-          child: Card(
-            elevation: 10,
-            borderOnForeground: true,
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Column(
-                children: [
-                  CachedNetworkImage(
-                    height: 170,
-                    width: double.infinity,
-                    fit: BoxFit.fill,
-                    imageUrl: bookData['coverPhotoFile'],
-                    placeholder: (context, url) =>
-                        Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) =>
-                        new Icon(Icons.error),
-                  ),
-                  SizedBox(
-                    child: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              bookData['title'].length > 20
-                                  ? bookData['title']
-                                          .substring(0, 20) +
-                                      '...'
-                                  : bookData['title'],
-                              style: TextStyle(fontSize: 12),
-                            ),
-                          ),
-                          Text(
-                            "\$" + bookData['price'].toString(),
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold),
-                          )
-                        ],
-                      ),
-                    ),
-                  )
-                ],
+              width: double.infinity,
+              height: height * 0.93,
+              child: FutureBuilder<QuerySnapshot>(
+                future: firestore
+                    .collection('payments')
+                    // .where('freeRentPaid', isEqualTo: 'rent')
+                    .where('userId',
+                        isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                    .get(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Visibility(
+                      visible: true,
+                      child: Center(child: Text('No Purchased books found')),
+                    );
+                  }
+                  return GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 6,
+                            mainAxisSpacing: 6,
+                            mainAxisExtent: 230),
+                    padding: const EdgeInsets.all(8.0),
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      QueryDocumentSnapshot payments =
+                          snapshot.data!.docs[index];
+                      // DateTime paymentCreationTime =
+                      //     payments.get('dateTimeCreated').toDate();
+                      // int duration = payments.get('durationDays');
+                      // DateTime expirationDate =
+                      //     paymentCreationTime.add(Duration(days: duration));
+                      // Duration timeLeft =
+                      //     expirationDate.difference(DateTime.now());
+                      // if (timeLeft.isNegative) {
+                      //   return Text('Talha');
+                      // }
+                      return FutureBuilder<DocumentSnapshot>(
+                        future: firestore
+                            .collection('books')
+                            .doc(payments.get('bookId'))
+                            .get(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<DocumentSnapshot> snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          }
+                          if (snapshot.hasData) {
+                            Map<String, dynamic>? bookData =
+                                snapshot.data!.data() as Map<String, dynamic>?;
+                            if (bookData != null) {
+                              return InkWell(
+                                onTap: () {
+                                  navigateWithNoBack(
+                                      context,
+                                      ViewBookScreen(
+                                        book: Book.fromMap(bookData),
+                                      ));
+                                },
+                                child: Card(
+                                  elevation: 10,
+                                  borderOnForeground: true,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Column(
+                                      children: [
+                                        CachedNetworkImage(
+                                          height: 170,
+                                          width: double.infinity,
+                                          fit: BoxFit.fill,
+                                          imageUrl: bookData['coverPhotoFile'],
+                                          placeholder: (context, url) => Center(
+                                              child:
+                                                  CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) =>
+                                              new Icon(Icons.error),
+                                        ),
+                                        SizedBox(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Flexible(
+                                                  child: Text(
+                                                    bookData['title'].length >
+                                                            20
+                                                        ? bookData['title']
+                                                                .substring(
+                                                                    0, 20) +
+                                                            '...'
+                                                        : bookData['title'],
+                                                    style:
+                                                        TextStyle(fontSize: 12),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "\$" +
+                                                      bookData['price']
+                                                          .toString(),
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                          return Container(); // default return value
+                        },
+                      );
+                    },
+                  );
+                },
               ),
-            ),
-          ),
-        );
-      }
-    }
-    return Container(); // default return value
-  },
-);
-
-        },
-      );
-    },
-  ),
-)
-),
+            )),
       ),
     );
   }

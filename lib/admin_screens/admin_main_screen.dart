@@ -98,28 +98,64 @@ class _MainScreenAdminState extends State<MainScreenAdmin> {
                         ),
                         label: 'Users',
                         backgroundColor: themeNotifier.getTheme() ==
-                                ThemeData.dark(useMaterial3: true)
+                                ThemeData.dark(useMaterial3: true).copyWith(
+                                  colorScheme: ColorScheme.dark().copyWith(
+                                    primary: darkprimarycolor,
+                                    error: Colors.red,
+                                    onPrimary: darkprimarycolor,
+                                    outline: darkprimarycolor,
+                                    primaryVariant: darkprimarycolor,
+                                    onPrimaryContainer: darkprimarycolor,
+                                  ),
+                                )
                             ? darkprimarycolor
                             : primarycolor),
                     BottomNavigationBarItem(
                         icon: Icon(Icons.upload),
                         label: 'Upload',
                         backgroundColor: themeNotifier.getTheme() ==
-                                ThemeData.dark(useMaterial3: true)
+                                ThemeData.dark(useMaterial3: true).copyWith(
+                                  colorScheme: ColorScheme.dark().copyWith(
+                                    primary: darkprimarycolor,
+                                    error: Colors.red,
+                                    onPrimary: darkprimarycolor,
+                                    outline: darkprimarycolor,
+                                    primaryVariant: darkprimarycolor,
+                                    onPrimaryContainer: darkprimarycolor,
+                                  ),
+                                )
                             ? darkprimarycolor
                             : primarycolor),
                     BottomNavigationBarItem(
                         icon: Icon(Icons.category_outlined),
                         label: 'Categories',
                         backgroundColor: themeNotifier.getTheme() ==
-                                ThemeData.dark(useMaterial3: true)
+                                ThemeData.dark(useMaterial3: true).copyWith(
+                                  colorScheme: ColorScheme.dark().copyWith(
+                                    primary: darkprimarycolor,
+                                    error: Colors.red,
+                                    onPrimary: darkprimarycolor,
+                                    outline: darkprimarycolor,
+                                    primaryVariant: darkprimarycolor,
+                                    onPrimaryContainer: darkprimarycolor,
+                                  ),
+                                )
                             ? darkprimarycolor
                             : primarycolor),
                     BottomNavigationBarItem(
                         icon: Icon(Icons.add_moderator_outlined),
                         label: 'Permissions',
                         backgroundColor: themeNotifier.getTheme() ==
-                                ThemeData.dark(useMaterial3: true)
+                                ThemeData.dark(useMaterial3: true).copyWith(
+                                  colorScheme: ColorScheme.dark().copyWith(
+                                    primary: darkprimarycolor,
+                                    error: Colors.red,
+                                    onPrimary: darkprimarycolor,
+                                    outline: darkprimarycolor,
+                                    primaryVariant: darkprimarycolor,
+                                    onPrimaryContainer: darkprimarycolor,
+                                  ),
+                                )
                             ? darkprimarycolor
                             : primarycolor),
                   ],

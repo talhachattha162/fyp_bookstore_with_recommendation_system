@@ -78,6 +78,8 @@ class _AddRemoveCategoriesState extends State<AddRemoveCategories> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text('Categories'),
+        
+            automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [

@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 
+import '../utils/navigation.dart';
+
 class IntroScreen extends StatefulWidget {
   const IntroScreen({Key? key}) : super(key: key);
 
@@ -14,9 +16,7 @@ class IntroScreenState extends State<IntroScreen> {
   final introKey = GlobalKey<IntroductionScreenState>();
 
   void _onIntroEnd(context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const MyApp()),
-    );
+    navigateWithNoBack(context, MyApp());
   }
 
   Widget _buildImage(String assetName, {double? width, double? height}) {
@@ -25,6 +25,20 @@ class IntroScreenState extends State<IntroScreen> {
       width: width,
       height: height,
     );
+  }
+
+
+  DateTime currentBackPressTime = DateTime.now();
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+      return Future.value(false);
+    }
+    return Future.value(true);
   }
 
   @override
@@ -39,93 +53,96 @@ class IntroScreenState extends State<IntroScreen> {
       imagePadding: EdgeInsets.zero,
     );
 
-    return IntroductionScreen(
-      key: introKey,
-      globalBackgroundColor: Colors.white,
-      allowImplicitScrolling: false,
-      // autoScrollDuration: 3000,
-      globalHeader: Align(
-        alignment: Alignment.topLeft,
-        child: SafeArea(
-          child: _buildImage('logo.png', width: 80, height: 80),
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: IntroductionScreen(
+        key: introKey,
+        globalBackgroundColor: Colors.white,
+        allowImplicitScrolling: false,
+        // autoScrollDuration: 3000,
+        globalHeader: Align(
+          alignment: Alignment.topLeft,
+          child: SafeArea(
+            child: _buildImage('logo.png', width: 80, height: 80),
+          ),
         ),
-      ),
-      // globalFooter: SizedBox(
-      //   width: double.infinity,
-      //   height: 60,
-      //   child: ElevatedButton(
-      //     child: const Text(
-      //       'Let\'s go right away!',
-      //       style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-      //     ),
-      //     onPressed: () => _onIntroEnd(context),
-      //   ),
-      // ),
-      pages: [
-        PageViewModel(
-          title: "Welcome to BookSavvy",
-          body:
-              "Get personalized book recommendations based on your interests.",
-          image: _buildImage('booksavvy.jpg', width: 300, height: 270),
-          decoration: pageDecoration,
+        // globalFooter: SizedBox(
+        //   width: double.infinity,
+        //   height: 60,
+        //   child: ElevatedButton(
+        //     child: const Text(
+        //       'Let\'s go right away!',
+        //       style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+        //     ),
+        //     onPressed: () => _onIntroEnd(context),
+        //   ),
+        // ),
+        pages: [
+          PageViewModel(
+            title: "Welcome to BookSavvy",
+            body:
+                "Get personalized book recommendations based on your interests.",
+            image: _buildImage('booksavvy.jpg', width: 300, height: 270),
+            decoration: pageDecoration,
+          ),
+          PageViewModel(
+            title: "Discover New Books",
+            body:
+                "Explore a wide range of books and discover your next favorite read.",
+            image: _buildImage('discoverbooks.jpg', width: 300, height: 270),
+            decoration: pageDecoration,
+          ),
+          PageViewModel(
+            title: "Buy or Rent Books",
+            body: "Buy or rent the books you love.",
+            image: _buildImage('buybooks.jpg', width: 300, height: 270),
+            decoration: pageDecoration,
+          ),
+          PageViewModel(
+            title: "Listen to Audiobooks",
+            body:
+                "Listen to your favorite books on the go with our audiobook collection.",
+            image: _buildImage('audiobook.jpg', width: 300, height: 270),
+            decoration: pageDecoration,
+          ),
+        ],
+        baseBtnStyle: TextButton.styleFrom(
+          backgroundColor: Colors.green,
         ),
-        PageViewModel(
-          title: "Discover New Books",
-          body:
-              "Explore a wide range of books and discover your next favorite read.",
-          image: _buildImage('discoverbooks.jpg', width: 300, height: 270),
-          decoration: pageDecoration,
+        skipStyle: TextButton.styleFrom(primary: Colors.white),
+        doneStyle: TextButton.styleFrom(primary: Colors.white),
+        nextStyle: TextButton.styleFrom(primary: Colors.white),
+        backStyle: TextButton.styleFrom(primary: Colors.white),
+        onDone: () => _onIntroEnd(context),
+        onSkip: () => _onIntroEnd(context), // You can override onSkip callback
+        showSkipButton: false,
+        skipOrBackFlex: 0,
+        nextFlex: 0,
+        showBackButton: true,
+        //rtl: true, // Display as right-to-left
+        back: const Icon(Icons.arrow_back),
+        skip: const Text('Skip', style: TextStyle(fontWeight: FontWeight.w600)),
+        next: const Icon(Icons.arrow_forward),
+        done:
+            const Text('Lets go', style: TextStyle(fontWeight: FontWeight.w600)),
+        curve: Curves.fastLinearToSlowEaseIn,
+        controlsMargin: const EdgeInsets.all(16),
+        controlsPadding: kIsWeb
+            ? const EdgeInsets.all(12.0)
+            : const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+        dotsDecorator: const DotsDecorator(
+          size: Size(10.0, 10.0),
+          color: Color(0xFFBDBDBD),
+          activeSize: Size(22.0, 10.0),
+          activeShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(25.0)),
+          ),
         ),
-        PageViewModel(
-          title: "Buy or Rent Books",
-          body: "Buy or rent the books you love.",
-          image: _buildImage('buybooks.jpg', width: 300, height: 270),
-          decoration: pageDecoration,
-        ),
-        PageViewModel(
-          title: "Listen to Audiobooks",
-          body:
-              "Listen to your favorite books on the go with our audiobook collection.",
-          image: _buildImage('audiobook.jpg', width: 300, height: 270),
-          decoration: pageDecoration,
-        ),
-      ],
-      baseBtnStyle: TextButton.styleFrom(
-        backgroundColor: Colors.green,
-      ),
-      skipStyle: TextButton.styleFrom(primary: Colors.white),
-      doneStyle: TextButton.styleFrom(primary: Colors.white),
-      nextStyle: TextButton.styleFrom(primary: Colors.white),
-      backStyle: TextButton.styleFrom(primary: Colors.white),
-      onDone: () => _onIntroEnd(context),
-      onSkip: () => _onIntroEnd(context), // You can override onSkip callback
-      showSkipButton: false,
-      skipOrBackFlex: 0,
-      nextFlex: 0,
-      showBackButton: true,
-      //rtl: true, // Display as right-to-left
-      back: const Icon(Icons.arrow_back),
-      skip: const Text('Skip', style: TextStyle(fontWeight: FontWeight.w600)),
-      next: const Icon(Icons.arrow_forward),
-      done:
-          const Text('Lets go', style: TextStyle(fontWeight: FontWeight.w600)),
-      curve: Curves.fastLinearToSlowEaseIn,
-      controlsMargin: const EdgeInsets.all(16),
-      controlsPadding: kIsWeb
-          ? const EdgeInsets.all(12.0)
-          : const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-      dotsDecorator: const DotsDecorator(
-        size: Size(10.0, 10.0),
-        color: Color(0xFFBDBDBD),
-        activeSize: Size(22.0, 10.0),
-        activeShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(25.0)),
-        ),
-      ),
-      dotsContainerDecorator: const ShapeDecoration(
-        color: Colors.black87,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+        dotsContainerDecorator: const ShapeDecoration(
+          color: Colors.black87,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          ),
         ),
       ),
     );

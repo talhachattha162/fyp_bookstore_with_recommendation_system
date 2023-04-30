@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../main.dart';
 import '../user_screens/login_screen.dart';
@@ -29,17 +30,18 @@ class _PermissionsState extends State<Permissions> {
   }
 
   String error = '';
-  void getPdfBytes(String path) async {
+  Future<Uint8List?> getPdfBytes(String path) async {
     try {
       HttpClient client = HttpClient();
       final Uri url = Uri.base.resolve(path);
       final HttpClientRequest request = await client.getUrl(url);
       final HttpClientResponse response = await request.close();
-      _documentBytes = await consolidateHttpClientResponseBytes(response);
-      setState(() {});
+
+      return consolidateHttpClientResponseBytes(response);
     } catch (e) {
       error = 'Error fetching PDF bytes: $e';
       // handle the error here, such as showing an error message to the user
+      return null;
     }
   }
 
@@ -158,9 +160,13 @@ class _PermissionsState extends State<Permissions> {
         child: Scaffold(
       appBar: AppBar(
         title: Text('Permissions'),
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
-              onPressed: () {
+              onPressed: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                bool isLoggedIn = false;
+                prefs.setBool('isLoggedIn', isLoggedIn);
                 navigateWithNoBack(context, MyApp());
               },
               icon: const Icon(Icons.logout)),
@@ -272,26 +278,37 @@ class _PermissionsState extends State<Permissions> {
                                     builder: (BuildContext context) {
                                       return AlertDialog(
                                         title: Text(book['title']),
-                                        content: Builder(
-                                          builder: (BuildContext context) {
-                                            getPdfBytes(book['bookFile']);
-                                            Widget child1 = error == ''
-                                                ? Center(
-                                                    child: Text(error),
-                                                  )
-                                                : Center(
-                                                    child:
-                                                        CircularProgressIndicator());
-                                            if (_documentBytes != null) {
-                                              child1 = Container(
-                                                  height: height * 0.73,
-                                                  width: width * 0.95,
-                                                  padding: EdgeInsets.all(8.0),
-                                                  child: SfPdfViewer.memory(
-                                                    _documentBytes!,
-                                                  ));
+                                        content: FutureBuilder<Uint8List?>(
+                                          future: getPdfBytes(book['bookFile']),
+                                          builder: (BuildContext context,
+                                              AsyncSnapshot<Uint8List?>
+                                                  snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            } else if (snapshot.hasError) {
+                                              return Center(
+                                                child: Text(
+                                                    'Error fetching PDF bytes: ${snapshot.error}'),
+                                              );
+                                            } else if (snapshot.hasData) {
+                                              return Container(
+                                                height: height * 0.73,
+                                                width: width * 0.95,
+                                                padding: EdgeInsets.all(8.0),
+                                                child: SfPdfViewer.memory(
+                                                  snapshot.data!,
+                                                ),
+                                              );
+                                            } else {
+                                              return Center(
+                                                child:
+                                                    Text('No PDF bytes found'),
+                                              );
                                             }
-                                            return child1;
                                           },
                                         ),
                                         actions: [

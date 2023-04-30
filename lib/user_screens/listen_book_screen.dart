@@ -150,12 +150,15 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
     return Uint8List.fromList(decryptedPdfData);
   }
 
-  extractTextFromPDF(Uint8List data) async {
-    final PdfDocument document = await PdfDocument(inputBytes: data);
+  extractTextFromPDF(Uint8List data) {
+    final PdfDocument document = PdfDocument(inputBytes: data);
     // print(document.documentInformation.toString());
     String extractedText = '';
-    final PdfTextExtractor extractor = await PdfTextExtractor(document);
-    extractedText = await extractor.extractText();
+    final PdfTextExtractor extractor = PdfTextExtractor(document);
+    extractedText = extractor.extractText();
+    setState(() {
+      isLoading = false;
+    });
     // document.dispose();
     return extractedText;
   }
@@ -234,9 +237,6 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
       Future.delayed(Duration(milliseconds: 50), () {
         initTts();
         decryptAndConvertToText();
-        setState(() {
-          isLoading = false;
-        });
       });
     });
   }

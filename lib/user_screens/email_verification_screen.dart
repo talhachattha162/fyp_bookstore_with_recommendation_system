@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/internetavailabilitynotifier.dart';
+import '../utils/InternetChecker.dart';
 import '../utils/firebase_constants.dart';
 import '../utils/fluttertoast.dart';
 import '../utils/navigation.dart';
@@ -46,6 +50,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     return user;
   }
 
+
+  Timer? timer1;
   @override
   void initState() {
     // TODO: implement initState
@@ -54,7 +60,27 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     // print('c111'+FirebaseAuth.instance.currentUser.toString());
     timer =
         Timer.periodic(const Duration(seconds: 3), (_) => checkEmailVerified());
+        
+    timer1 = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+      final internetAvailabilityNotifier =
+          Provider.of<InternetNotifier>(context, listen: false);
+      try {
+        final result = await InternetAddress.lookup('google.com');
+        final result2 = await InternetAddress.lookup('facebook.com');
+        final result3 = await InternetAddress.lookup('microsoft.com');
+        if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty) ||
+            (result2.isNotEmpty && result2[0].rawAddress.isNotEmpty) ||
+            (result3.isNotEmpty && result3[0].rawAddress.isNotEmpty)) {
+          internetAvailabilityNotifier.setInternetAvailability(true);
+        } else {}
+      } on SocketException catch (_) {
+        internetAvailabilityNotifier.setInternetAvailability(false);
+      }
+    });
   }
+
+ 
+
 
   checkEmailVerified() async {
     await FirebaseAuth.instance.currentUser?.reload();
@@ -95,7 +121,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
+    final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
+    return internetAvailabilityNotifier.getInternetAvailability() == false
+            ? InternetChecker()
+            :WillPopScope(
       onWillPop: onWillPop,
       child: SafeArea(
         child: Scaffold(

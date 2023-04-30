@@ -39,8 +39,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
       onWillPop: onWillPop,
       child: SafeArea(
         child: Scaffold(
-            appBar: AppBar(title: const Text('Library'),
-            automaticallyImplyLeading: false,),
+            appBar: AppBar(
+              title: const Text('Library'),
+              automaticallyImplyLeading: false,
+            ),
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -49,71 +51,71 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 ),
                 Row(
                   children: [
-                    InkWell(
-                      onTap: () {
-                        navigateWithNoBack(context, RentedBooks());
-                      },
-                      child: SizedBox(
-                        height: height * 0.3,
-                        width: width * 0.49,
-                        child: Card(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 26.0,
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.download_done_outlined,
-                                  size: 20,
-                                  color: themeNotifier.getTheme() ==
-                                          ThemeData.dark(useMaterial3: true)
-                                              .copyWith(
-                                            colorScheme:
-                                                ColorScheme.dark().copyWith(
-                                              primary: darkprimarycolor,
-                                              error: Colors.red,
-                                              onPrimary: darkprimarycolor,
-                                              outline: darkprimarycolor,
-                                              primaryVariant: darkprimarycolor,
-                                              onPrimaryContainer:
-                                                  darkprimarycolor,
-                                            ),
-                                          )
-                                      ? darkprimarycolor
-                                      : primarycolor,
-                                ),
-                                Text('Rented \nBooks',
-                                    style: TextStyle(
-                                        color: themeNotifier.getTheme() ==
-                                                ThemeData.dark(
-                                                        useMaterial3: true)
-                                                    .copyWith(
-                                                  colorScheme:
-                                                      ColorScheme.dark()
-                                                          .copyWith(
-                                                    primary: darkprimarycolor,
-                                                    error: Colors.red,
-                                                    onPrimary: darkprimarycolor,
-                                                    outline: darkprimarycolor,
-                                                    primaryVariant:
-                                                        darkprimarycolor,
-                                                    onPrimaryContainer:
-                                                        darkprimarycolor,
-                                                  ),
-                                                )
-                                            ? darkprimarycolor
-                                            : primarycolor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20)),
-                              ],
-                            ),
-                          ),
-                          elevation: 50,
-                        ),
-                      ),
-                    ),
+                    // InkWell(
+                    //   onTap: () {
+                    //     navigateWithNoBack(context, RentedBooks());
+                    //   },
+                    //   child: SizedBox(
+                    //     height: height * 0.3,
+                    //     width: width * 0.49,
+                    //     child: Card(
+                    //       child: Container(
+                    //         padding: EdgeInsets.symmetric(
+                    //           horizontal: 26.0,
+                    //         ),
+                    //         child: Column(
+                    //           mainAxisAlignment: MainAxisAlignment.center,
+                    //           children: [
+                    //             Icon(
+                    //               Icons.download_done_outlined,
+                    //               size: 20,
+                    //               color: themeNotifier.getTheme() ==
+                    //                       ThemeData.dark(useMaterial3: true)
+                    //                           .copyWith(
+                    //                         colorScheme:
+                    //                             ColorScheme.dark().copyWith(
+                    //                           primary: darkprimarycolor,
+                    //                           error: Colors.red,
+                    //                           onPrimary: darkprimarycolor,
+                    //                           outline: darkprimarycolor,
+                    //                           primaryVariant: darkprimarycolor,
+                    //                           onPrimaryContainer:
+                    //                               darkprimarycolor,
+                    //                         ),
+                    //                       )
+                    //                   ? darkprimarycolor
+                    //                   : primarycolor,
+                    //             ),
+                    //             Text('All Purchased \nBooks',
+                    //                 style: TextStyle(
+                    //                     color: themeNotifier.getTheme() ==
+                    //                             ThemeData.dark(
+                    //                                     useMaterial3: true)
+                    //                                 .copyWith(
+                    //                               colorScheme:
+                    //                                   ColorScheme.dark()
+                    //                                       .copyWith(
+                    //                                 primary: darkprimarycolor,
+                    //                                 error: Colors.red,
+                    //                                 onPrimary: darkprimarycolor,
+                    //                                 outline: darkprimarycolor,
+                    //                                 primaryVariant:
+                    //                                     darkprimarycolor,
+                    //                                 onPrimaryContainer:
+                    //                                     darkprimarycolor,
+                    //                               ),
+                    //                             )
+                    //                         ? darkprimarycolor
+                    //                         : primarycolor,
+                    //                     fontWeight: FontWeight.bold,
+                    //                     fontSize: 20)),
+                    //           ],
+                    //         ),
+                    //       ),
+                    //       elevation: 50,
+                    //     ),
+                    //   ),
+                    // ),
                     InkWell(
                       onTap: () {
                         navigateWithNoBack(context, FavouritesScreen());
@@ -179,69 +181,72 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         ),
                       ),
                     ),
-                  ],
-                ),
-                InkWell(
-                  onTap: () {
-                    navigateWithNoBack(context, OrderHistory());
-                  },
-                  child: SizedBox(
-                    width: width * 0.49,
-                    height: height * 0.3,
-                    child: Card(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 26.0,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.history,
-                              size: 20,
-                              color: themeNotifier.getTheme() ==
-                                      ThemeData.dark(useMaterial3: true)
-                                          .copyWith(
-                                        colorScheme:
-                                            ColorScheme.dark().copyWith(
-                                          primary: darkprimarycolor,
-                                          error: Colors.red,
-                                          onPrimary: darkprimarycolor,
-                                          outline: darkprimarycolor,
-                                          primaryVariant: darkprimarycolor,
-                                          onPrimaryContainer: darkprimarycolor,
-                                        ),
-                                      )
-                                  ? darkprimarycolor
-                                  : primarycolor,
+                    InkWell(
+                      onTap: () {
+                        navigateWithNoBack(context, OrderHistory());
+                      },
+                      child: SizedBox(
+                        width: width * 0.49,
+                        height: height * 0.3,
+                        child: Card(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 26.0,
                             ),
-                            Text('Orders History',
-                                style: TextStyle(
-                                    color: themeNotifier.getTheme() ==
-                                            ThemeData.dark(useMaterial3: true)
-                                                .copyWith(
-                                              colorScheme:
-                                                  ColorScheme.dark().copyWith(
-                                                primary: darkprimarycolor,
-                                                error: Colors.red,
-                                                onPrimary: darkprimarycolor,
-                                                outline: darkprimarycolor,
-                                                primaryVariant:
-                                                    darkprimarycolor,
-                                                onPrimaryContainer:
-                                                    darkprimarycolor,
-                                              ),
-                                            )
-                                        ? darkprimarycolor
-                                        : primarycolor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20)),
-                          ],
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.history,
+                                  size: 20,
+                                  color: themeNotifier.getTheme() ==
+                                          ThemeData.dark(useMaterial3: true)
+                                              .copyWith(
+                                            colorScheme:
+                                                ColorScheme.dark().copyWith(
+                                              primary: darkprimarycolor,
+                                              error: Colors.red,
+                                              onPrimary: darkprimarycolor,
+                                              outline: darkprimarycolor,
+                                              primaryVariant: darkprimarycolor,
+                                              onPrimaryContainer:
+                                                  darkprimarycolor,
+                                            ),
+                                          )
+                                      ? darkprimarycolor
+                                      : primarycolor,
+                                ),
+                                Text('Orders History',
+                                    style: TextStyle(
+                                        color: themeNotifier.getTheme() ==
+                                                ThemeData.dark(
+                                                        useMaterial3: true)
+                                                    .copyWith(
+                                                  colorScheme:
+                                                      ColorScheme.dark()
+                                                          .copyWith(
+                                                    primary: darkprimarycolor,
+                                                    error: Colors.red,
+                                                    onPrimary: darkprimarycolor,
+                                                    outline: darkprimarycolor,
+                                                    primaryVariant:
+                                                        darkprimarycolor,
+                                                    onPrimaryContainer:
+                                                        darkprimarycolor,
+                                                  ),
+                                                )
+                                            ? darkprimarycolor
+                                            : primarycolor,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20)),
+                              ],
+                            ),
+                          ),
+                          elevation: 50,
                         ),
                       ),
-                      elevation: 50,
                     ),
-                  ),
+                  ],
                 ),
               ],
             )),

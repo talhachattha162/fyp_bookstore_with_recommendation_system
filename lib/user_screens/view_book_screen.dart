@@ -33,7 +33,7 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:http/http.dart' as http;
 import '../models/razorpay_response.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:downloads_path_provider/downloads_path_provider.dart';
+// import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../utils/snackbar.dart';
@@ -109,8 +109,10 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     try {
       // Get the downloads directory on Android.
       // On iOS, use getApplicationDocumentsDirectory instead.
-      final dir = await DownloadsPathProvider.downloadsDirectory;
-      final file = File('${dir.path}/$fileName.pdf');
+      // final dir = await DownloadsPathProvider.downloadsDirectory;
+      // final file = File('${dir.path}/$fileName.pdf');
+      final downloadsDirectory = await getExternalStorageDirectory();
+      final file = File('${downloadsDirectory!.path}/$fileName.pdf');
       HttpClient httpClient = HttpClient();
       HttpClientRequest request = await httpClient.getUrl(Uri.parse(url));
       HttpClientResponse response = await request.close();
@@ -128,7 +130,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                   Column(
                     children: [
                       Icon(Icons.check_circle_outline),
-                      Text('Downloaded at /Download folder',
+                      Text('Downloaded at ${downloadsDirectory.path} folder',
                           style: TextStyle(fontSize: 12))
                     ],
                   ),
@@ -481,7 +483,10 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                               SizedBox(height: 10),
                             ],
                           )
-                        : Container(),
+                        : Container(
+                            height: 0,
+                            width: 0,
+                          ),
                     const Text(
                       'Pay with Razor Payment',
                       style:
@@ -489,11 +494,13 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                     ),
                     const Divider(thickness: 30),
                     ElevatedButton(
-                      onPressed: () {
-                        setState(() {
+                      onPressed: () {if(_durationdaysController.text!=''){
+ setState(() {
                           _durationDays =
                               int.parse(_durationdaysController.text);
                         });
+                      }
+                       
                         createOrder();
                         Navigator.pop(context);
                       },
@@ -1665,8 +1672,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                   children: [
                                       Text(_userData != null
                                           ? _userData!.name.length > 10
-                                              ? 'Username:' +
-                                                  'Username:' +
+                                              ? 'Uploaded by ' +
                                                   _userData!.name
                                                       .substring(0, 10)
                                               : 'Uploaded by ' + _userData!.name
