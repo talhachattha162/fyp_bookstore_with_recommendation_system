@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../models/book.dart';
 import '../providers/internetavailabilitynotifier.dart';
+import '../providers/themenotifier.dart';
 import '../utils/InternetChecker.dart';
 import '../utils/navigation.dart';
 import 'view_book_screen.dart';
@@ -49,10 +51,11 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
     final tempDir = await getTemporaryDirectory();
     final tempPdfFile = File('${tempDir.path}/decrypted.pdf');
     await tempPdfFile.writeAsBytes(decryptedPdfData);
-
-    setState(() {
-      _pdfPath = tempPdfFile.path;
-    });
+    if (mounted) {
+      setState(() {
+        _pdfPath = tempPdfFile.path;
+      });
+    }
   }
 
   @override
@@ -100,6 +103,7 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
@@ -128,7 +132,23 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
                             horizontal: width * 0.05, vertical: height * 0.015),
                         child: _pdfPath.isNotEmpty
                             ? SfPdfViewer.file(File(_pdfPath))
-                            : Center(child: CircularProgressIndicator.adaptive()
+                            : Center(
+                                child: LoadingAnimationWidget.fourRotatingDots(
+                                color: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                                size: 50,
+                              )
                                 // Text('Loading...')
                                 ),
                       ),

@@ -23,7 +23,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
   List<NotificationItem> notifications = [];
   Timer? timer;
 
-
   @override
   void initState() {
     super.initState();
@@ -47,6 +46,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
     _getNotifications();
   }
 
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
   Future<void> _getNotifications() async {
     try {
       final userId = FirebaseAuth.instance.currentUser!.uid;
@@ -58,9 +63,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
       final docs = querySnapshot.docs;
       final notifications1 =
           docs.map((doc) => NotificationItem.fromSnapshot(doc)).toList();
-      setState(() {
-        notifications = notifications1;
-      });
+      if (mounted) {
+        setState(() {
+          notifications = notifications1;
+        });
+      }
 
       updateNotificationLength(notifications.length);
     } catch (e) {
@@ -98,46 +105,46 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     return internetAvailabilityNotifier.getInternetAvailability() == false
-            ? InternetChecker()
-            :
-            WillPopScope(
-      onWillPop: onWillPop,
-      child: Scaffold(
-        appBar: AppBar(
-            title: Text('Notifications'),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                navigateWithNoBack(context, const MainScreenUser());
-              },
-            )),
-        body: notifications.isEmpty
-            ? Center(
-                child: Center(
-                  child: Text('No Notifications'),
-                ),
-              )
-            : ListView.builder(
-                itemCount: notifications.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final notification = notifications[index];
-                  DateTime dateTime =
-                      notification.notificationDateTime!.toDate();
-                  String formattedDateTime =
-                      '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}';
-                  print(formattedDateTime);
-                  return Column(
-                    children: [
-                      ListTile(
-                        title: Text(notification.notificationMsg.toString()),
-                        subtitle: Text(formattedDateTime),
+        ? InternetChecker()
+        : WillPopScope(
+            onWillPop: onWillPop,
+            child: Scaffold(
+              appBar: AppBar(
+                  title: Text('Notifications'),
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      navigateWithNoBack(context, const MainScreenUser());
+                    },
+                  )),
+              body: notifications.isEmpty
+                  ? Center(
+                      child: Center(
+                        child: Text('No Notifications'),
                       ),
-                      Divider()
-                    ],
-                  );
-                },
-              ),
-      ),
-    );
+                    )
+                  : ListView.builder(
+                      itemCount: notifications.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final notification = notifications[index];
+                        DateTime dateTime =
+                            notification.notificationDateTime!.toDate();
+                        String formattedDateTime =
+                            '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}';
+                        // print(formattedDateTime);
+                        return Column(
+                          children: [
+                            ListTile(
+                              title:
+                                  Text(notification.notificationMsg.toString()),
+                              subtitle: Text(formattedDateTime),
+                            ),
+                            Divider()
+                          ],
+                        );
+                      },
+                    ),
+            ),
+          );
   }
 }

@@ -69,16 +69,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: userEmail, password: password);
-      Users users = Users(
-          auth.currentUser!.uid, name, '', userEmail, password, '', 0, 'email',0);
+      Users users = Users(auth.currentUser!.uid, name, '', userEmail, password,
+          '', 0, 'email', 0);
       var firebaseUser = auth.currentUser;
       firestoreInstance
           .collection("users")
           .doc(firebaseUser!.uid)
           .set(users.toMap())
-          .then((value) async {})
+          .then((value) async {
+            firestoreInstance
+                                      .collection("darkmode")
+                                      .doc(FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                      .set({"darkmode1": false});
+          })
           .onError((error, stackTrace) async {});
       // auth.signOut();
+
 
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
@@ -187,9 +194,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     : Icons.visibility_off,
                               ),
                               onPressed: () {
-                                setState(() {
-                                  _obscureText = !_obscureText;
-                                });
+                                if (mounted) {
+                                  setState(() {
+                                    _obscureText = !_obscureText;
+                                  });
+                                }
                               },
                             ),
                             textInputType: TextInputType.text,
@@ -215,15 +224,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             : ElevatedButton(
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
+                                    if (mounted) {
+                                      setState(() {
+                                        _isLoading = true;
+                                      });
+                                    }
                                     final u = await signUp(
                                         name: _nameController.text,
                                         userEmail: _emailController.text,
                                         password: _passwordController.text,
                                         context: context);
                                     if (u != 'exist') {
+                                      
                                       Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
@@ -235,9 +247,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                                           _passwordController
                                                               .text)));
                                     }
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
+                                    if (mounted) {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                    }
                                   }
                                 },
                                 child: const Padding(

@@ -5,6 +5,8 @@ import 'package:bookstore_recommendation_system_fyp/user_screens/library_screen.
 import 'package:bookstore_recommendation_system_fyp/user_screens/trending_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/upload_book_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/InternetChecker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,12 +35,29 @@ class _MainScreenUserState extends State<MainScreenUser> {
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (mounted) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   Timer? timer;
+
+  Future checkDarkMode(String userId) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final DocumentReference documentReference =
+        firestore.collection('darkmode').doc(userId);
+    final DocumentSnapshot snapshot = await documentReference.get();
+    // print(snapshot.id.toString());
+    // print(snapshot.data());
+    if (snapshot.exists) {
+      final darkmode = snapshot.get('darkmode1');
+      return darkmode;
+    }
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -58,6 +77,25 @@ class _MainScreenUserState extends State<MainScreenUser> {
       } on SocketException catch (_) {
         internetAvailabilityNotifier.setInternetAvailability(false);
       }
+    });
+    Future.delayed(Duration.zero, () async {
+      final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
+      themeNotifier.setTheme(
+          await checkDarkMode(FirebaseAuth.instance.currentUser!.uid) == true
+              ? ThemeData.dark(useMaterial3: true).copyWith(
+                  colorScheme: ColorScheme.dark().copyWith(
+                    primary: darkprimarycolor,
+                    error: Colors.red,
+                    onPrimary: darkprimarycolor,
+                    outline: darkprimarycolor,
+                    primaryVariant: darkprimarycolor,
+                    onPrimaryContainer: darkprimarycolor,
+                  ),
+                )
+              : ThemeData(
+                  appBarTheme: AppBarTheme(color: Colors.green[300]),
+                  primarySwatch: primarycolor,
+                  fontFamily: 'RobotoMono'));
     });
   }
 

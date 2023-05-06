@@ -12,6 +12,7 @@ import 'package:reviews_slider/reviews_slider.dart';
 
 import '../Widgets/text_field.dart';
 import '../models/book.dart';
+import '../models/notificationitem.dart';
 import '../models/review.dart';
 import '../providers/internetavailabilitynotifier.dart';
 import '../providers/themenotifier.dart';
@@ -62,6 +63,26 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
     super.dispose();
   }
 
+  Future<String> getName(String userId) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final DocumentReference documentReference =
+        firestore.collection('users').doc(userId);
+    final DocumentSnapshot snapshot = await documentReference.get();
+    final String name = snapshot.get('name');
+    return name;
+  }
+
+  reviewNotification(title, reviewedby, userid) async {
+    final name = await getName(reviewedby);
+    NotificationItem item = NotificationItem(
+        title + ' book is reviewed by $name', userid, Timestamp.now());
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final CollectionReference collectionReference =
+        firestore.collection('notifications');
+    await collectionReference.add(item.toMap());
+    print('notification2:' + item.toMap().toString());
+  }
+
   DateTime currentBackPressTime = DateTime.now();
 
   Future<bool> onWillPop() async {
@@ -103,7 +124,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                       ),
                       TextInputField(
                         hintText: 'Enter Review',
-                                  suffixIcon: Text(''),
+                        suffixIcon: Text(''),
                         isPassword: false,
                         textInputType: TextInputType.text,
                         textEditingController: _reviewController,
@@ -145,9 +166,11 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                           : ElevatedButton(
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
-                                  setState(() {
-                                    isLoading = true;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      isLoading = true;
+                                    });
+                                  }
                                   //user liked code//
                                   // List userid=[FirebaseAuth.instance.currentUser!.uid];
                                   // List usersReviewed=widget.book.userliked;
@@ -184,13 +207,24 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                                       flutterToast('Error:' + error.toString());
                                     }).then((_) {
                                       flutterToast('Review submitted');
+                                      if (FirebaseAuth
+                                              .instance.currentUser!.uid !=
+                                          widget.book.userid) {
+                                        reviewNotification(
+                                            widget.book.title,
+                                            FirebaseAuth
+                                                .instance.currentUser!.uid,
+                                            widget.book.userid);
+                                      }
                                     });
                                   } catch (e) {
                                     flutterToast('Error:' + e.toString());
                                   }
-                                  setState(() {
-                                    isLoading = false;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  }
                                 }
                               },
                               child: const Padding(

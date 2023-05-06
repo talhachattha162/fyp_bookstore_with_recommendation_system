@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../models/book.dart';
@@ -139,6 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     // print('home');
     double height = MediaQuery.of(context).size.height;
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     // _fetchNotifications(context);
     return WillPopScope(
       onWillPop: onWillPop,
@@ -204,9 +206,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: ChipsChoice<int>.single(
                           value: tag,
                           onChanged: (val) {
-                            setState(() {
-                              tag = val;
-                            });
+                            if (mounted) {
+                              setState(() {
+                                tag = val;
+                              });
+                            }
                           },
                           choiceItems: categories.isEmpty
                               ? C2Choice.listFrom<int, String>(
@@ -237,7 +241,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return Center(child: Text('Loading...'));
+                          return Center(
+                              child: LoadingAnimationWidget.fourRotatingDots(
+                            color: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                            size: 50,
+                          ));
                         }
                         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                           return Center(

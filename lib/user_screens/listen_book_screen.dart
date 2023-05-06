@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
-
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -156,9 +156,11 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
     String extractedText = '';
     final PdfTextExtractor extractor = PdfTextExtractor(document);
     extractedText = extractor.extractText();
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
     // document.dispose();
     return extractedText;
   }
@@ -176,37 +178,46 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
   initTts() async {
     flutterTts = FlutterTts();
     await flutterTts.awaitSpeakCompletion(true);
+    await flutterTts.setSpeechRate(0.4);
 
     flutterTts.setStartHandler(() {
-      setState(() {
-        print("Playing");
-        guidemsg = "Playing...";
-        _ttsState = TtsState.playing;
-      });
+      if (mounted) {
+        setState(() {
+          print("Playing");
+          guidemsg = "Playing...";
+          _ttsState = TtsState.playing;
+        });
+      }
     });
 
     flutterTts.setCompletionHandler(() {
-      setState(() {
-        print("Complete");
-        guidemsg = "Completed.";
-        _ttsState = TtsState.stopped;
-      });
+      if (mounted) {
+        setState(() {
+          print("Complete");
+          guidemsg = "Completed.";
+          _ttsState = TtsState.stopped;
+        });
+      }
     });
 
     flutterTts.setCancelHandler(() {
-      setState(() {
-        print("Cancel");
-        guidemsg = "Stopped";
-        _ttsState = TtsState.stopped;
-      });
+      if (mounted) {
+        setState(() {
+          print("Cancel");
+          guidemsg = "Stopped";
+          _ttsState = TtsState.stopped;
+        });
+      }
     });
 
     flutterTts.setErrorHandler((message) {
-      setState(() {
-        guidemsg = "Error: $message";
-        print("Error: $message");
-        _ttsState = TtsState.stopped;
-      });
+      if (mounted) {
+        setState(() {
+          guidemsg = "Error: $message";
+          print("Error: $message");
+          _ttsState = TtsState.stopped;
+        });
+      }
     });
   }
 
@@ -231,10 +242,12 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Add a delay of 100 milliseconds before executing heavy operations
-      setState(() {
-        isLoading = true;
-      });
-      Future.delayed(Duration(milliseconds: 50), () {
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
+      Future.delayed(Duration(milliseconds: 30), () {
         initTts();
         decryptAndConvertToText();
       });
@@ -250,6 +263,7 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
@@ -264,8 +278,24 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
                         child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Please wait'),
-                      Text('Loading...'),
+                      LoadingAnimationWidget.fourRotatingDots(
+                        color: themeNotifier.getTheme() ==
+                                ThemeData.dark(useMaterial3: true).copyWith(
+                                  colorScheme: ColorScheme.dark().copyWith(
+                                    primary: darkprimarycolor,
+                                    error: Colors.red,
+                                    onPrimary: darkprimarycolor,
+                                    outline: darkprimarycolor,
+                                    primaryVariant: darkprimarycolor,
+                                    onPrimaryContainer: darkprimarycolor,
+                                  ),
+                                )
+                            ? darkprimarycolor
+                            : primarycolor,
+                        size: 50,
+                      ),
+                      // Text('Please wait'),
+                      //  Text('Loading...'),
                     ],
                   )))
                 : Scaffold(

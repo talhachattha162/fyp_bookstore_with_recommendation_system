@@ -135,7 +135,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           const Divider(),
                           ListTile(
                             leading: const Icon(Icons.mode_night_outlined),
-                            title: const Text('Dark Mode'),
+                            title: const Text('Change Mode'),
                             trailing: Switch(
                                 value: _isSwitched,
                                 onChanged: (value) {
@@ -165,9 +165,33 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                               color: Colors.green[300]),
                                           primarySwatch: primarycolor,
                                           fontFamily: 'RobotoMono'));
-                                  setState(() {
-                                    _isSwitched = value;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      _isSwitched = value;
+                                    });
+                                  }
+                                  if(themeNotifier
+                                              .getTheme() ==
+                                          ThemeData(
+                                              // useMaterial3: true,
+                                              appBarTheme: AppBarTheme(
+                                                  color: Colors.green[300]),
+                                              primarySwatch: primarycolor,
+                                              fontFamily: 'RobotoMono')){
+firestoreInstance
+                                      .collection("darkmode")
+                                      .doc(FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                      .set({"darkmode1": false});
+                                              }
+                                              else{
+                                                firestoreInstance
+                                      .collection("darkmode")
+                                      .doc(FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                      .set({"darkmode1": true});
+                                              }
+                                  
                                 }),
                           ),
                           const Divider(),
@@ -189,9 +213,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               onTap: () async {
                                 try {
                                   SharedPreferences prefs =
-                                          await SharedPreferences.getInstance();
-                                      bool isLoggedIn = false;
-                                      prefs.setBool('isLoggedIn', isLoggedIn);
+                                      await SharedPreferences.getInstance();
+                                  bool isLoggedIn = false;
+                                  prefs.setBool('isLoggedIn', isLoggedIn);
                                   // sign out of Firebase
                                   await auth.signOut();
 

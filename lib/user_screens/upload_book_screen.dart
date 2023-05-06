@@ -136,8 +136,10 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
       onWillPop: onWillPop,
       child: SafeArea(
         child: Scaffold(
-            appBar: AppBar(title: const Text('Book Details'),
-            automaticallyImplyLeading: false,),
+            appBar: AppBar(
+              title: const Text('Book Details'),
+              automaticallyImplyLeading: false,
+            ),
             resizeToAvoidBottomInset: false,
             body: Stack(
               children: [
@@ -161,7 +163,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                         children: [
                           TextInputField(
                             hintText: 'Enter title',
-                                  suffixIcon: Text(''),
+                            suffixIcon: Text(''),
                             isPassword: false,
                             textInputType: TextInputType.text,
                             textEditingController: _titleController,
@@ -174,7 +176,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                           ),
                           TextInputField(
                             hintText: 'Enter Author Name',
-                                  suffixIcon: Text(''),
+                            suffixIcon: Text(''),
                             isPassword: false,
                             textInputType: TextInputType.name,
                             textEditingController: _authorController,
@@ -190,7 +192,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                           ),
                           TextInputField(
                             hintText: 'Enter Published Year',
-                                  suffixIcon: Text(''),
+                            suffixIcon: Text(''),
                             isPassword: false,
                             textInputType: TextInputType.text,
                             textEditingController: _publishyearController,
@@ -208,9 +210,21 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                             alignedDropdown: true,
                             height: 20,
                             child: DropdownButton(
-                              elevation: 20,
+                              elevation: 50,
                               isExpanded: true,
-                              iconEnabledColor: primarycolor,
+                              iconEnabledColor: themeNotifier.getTheme() ==
+                                ThemeData.dark(useMaterial3: true).copyWith(
+                                  colorScheme: ColorScheme.dark().copyWith(
+                                    primary: darkprimarycolor,
+                                    error: Colors.red,
+                                    onPrimary: darkprimarycolor,
+                                    outline: darkprimarycolor,
+                                    primaryVariant: darkprimarycolor,
+                                    onPrimaryContainer: darkprimarycolor,
+                                  ),
+                                )
+                            ? darkprimarycolor
+                            : primarycolor,
                               value: selectedCategory == ''
                                   ? 'Select Category'
                                   : selectedCategory,
@@ -223,9 +237,11 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                       );
                                     }).toList(),
                               onChanged: (value) {
-                                setState(() {
-                                  selectedCategory = value.toString();
-                                });
+                                if (mounted) {
+                                  setState(() {
+                                    selectedCategory = value.toString();
+                                  });
+                                }
                               },
                             ),
                           ),
@@ -238,7 +254,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   width: width * 0.305,
                                   child: TextInputField(
                                     hintText: 'Tag1',
-                                  suffixIcon: Text(''),
+                                    suffixIcon: Text(''),
                                     isPassword: false,
                                     textInputType: TextInputType.text,
                                     textEditingController: _tag1Controller,
@@ -257,7 +273,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   width: width * 0.305,
                                   child: TextInputField(
                                     hintText: 'Tag2',
-                                  suffixIcon: Text(''),
+                                    suffixIcon: Text(''),
                                     isPassword: false,
                                     textInputType: TextInputType.text,
                                     textEditingController: _tag2Controller,
@@ -276,7 +292,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   width: width * 0.305,
                                   child: TextInputField(
                                     hintText: 'Tag3',
-                                  suffixIcon: Text(''),
+                                    suffixIcon: Text(''),
                                     isPassword: false,
                                     textInputType: TextInputType.text,
                                     textEditingController: _tag3Controller,
@@ -325,10 +341,12 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   value: "free",
                                   groupValue: freeRentPaid,
                                   onChanged: (value) {
-                                    setState(() {
-                                      freeRentPaid = value.toString();
-                                      _isvisible = false;
-                                    });
+                                    if (mounted) {
+                                      setState(() {
+                                        freeRentPaid = value.toString();
+                                        _isvisible = false;
+                                      });
+                                    }
                                   },
                                 ),
                               ),
@@ -360,10 +378,12 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   value: "rent",
                                   groupValue: freeRentPaid,
                                   onChanged: (value) {
-                                    setState(() {
-                                      freeRentPaid = value.toString();
-                                      _isvisible = true;
-                                    });
+                                    if (mounted) {
+                                      setState(() {
+                                        freeRentPaid = value.toString();
+                                        _isvisible = true;
+                                      });
+                                    }
                                   },
                                 ),
                               ),
@@ -395,10 +415,12 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   value: "paid",
                                   groupValue: freeRentPaid,
                                   onChanged: (value) {
-                                    setState(() {
-                                      freeRentPaid = value.toString();
-                                      _isvisible = true;
-                                    });
+                                    if (mounted) {
+                                      setState(() {
+                                        freeRentPaid = value.toString();
+                                        _isvisible = true;
+                                      });
+                                    }
                                   },
                                 ),
                               )
@@ -439,9 +461,11 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                 try {
                                   PlatformFile file = await pickFile(
                                       [], FileType.image, 5000000, context);
-                                  setState(() {
-                                    _filename1 = file.name;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      _filename1 = file.name;
+                                    });
+                                  }
                                   _file1 = file.bytes!;
                                 } catch (err) {
                                   if (_filename1 == "<5 mb image allowed") {
@@ -474,9 +498,11 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                 try {
                                   PlatformFile file = await pickFile(['pdf'],
                                       FileType.custom, 25000000, context);
-                                  setState(() {
-                                    _filename2 = file.name;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      _filename2 = file.name;
+                                    });
+                                  }
                                   _file2 = file.bytes!;
                                 } catch (err) {
                                   if (_filename2 == "<25 mb pdf allowed") {
@@ -509,9 +535,11 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                 try {
                                   PlatformFile file = await pickFile(
                                       [], FileType.image, 5000000, context);
-                                  setState(() {
-                                    _filename3 = file.name;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      _filename3 = file.name;
+                                    });
+                                  }
                                   _file3 = file.bytes!;
                                 } catch (err) {
                                   if (_filename3 == "<5 mb image allowed") {
@@ -551,10 +579,11 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                 context, 'Please upload file');
                                           } else {
                                             // _convertTextToSpeech();
-                                            // createAudioScript();
+                                            // createAudioScript(); if (mounted) {
+      
                                             setState(() {
                                               isLoading = true;
-                                            });
+                                            });}
                                             if (categories.isNotEmpty) {
                                               String coverpic =
                                                   await uploadFileToFirebaseStorage(
@@ -663,7 +692,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                             _filename3 = "<5 mb image allowed";
                                             _file1 = null;
                                             _file2 = null;
-                                            _file3 = null;
+                                            _file3 = null; if (mounted) {
+      
                                             setState(() {
                                               isLoading = false;
                                             });

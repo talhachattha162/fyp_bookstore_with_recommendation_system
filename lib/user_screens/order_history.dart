@@ -24,11 +24,10 @@ class _OrderHistoryState extends State<OrderHistory> {
   List<Book> _books = [];
   Timer? timer;
 
-
   @override
   void initState() {
     super.initState();
-    
+
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
@@ -48,16 +47,23 @@ class _OrderHistoryState extends State<OrderHistory> {
     _loadBooks();
   }
 
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
   Future<void> _loadBooks() async {
     final QuerySnapshot<Map<String, dynamic>> snapshot =
         await FirebaseFirestore.instance.collection('books').get();
 
     final List<Book> books =
         snapshot.docs.map((doc) => Book.fromSnapshot(doc)).toList();
-
-    setState(() {
-      _books = books;
-    });
+    if (mounted) {
+      setState(() {
+        _books = books;
+      });
+    }
   }
 
   Book? searchBooksById(List<Book> books, String bookid) {
@@ -88,65 +94,70 @@ class _OrderHistoryState extends State<OrderHistory> {
   Widget build(BuildContext context) {
     // final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     double height = MediaQuery.of(context).size.height;
-   final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
+    final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     return internetAvailabilityNotifier.getInternetAvailability() == false
-            ? InternetChecker()
-            : WillPopScope(
-      onWillPop: onWillPop,
-      child: SafeArea(
-        child: Scaffold(
-            appBar: AppBar(
-                title: const Text('Orders History'),
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    navigateWithNoBack(context, const MainScreenUser());
-                  },
-                )),
-            body: SizedBox(
-              width: double.infinity,
-              height: height * 0.93,
-              child: Consumer<PaymentProvider>(
-                builder: (context, provider, child) {
-                  if (provider.payments.isEmpty) {
-                    provider.fetchPayments(FirebaseAuth.instance.currentUser!.uid);
-                    return Center(child: Text('No Data found'));
-                  } else {
-                    return ListView.builder(
-                        itemCount: provider.payments.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          final payment = provider.payments[index];
-                          Book? book = searchBooksById(_books, payment.bookId);
-                          if (book != null) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: [
-                                  Wrap(
-                                    children: [
-                                      payment.freeRentPaid == 'rent'
-                                          ? Text(
-                                              'On ${payment.formattedDate}, at ${payment.formattedTime}, a copy of the book ${book.title} was rented for \$${payment.pricePaid}.The book was rented for ${payment.durationDays} days',
-                                              style: TextStyle(fontSize: 16),
-                                            )
-                                          : Text(
-                                              'On ${payment.formattedDate}, at ${payment.formattedTime}, a copy of the book ${book.title} was purchased for \$${payment.pricePaid}.',
-                                              style: TextStyle(fontSize: 16),
-                                            ),
-                                    ],
-                                  ),
-                                  if (index < provider.payments.length - 1)
-                                    Divider(),
-                                ],
-                              ),
-                            );
-                          }
-                        });
-                  }
-                },
-              ),
-            )),
-      ),
-    );
+        ? InternetChecker()
+        : WillPopScope(
+            onWillPop: onWillPop,
+            child: SafeArea(
+              child: Scaffold(
+                  appBar: AppBar(
+                      title: const Text('Orders History'),
+                      leading: IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () {
+                          navigateWithNoBack(context, const MainScreenUser());
+                        },
+                      )),
+                  body: SizedBox(
+                    width: double.infinity,
+                    height: height * 0.93,
+                    child: Consumer<PaymentProvider>(
+                      builder: (context, provider, child) {
+                        if (provider.payments.isEmpty) {
+                          provider.fetchPayments(
+                              FirebaseAuth.instance.currentUser!.uid);
+                          return Center(child: Text('No Data found'));
+                        } else {
+                          return ListView.builder(
+                              itemCount: provider.payments.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final payment = provider.payments[index];
+                                Book? book =
+                                    searchBooksById(_books, payment.bookId);
+                                if (book != null) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: [
+                                        Wrap(
+                                          children: [
+                                            payment.freeRentPaid == 'rent'
+                                                ? Text(
+                                                    'On ${payment.formattedDate}, at ${payment.formattedTime}, a copy of the book ${book.title} was rented for \$${payment.pricePaid}.The book was rented for ${payment.durationDays} days',
+                                                    style:
+                                                        TextStyle(fontSize: 16),
+                                                  )
+                                                : Text(
+                                                    'On ${payment.formattedDate}, at ${payment.formattedTime}, a copy of the book ${book.title} was purchased for \$${payment.pricePaid}.',
+                                                    style:
+                                                        TextStyle(fontSize: 16),
+                                                  ),
+                                          ],
+                                        ),
+                                        if (index <
+                                            provider.payments.length - 1)
+                                          Divider(),
+                                      ],
+                                    ),
+                                  );
+                                }
+                              });
+                        }
+                      },
+                    ),
+                  )),
+            ),
+          );
   }
 }

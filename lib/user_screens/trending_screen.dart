@@ -2,9 +2,13 @@ import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_scree
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
 import '../models/book.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../providers/themenotifier.dart';
+import '../utils/global_variables.dart';
 import '../utils/navigation.dart';
 
 class TrendingScreen extends StatefulWidget {
@@ -50,17 +54,21 @@ class _TrendingScreenState extends State<TrendingScreen> {
 
   List<String> _trendingBookIds = [];
   Future<void> _fetchTrendingBookIds() async {
-    setState(() {
-      isLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
     try {
       final response = await http
           .get(Uri.parse('http://tayyab162.pythonanywhere.com/trending-books'));
       if (response.statusCode == 200) {
         final List<dynamic> bookIds = json.decode(response.body);
-        setState(() {
-          _trendingBookIds = bookIds.cast<String>();
-        });
+        if (mounted) {
+          setState(() {
+            _trendingBookIds = bookIds.cast<String>();
+          });
+        }
       } else {
         throw Exception('Failed to retrieve trending book ids');
       }
@@ -78,6 +86,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     return WillPopScope(
       onWillPop: onWillPop,
       child: SafeArea(
@@ -90,7 +99,22 @@ class _TrendingScreenState extends State<TrendingScreen> {
           body: isLoading
               ? Center(
                   child: Visibility(
-                  child: Text('Loading...'),
+                  child: LoadingAnimationWidget.fourRotatingDots(
+                    color: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                    size: 50,
+                  ),
                   visible: true,
                 ))
               : _trendingBookIds.isEmpty

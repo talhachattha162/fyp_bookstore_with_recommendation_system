@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import '../providers/internetavailabilitynotifier.dart';
 import '../utils/InternetChecker.dart';
@@ -50,7 +51,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     return user;
   }
 
-
   Timer? timer1;
   @override
   void initState() {
@@ -60,10 +60,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     // print('c111'+FirebaseAuth.instance.currentUser.toString());
     timer =
         Timer.periodic(const Duration(seconds: 3), (_) => checkEmailVerified());
-        
+
     timer1 = Timer.periodic(Duration(seconds: 1), (Timer t) async {
-      final internetAvailabilityNotifier =
-          Provider.of<InternetNotifier>(context, listen: false);
+       if (!mounted) {
+    return; // exit if the widget is no longer mounted
+  }
+        final internetAvailabilityNotifier =
+            Provider.of<InternetNotifier>(context, listen: false);
+      
       try {
         final result = await InternetAddress.lookup('google.com');
         final result2 = await InternetAddress.lookup('facebook.com');
@@ -79,15 +83,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     });
   }
 
- 
-
-
   checkEmailVerified() async {
     await FirebaseAuth.instance.currentUser?.reload();
-
-    setState(() {
-      isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
-    });
+    if (mounted) {
+      setState(() {
+        isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+      });
+    }
 
     if (isEmailVerified) {
       // TODO: implement your code after email verification
@@ -123,73 +125,73 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Widget build(BuildContext context) {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     return internetAvailabilityNotifier.getInternetAvailability() == false
-            ? InternetChecker()
-            :WillPopScope(
-      onWillPop: onWillPop,
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-              title: const Text('Verify Email'),
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  navigateWithNoBack(context, const LoginScreen());
-                },
-              )),
-          body: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 35),
-                const SizedBox(height: 30),
-                const Center(
-                  child: Text(
-                    'Check your \n Email',
-                    textAlign: TextAlign.center,
+        ? InternetChecker()
+        : WillPopScope(
+            onWillPop: onWillPop,
+            child: SafeArea(
+              child: Scaffold(
+                appBar: AppBar(
+                    title: const Text('Verify Email'),
+                    leading: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () {
+                        navigateWithNoBack(context, const LoginScreen());
+                      },
+                    )),
+                body: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 35),
+                      const SizedBox(height: 30),
+                      const Center(
+                        child: Text(
+                          'Check your \n Email',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        child: Center(
+                          child: Text(
+                            'We have sent you a Email on  ${auth.currentUser?.email}',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Center(child: CircularProgressIndicator()),
+                      const SizedBox(height: 8),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 32.0),
+                        child: Center(
+                          child: Text(
+                            'Verifying email....',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 57),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        child: ElevatedButton(
+                          child: const Text('Resend'),
+                          onPressed: () {
+                            try {
+                              FirebaseAuth.instance.currentUser
+                                  ?.sendEmailVerification();
+                            } catch (e) {
+                              debugPrint('$e');
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: Center(
-                    child: Text(
-                      'We have sent you a Email on  ${auth.currentUser?.email}',
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Center(child: CircularProgressIndicator()),
-                const SizedBox(height: 8),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 32.0),
-                  child: Center(
-                    child: Text(
-                      'Verifying email....',
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 57),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: ElevatedButton(
-                    child: const Text('Resend'),
-                    onPressed: () {
-                      try {
-                        FirebaseAuth.instance.currentUser
-                            ?.sendEmailVerification();
-                      } catch (e) {
-                        debugPrint('$e');
-                      }
-                    },
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 }

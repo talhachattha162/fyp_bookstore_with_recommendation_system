@@ -49,11 +49,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       final String name = user1.getName();
       final String age = user1.getAge();
       final photo = user1.getPhoto();
-      setState(() {
-        photoURL = photo;
-        _nameController.text = name;
-        _ageController.text = age;
-      });
+      if (mounted) {
+        setState(() {
+          photoURL = photo;
+          _nameController.text = name;
+          _ageController.text = age;
+        });
+      }
     }
   }
 
@@ -116,7 +118,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     return Future.value(true);
   }
 
-
   @override
   Widget build(BuildContext context) {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
@@ -174,7 +175,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                               horizontal: 16.0, vertical: 4.0),
                           child: TextInputField(
                             hintText: 'Enter Name',
-                                  suffixIcon: Text(''),
+                            suffixIcon: Text(''),
                             textInputType: TextInputType.name,
                             textEditingController: _nameController,
                             isPassword: false,
@@ -197,7 +198,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                               horizontal: 16.0, vertical: 4.0),
                           child: TextInputField(
                             hintText: 'Enter Age',
-                                  suffixIcon: Text(''),
+                            suffixIcon: Text(''),
                             textInputType: TextInputType.number,
                             textEditingController: _ageController,
                             isPassword: false,
@@ -220,9 +221,11 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                             : ElevatedButton(
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
+                                    if (mounted) {
+                                      setState(() {
+                                        _isLoading = true;
+                                      });
+                                    }
                                     final userId =
                                         FirebaseAuth.instance.currentUser!.uid;
                                     if (file != null) {
@@ -241,6 +244,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                         'name': _nameController.text,
                                         'age': _ageController.text,
                                         'photo': downloadUrl,
+                                      }).then((value) {
+                                        flutterToast('Updated');
                                       });
                                     } else {
                                       if (photoURL.isEmpty) {
@@ -253,15 +258,18 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                           'name': _nameController.text,
                                           'age': _ageController.text,
                                           'photo': photoURL,
+                                        }).then((value) {
+                                          flutterToast('Updated');
                                         });
                                       }
                                     }
-    
+
                                     loadData();
-    
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
+                                    if (mounted) {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                    }
                                   }
                                 },
                                 child: const Padding(

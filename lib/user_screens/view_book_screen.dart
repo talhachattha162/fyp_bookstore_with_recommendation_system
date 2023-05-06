@@ -13,6 +13,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../Widgets/text_field.dart';
@@ -245,9 +246,11 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     super.initState();
     _paymentsStreamSubscription = paymentsStream().listen((hasData) {
       if (hasData) {
-        setState(() {
-          hasDataf = true;
-        });
+        if (mounted) {
+          setState(() {
+            hasDataf = true;
+          });
+        }
       }
     });
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
@@ -273,9 +276,11 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
 
   Future<void> _checkIfBookIsFavorited() async {
     final isFavorited = await isBookFavorited();
-    setState(() {
-      favourite = isFavorited;
-    });
+    if (mounted) {
+      setState(() {
+        favourite = isFavorited;
+      });
+    }
   }
 
   StreamSubscription<bool>? _paymentsStreamSubscription;
@@ -328,6 +333,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
       Fluttertoast.showToast(msg: 'Error:' + error.toString());
     }).then((value) {
       Fluttertoast.showToast(msg: " Payment Successful");
+      purchaseNotification(widget.book.title,
+          FirebaseAuth.instance.currentUser!.uid, widget.book.userid);
     });
 
     DocumentReference userRef =
@@ -494,13 +501,16 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                     ),
                     const Divider(thickness: 30),
                     ElevatedButton(
-                      onPressed: () {if(_durationdaysController.text!=''){
- setState(() {
-                          _durationDays =
-                              int.parse(_durationdaysController.text);
-                        });
-                      }
-                       
+                      onPressed: () {
+                        if (_durationdaysController.text != '') {
+                          if (mounted) {
+                            setState(() {
+                              _durationDays =
+                                  int.parse(_durationdaysController.text);
+                            });
+                          }
+                        }
+
                         createOrder();
                         Navigator.pop(context);
                       },
@@ -542,13 +552,17 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
         .snapshots()
         .listen((QuerySnapshot<Map<String, dynamic>> snapshot) {
       if (snapshot.docs.isNotEmpty) {
-        setState(() {
-          _isSubscribed = true;
-        });
+        if (mounted) {
+          setState(() {
+            _isSubscribed = true;
+          });
+        }
       } else {
-        setState(() {
-          _isSubscribed = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isSubscribed = false;
+          });
+        }
       }
     });
   }
@@ -588,23 +602,31 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   }
 
   void _startDownload() async {
-    setState(() {
-      isDownloading = true;
-    });
+    if (mounted) {
+      setState(() {
+        isDownloading = true;
+      });
+    }
 
     try {
       await downloadFile(context, widget.book.bookFile, widget.book.title);
-      setState(() {
-        downloadString = 'Download Successful';
-      });
+      if (mounted) {
+        setState(() {
+          downloadString = 'Download Successful';
+        });
+      }
     } catch (e) {
-      setState(() {
-        downloadString = 'Download failed';
-      });
+      if (mounted) {
+        setState(() {
+          downloadString = 'Download failed';
+        });
+      }
     } finally {
-      setState(() {
-        isDownloading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isDownloading = false;
+        });
+      }
     }
   }
 
@@ -617,10 +639,12 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
         .get()
         .then((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot.exists) {
-        setState(() {
-          _userData = Users.fromMap(
-              (documentSnapshot.data() as Map<String, dynamic>?)!);
-        });
+        if (mounted) {
+          setState(() {
+            _userData = Users.fromMap(
+                (documentSnapshot.data() as Map<String, dynamic>?)!);
+          });
+        }
       }
     });
   }
@@ -632,9 +656,11 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
       'FromUserId': FirebaseAuth.instance.currentUser!.uid,
       'ToUserId': widget.book.userid,
     }).then((value) {
-      setState(() {
-        _isSubscribed = true;
-      });
+      if (mounted) {
+        setState(() {
+          _isSubscribed = true;
+        });
+      }
     });
     final name = await getName(FirebaseAuth.instance.currentUser!.uid);
     NotificationItem item = NotificationItem(
@@ -651,9 +677,11 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
         .doc(widget.book.userid + FirebaseAuth.instance.currentUser!.uid)
         .delete()
         .then((_) {
-      setState(() {
-        _isSubscribed = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isSubscribed = false;
+        });
+      }
     }).catchError((error) => print('Error unsubscribing: $error'));
 
     final name = await getName(FirebaseAuth.instance.currentUser!.uid);
@@ -664,6 +692,17 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
         firestore.collection('notifications');
     final Map<String, dynamic> data = item.toMap();
     await collectionReference.add(data);
+  }
+
+  purchaseNotification(title, purchasedby, userid) async {
+    final name = await getName(purchasedby);
+    NotificationItem item = NotificationItem(
+        title + ' book is purchased by $name', userid, Timestamp.now());
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final CollectionReference collectionReference =
+        firestore.collection('notifications');
+    await collectionReference.add(item.toMap());
+    print('notification2:' + item.toMap().toString());
   }
 
   @override
@@ -716,7 +755,22 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                 child: CachedNetworkImage(
                                   imageUrl: widget.book.coverPhotoFile,
                                   placeholder: (context, url) =>
-                                      CircularProgressIndicator(),
+                                      LoadingAnimationWidget.fourRotatingDots(
+                                    color: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                                    size: 50,
+                                  ),
                                   errorWidget: (context, url, error) =>
                                       Icon(Icons.error),
                                 ),
@@ -770,6 +824,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                             .where('bookid',
                                                 isEqualTo: widget.book.bookid)
                                             .get();
+
                                     setState(() {
                                       if (favourite == false) {
                                         favouritiesRef.add({
@@ -778,18 +833,22 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                               .instance.currentUser!.uid,
                                         }).then((value) {
                                           print('favourities added');
-                                          setState(() {
-                                            favourite = true;
-                                          });
+                                          if (mounted) {
+                                            setState(() {
+                                              favourite = true;
+                                            });
+                                          }
                                         }).catchError((error) => print(
                                             'Failed to add favourities: $error'));
                                       } else {
                                         querySnapshot.docs.forEach((doc) {
                                           doc.reference.delete().then((value) {
                                             print('favourities deleted');
-                                            setState(() {
-                                              favourite = false;
-                                            });
+                                            if (mounted) {
+                                              setState(() {
+                                                favourite = false;
+                                              });
+                                            }
                                           }).catchError((error) => print(
                                               'Failed to delete favourities: $error'));
                                         });
@@ -820,7 +879,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                             Book? book = provider.book;
                             if (book == null) {
                               return Container(
-                                child: (Text('Loading...')),
+                                child: Text('Loading...'),
                               );
                             } else {
                               if (book.freeRentPaid == "paid" &&
@@ -925,10 +984,12 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                 .add(Duration(days: duration));
                                         WidgetsBinding.instance
                                             .addPostFrameCallback((_) {
-                                          setState(() {
-                                            _timeLeft = expirationDate
-                                                .difference(DateTime.now());
-                                          });
+                                          if (mounted) {
+                                            setState(() {
+                                              _timeLeft = expirationDate
+                                                  .difference(DateTime.now());
+                                            });
+                                          }
                                         });
                                       }
 

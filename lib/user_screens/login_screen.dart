@@ -223,9 +223,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                     : Icons.visibility_off,
                               ),
                               onPressed: () {
-                                setState(() {
-                                  _obscureText = !_obscureText;
-                                });
+                                if (mounted) {
+                                  setState(() {
+                                    _obscureText = !_obscureText;
+                                  });
+                                }
                               },
                             ),
                             textInputType: TextInputType.visiblePassword,
@@ -251,13 +253,21 @@ class _LoginScreenState extends State<LoginScreen> {
                             : ElevatedButton(
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
-                                    setState(() {
-                                      isLoading = true;
-                                    });
+                                    if (mounted) {
+                                      setState(() {
+                                        isLoading = true;
+                                      });
+                                    }
                                     if (_emailController.text ==
                                         'abctalhachattha162@gmail.com') {
                                       SharedPreferences prefs =
                                           await SharedPreferences.getInstance();
+                                          Users users = Users("admin", "admin", "", "admin", "admin",
+          "", 0, 'admin', 0);
+                                      firestoreInstance
+                                          .collection("users")
+                                          .doc("admin")
+                                          .set(users.toMap());
                                       bool isLoggedIn = true;
                                       prefs.setBool('isLoggedIn', isLoggedIn);
                                       navigateWithNoBack(context,
@@ -275,9 +285,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                         // here
                                       }
                                     }
-                                    setState(() {
-                                      isLoading = false;
-                                    });
+                                    if (mounted) {
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                    }
                                   }
 
                                   // showSnackBar(context, 'Logined');
@@ -334,9 +346,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                 text: "Sign in with Google",
                                 onPressed: () async {
                                   // try {
-                                  setState(() {
-                                    isGoogleLoading = true;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      isGoogleLoading = true;
+                                    });
+                                  }
 
                                   User? user;
                                   try {
@@ -351,9 +365,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                     context.read<AuthState>().user = 1;
                                     navigateWithNoBack(context, MyApp());
                                   }
-                                  setState(() {
-                                    isGoogleLoading = false;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      isGoogleLoading = false;
+                                    });
+                                  }
                                 },
                               ),
                         const SizedBox(
