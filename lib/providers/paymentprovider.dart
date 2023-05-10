@@ -17,5 +17,12 @@ class PaymentProvider extends ChangeNotifier {
     _payments = snapshot.docs.map((doc) => Payment.fromSnapshot(doc)).toList();
     notifyListeners();
   }
+  void clearPayments() {
+  payments.clear();
+  print("talhaxyza");
+  notifyListeners();
+
+}
+
 }
 

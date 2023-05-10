@@ -141,93 +141,94 @@ class _HomeScreenState extends State<HomeScreen> {
     // print('home');
     double height = MediaQuery.of(context).size.height;
     final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final orientation = MediaQuery.of(context).orientation;
     // _fetchNotifications(context);
-    return WillPopScope(
-      onWillPop: onWillPop,
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Book Store'),
-            automaticallyImplyLeading: false,
-            actions: [
-              Stack(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      navigateWithNoBack(context, NotificationScreen());
-                    },
-                    icon: const Icon(Icons.notifications),
-                  ),
-                  Positioned(
-                    top: 22.0,
-                    right: 5.0,
-                    child: Container(
-                      padding: EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.red,
-                      ),
-                      child: Text(
-                        notificationLength.toString(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10.0,
-                          fontWeight: FontWeight.bold,
-                        ),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Book Store'),
+          automaticallyImplyLeading: false,
+          actions: [
+            Stack(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    navigateWithNoBack(context, NotificationScreen());
+                  },
+                  icon: const Icon(Icons.notifications),
+                ),
+                Positioned(
+                  top: 22.0,
+                  right: 5.0,
+                  child: Container(
+                    padding: EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.red,
+                    ),
+                    child: Text(
+                      notificationLength.toString(),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10.0,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ],
-              ),
-              IconButton(
-                onPressed: () {
-                  // method to show the search bar
-                  showSearch(
-                      context: context,
-                      // delegate to customize the search bar
-                      delegate: CustomSearchDelegate(
-                          searchData: searchData, books: books));
-                },
-                icon: const Icon(CupertinoIcons.search),
-              ),
-            ],
-          ),
-          resizeToAvoidBottomInset: false,
-          body: SingleChildScrollView(
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(children: [
-                      Padding(
-                        padding: const EdgeInsets.all(3.0),
-                        child: ChipsChoice<int>.single(
-                          value: tag,
-                          onChanged: (val) {
-                            if (mounted) {
-                              setState(() {
-                                tag = val;
-                              });
-                            }
-                          },
-                          choiceItems: categories.isEmpty
-                              ? C2Choice.listFrom<int, String>(
-                                  source: options,
-                                  value: (i, v) => i,
-                                  label: (i, v) => v,
-                                )
-                              : C2Choice.listFrom<int, String>(
-                                  source: categories,
-                                  value: (i, v) => i,
-                                  label: (i, v) => v,
-                                ),
-                        ),
-                      )
-                    ]),
-                  ),
-                  SizedBox(
+                ),
+              ],
+            ),
+            IconButton(
+              onPressed: () {
+                // method to show the search bar
+                showSearch(
+                    context: context,
+                    // delegate to customize the search bar
+                    delegate: CustomSearchDelegate(
+                        searchData: searchData, books: books));
+              },
+              icon: const Icon(CupertinoIcons.search),
+            ),
+          ],
+        ),
+        resizeToAvoidBottomInset: false,
+        body: SingleChildScrollView(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(3.0),
+                      child: ChipsChoice<int>.single(
+                        value: tag,
+                        onChanged: (val) {
+                          if (mounted) {
+                            setState(() {
+                              tag = val;
+                            });
+                          }
+                        },
+                        choiceItems: categories.isEmpty
+                            ? C2Choice.listFrom<int, String>(
+                                source: options,
+                                value: (i, v) => i,
+                                label: (i, v) => v,
+                              )
+                            : C2Choice.listFrom<int, String>(
+                                source: categories,
+                                value: (i, v) => i,
+                                label: (i, v) => v,
+                              ),
+                      ),
+                    )
+                  ]),
+                ),
+                Padding(
+                  padding:  EdgeInsets.symmetric(horizontal:orientation == Orientation.portrait?8:25.0,vertical:orientation == Orientation.portrait?2:8.0),
+                  child: SizedBox(
                     width: double.infinity,
                     height: height * 0.73,
                     child: StreamBuilder<QuerySnapshot>(
@@ -267,12 +268,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           );
                         }
-                        return Stack(
-                          children: [
+                        return
                             GridView.builder(
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
+                                      crossAxisCount: orientation == Orientation.portrait?2:4,
                                       crossAxisSpacing: 6,
                                       mainAxisSpacing: 6,
                                       mainAxisExtent: 230),
@@ -354,19 +354,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 );
                               },
-                            ),
-                          ],
-                        );
+                            );
                       },
                     ),
 
                     //stack
-                  )
-                ]
-                //   },
-                // ),
-                ),
-          ),
+                  ),
+                )
+              ]
+              //   },
+              // ),
+              ),
         ),
       ),
     );

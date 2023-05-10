@@ -27,7 +27,9 @@ class _OrderHistoryState extends State<OrderHistory> {
   @override
   void initState() {
     super.initState();
-
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      Provider.of<PaymentProvider>(context, listen: false).clearPayments();
+    });
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
@@ -47,8 +49,11 @@ class _OrderHistoryState extends State<OrderHistory> {
     _loadBooks();
   }
 
+
+
   @override
   void dispose() {
+    print('talhaxyza2');
     timer?.cancel();
     super.dispose();
   }
@@ -99,7 +104,6 @@ class _OrderHistoryState extends State<OrderHistory> {
         ? InternetChecker()
         : WillPopScope(
             onWillPop: () async {
-
               navigateWithNoBack(context, MainScreenUser());
               return false;
             },
@@ -118,10 +122,12 @@ class _OrderHistoryState extends State<OrderHistory> {
                     height: height * 0.93,
                     child: Consumer<PaymentProvider>(
                       builder: (context, provider, child) {
+
                         if (provider.payments.isEmpty) {
+                          print(FirebaseAuth.instance.currentUser!.uid.toString()+'talhaxyz'+provider.payments.length.toString());
                           provider.fetchPayments(
                               FirebaseAuth.instance.currentUser!.uid);
-                          return Center(child: Text('No Data found'));
+                          return Center(child: Text('No orders found'));
                         } else {
                           return ListView.builder(
                               itemCount: provider.payments.length,

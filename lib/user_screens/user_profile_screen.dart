@@ -79,15 +79,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    return WillPopScope(
-      onWillPop: onWillPop,
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text('Balance: \$$balance'),
-            automaticallyImplyLeading: false,
-          ),
-          body: Row(
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Balance: \$$balance'),
+          automaticallyImplyLeading: false,
+        ),
+        body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Column(
@@ -191,7 +191,7 @@ firestoreInstance
                                           .instance.currentUser!.uid)
                                       .set({"darkmode1": true});
                                               }
-                                  
+
                                 }),
                           ),
                           const Divider(),

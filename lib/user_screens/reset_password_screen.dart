@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:bookstore_recommendation_system_fyp/user_screens/signup_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -107,9 +108,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     return internetAvailabilityNotifier.getInternetAvailability() == false
         ? InternetChecker()
         : WillPopScope(
-            onWillPop: onWillPop,
+            onWillPop: () async {
+              navigateWithNoBack(context, LoginScreen());
+              return false;
+            },
             child: SafeArea(
               child: Scaffold(
+                resizeToAvoidBottomInset: false,
                 appBar: AppBar(
                     title: const Text('Reset Passwords',
                         style: TextStyle(

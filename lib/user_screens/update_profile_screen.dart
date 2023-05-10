@@ -123,7 +123,10 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
 
     return WillPopScope(
-      onWillPop: onWillPop,
+      onWillPop:  () async {
+        navigateWithNoBack(context, MainScreenUser());
+        return false;
+      },
       child: SafeArea(
         child: internetAvailabilityNotifier.getInternetAvailability() == false
             ? InternetChecker()
@@ -137,150 +140,153 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       },
                     )),
                 resizeToAvoidBottomInset: false,
-                body: Column(children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                        maxRadius: 60,
-                        backgroundImage:
-                            photoURL.isNotEmpty ? NetworkImage(photoURL) : null,
-                        backgroundColor: Colors.green,
-                      ),
-                      Positioned(
-                        bottom: -10,
-                        left: 80,
-                        child: IconButton(
-                          onPressed: () async {
-                            File? fileans = await pickImage();
-                            if (fileans == null) {
-                              flutterToast('plz pick image again');
-                            } else {
-                              file = fileans;
-                            }
-                          },
-                          icon: Icon(Icons.add_a_photo),
-                        ),
-                      )
-                    ],
-                  ),
-                  Form(
-                    key: _formKey,
-                    child: Column(
+                body: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(children: [
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Stack(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 4.0),
-                          child: TextInputField(
-                            hintText: 'Enter Name',
-                            suffixIcon: Text(''),
-                            textInputType: TextInputType.name,
-                            textEditingController: _nameController,
-                            isPassword: false,
-                            validator: (value) {
-                              if (!name_valid.hasMatch(value)) {
-                                return 'Enter valid name';
+                        CircleAvatar(
+                          maxRadius: 60,
+                          backgroundImage:
+                              photoURL.isNotEmpty ? NetworkImage(photoURL) : null,
+                          backgroundColor: Colors.green,
+                        ),
+                        Positioned(
+                          bottom: -10,
+                          left: 80,
+                          child: IconButton(
+                            onPressed: () async {
+                              File? fileans = await pickImage();
+                              if (fileans == null) {
+                                flutterToast('plz pick image again');
+                              } else {
+                                file = fileans;
                               }
-                              if (value.length > 25) {
-                                return 'Name should be less\n than 25 characters';
-                              }
-                              return null;
                             },
+                            icon: Icon(Icons.add_a_photo),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 4.0),
-                          child: TextInputField(
-                            hintText: 'Enter Age',
-                            suffixIcon: Text(''),
-                            textInputType: TextInputType.number,
-                            textEditingController: _ageController,
-                            isPassword: false,
-                            validator: (value) {
-                              if (!age_valid.hasMatch(value)) {
-                                return 'Enter valid age';
-                              }
-                              if (value.length >= 3) {
-                                return 'Enter valid age';
-                              }
-                              return null;
-                            },
+                        )
+                      ],
+                    ),
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 4.0),
+                            child: TextInputField(
+                              hintText: 'Enter Name',
+                              suffixIcon: Text(''),
+                              textInputType: TextInputType.name,
+                              textEditingController: _nameController,
+                              isPassword: false,
+                              validator: (value) {
+                                if (!name_valid.hasMatch(value)) {
+                                  return 'Enter valid name';
+                                }
+                                if (value.length > 25) {
+                                  return 'Name should be less\n than 25 characters';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 20.0,
-                        ),
-                        _isLoading == true
-                            ? CircularProgressIndicator()
-                            : ElevatedButton(
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {
-                                    if (mounted) {
-                                      setState(() {
-                                        _isLoading = true;
-                                      });
-                                    }
-                                    final userId =
-                                        FirebaseAuth.instance.currentUser!.uid;
-                                    if (file != null) {
-                                      Reference storageRef = FirebaseStorage
-                                          .instance
-                                          .ref()
-                                          .child('users/$userId');
-                                      final TaskSnapshot snapshot =
-                                          await storageRef.putFile(file!);
-                                      final downloadUrl =
-                                          await snapshot.ref.getDownloadURL();
-                                      FirebaseFirestore.instance
-                                          .collection('users')
-                                          .doc(userId)
-                                          .update({
-                                        'name': _nameController.text,
-                                        'age': _ageController.text,
-                                        'photo': downloadUrl,
-                                      }).then((value) {
-                                        flutterToast('Updated');
-                                      });
-                                    } else {
-                                      if (photoURL.isEmpty) {
-                                        flutterToast('plz upload image');
-                                      } else {
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 4.0),
+                            child: TextInputField(
+                              hintText: 'Enter Age',
+                              suffixIcon: Text(''),
+                              textInputType: TextInputType.number,
+                              textEditingController: _ageController,
+                              isPassword: false,
+                              validator: (value) {
+                                if (!age_valid.hasMatch(value)) {
+                                  return 'Enter valid age';
+                                }
+                                if (value.length >= 3) {
+                                  return 'Enter valid age';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20.0,
+                          ),
+                          _isLoading == true
+                              ? CircularProgressIndicator()
+                              : ElevatedButton(
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      if (mounted) {
+                                        setState(() {
+                                          _isLoading = true;
+                                        });
+                                      }
+                                      final userId =
+                                          FirebaseAuth.instance.currentUser!.uid;
+                                      if (file != null) {
+                                        Reference storageRef = FirebaseStorage
+                                            .instance
+                                            .ref()
+                                            .child('users/$userId');
+                                        final TaskSnapshot snapshot =
+                                            await storageRef.putFile(file!);
+                                        final downloadUrl =
+                                            await snapshot.ref.getDownloadURL();
                                         FirebaseFirestore.instance
                                             .collection('users')
                                             .doc(userId)
                                             .update({
                                           'name': _nameController.text,
                                           'age': _ageController.text,
-                                          'photo': photoURL,
+                                          'photo': downloadUrl,
                                         }).then((value) {
                                           flutterToast('Updated');
                                         });
+                                      } else {
+                                        if (photoURL.isEmpty) {
+                                          flutterToast('plz upload image');
+                                        } else {
+                                          FirebaseFirestore.instance
+                                              .collection('users')
+                                              .doc(userId)
+                                              .update({
+                                            'name': _nameController.text,
+                                            'age': _ageController.text,
+                                            'photo': photoURL,
+                                          }).then((value) {
+                                            flutterToast('Updated');
+                                          });
+                                        }
+                                      }
+
+                                      loadData();
+                                      if (mounted) {
+                                        setState(() {
+                                          _isLoading = false;
+                                        });
                                       }
                                     }
-
-                                    loadData();
-                                    if (mounted) {
-                                      setState(() {
-                                        _isLoading = false;
-                                      });
-                                    }
-                                  }
-                                },
-                                child: const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 75.0, vertical: 12.0),
-                                    child: Text('Update Profile')),
-                              ),
-                      ],
+                                  },
+                                  child: const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 75.0, vertical: 12.0),
+                                      child: Text('Update Profile')),
+                                ),
+                        ],
+                      ),
                     ),
-                  ),
-                ])),
+                  ]),
+                )),
       ),
     );
   }

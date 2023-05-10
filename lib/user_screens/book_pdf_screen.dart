@@ -107,6 +107,7 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+    final orientation = MediaQuery.of(context).orientation;
     return WillPopScope(
       onWillPop:  () async {
         navigateWithNoBack(context, ViewBookScreen(book: widget.book));
@@ -127,42 +128,45 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
                               ));
                         },
                       )),
-                  body: Column(
-                    children: [
-                      Container(
-                        height: height * 0.77,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: width * 0.05, vertical: height * 0.015),
-                        child: _pdfPath.isNotEmpty
-                            ? SfPdfViewer.file(File(_pdfPath))
-                            : Center(
-                                child: LoadingAnimationWidget.fourRotatingDots(
-                                color: themeNotifier.getTheme() ==
-                                    ThemeData.dark(useMaterial3: true).copyWith(
-                                      colorScheme: ColorScheme.dark().copyWith(
-                                        primary: darkprimarycolor,
-                                        error: Colors.red,
-                                        onPrimary: darkprimarycolor,
-                                        outline: darkprimarycolor,
-                                        primaryVariant: darkprimarycolor,
-                                        onPrimaryContainer: darkprimarycolor,
-                                      ),
-                                    )
-                                ? darkprimarycolor
-                                : primarycolor,
-                                size: 50,
-                              )
-                                // Text('Loading...')
-                                ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        '${widget.book.title}',
-                        style: TextStyle(
-                          fontSize: 18,
+                  body: Center(
+                    child: Column(
+                      children: [
+                        Container(
+                          width:orientation == Orientation.portrait?double.infinity:600,
+                          height: height * 0.72,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: width * 0.05, vertical: height * 0.015),
+                          child: _pdfPath.isNotEmpty
+                              ? SfPdfViewer.file(File(_pdfPath))
+                              : Center(
+                                  child: LoadingAnimationWidget.fourRotatingDots(
+                                  color: themeNotifier.getTheme() ==
+                                      ThemeData.dark(useMaterial3: true).copyWith(
+                                        colorScheme: ColorScheme.dark().copyWith(
+                                          primary: darkprimarycolor,
+                                          error: Colors.red,
+                                          onPrimary: darkprimarycolor,
+                                          outline: darkprimarycolor,
+                                          primaryVariant: darkprimarycolor,
+                                          onPrimaryContainer: darkprimarycolor,
+                                        ),
+                                      )
+                                  ? darkprimarycolor
+                                  : primarycolor,
+                                  size: 50,
+                                )
+                                  // Text('Loading...')
+                                  ),
                         ),
-                      ),
-                    ],
+                        SizedBox(height:orientation == Orientation.portrait?5:0),
+                        orientation == Orientation.portrait?Text(
+                          '${widget.book.title}',
+                          style: TextStyle(
+                            fontSize: 18,
+                          ),
+                        ):Container(),
+                      ],
+                    ),
                   ),
                 )
               : InternetChecker()),

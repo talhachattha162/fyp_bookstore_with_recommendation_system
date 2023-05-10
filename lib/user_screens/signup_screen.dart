@@ -127,157 +127,159 @@ class _SignUpScreenState extends State<SignUpScreen> {
       child: SafeArea(
         child: internetAvailabilityNotifier.getInternetAvailability() == false
             ? InternetChecker()
-            : Scaffold(
-                resizeToAvoidBottomInset: false,
-                body: Column(children: [
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  themeNotifier.getTheme() == ThemeData.dark(useMaterial3: true)
-                      ? SvgPicture.asset('lib/assets/images/signupblue.svg',
-                          semanticsLabel: 'Signup', height: 250, width: 200)
-                      : SvgPicture.asset('lib/assets/images/signup.svg',
-                          semanticsLabel: 'Signup', height: 250, width: 200),
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 4.0),
-                          child: TextInputField(
-                            hintText: 'Enter Name',
-                            suffixIcon: Text(''),
-                            textInputType: TextInputType.name,
-                            textEditingController: _nameController,
-                            isPassword: false,
-                            validator: (value) {
-                              if (!name_valid.hasMatch(value)) {
-                                return 'Enter valid name';
-                              }
-                              if (value.length > 25) {
-                                return 'Name should be less\n than 25 characters';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 4.0),
-                          child: TextInputField(
-                            hintText: 'Enter Email',
-                            suffixIcon: Text(''),
-                            textInputType: TextInputType.emailAddress,
-                            textEditingController: _emailController,
-                            isPassword: false,
-                            validator: (value) {
-                              if (!email_valid.hasMatch(value)) {
-                                return 'Please enter valid email';
-                              }
-                              if (value.length > 40) {
-                                return 'Enter email with less\n than 40 characters';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 4.0),
-                          child: TextInputField(
-                            hintText: 'Enter Password',
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureText
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                              ),
-                              onPressed: () {
-                                if (mounted) {
-                                  setState(() {
-                                    _obscureText = !_obscureText;
-                                  });
+            :  Scaffold(
+                  resizeToAvoidBottomInset: false,
+                  body: SingleChildScrollView(
+                      child:Column(children: [
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    themeNotifier.getTheme() == ThemeData.dark(useMaterial3: true)
+                        ? SvgPicture.asset('lib/assets/images/signupblue.svg',
+                            semanticsLabel: 'Signup', height: 250, width: 200)
+                        : SvgPicture.asset('lib/assets/images/signup.svg',
+                            semanticsLabel: 'Signup', height: 250, width: 200),
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 4.0),
+                            child: TextInputField(
+                              hintText: 'Enter Name',
+                              suffixIcon: Text(''),
+                              textInputType: TextInputType.name,
+                              textEditingController: _nameController,
+                              isPassword: false,
+                              validator: (value) {
+                                if (!name_valid.hasMatch(value)) {
+                                  return 'Enter valid name';
                                 }
+                                if (value.length > 25) {
+                                  return 'Name should be less\n than 25 characters';
+                                }
+                                return null;
                               },
                             ),
-                            textInputType: TextInputType.text,
-                            textEditingController: _passwordController,
-                            isPassword: _obscureText,
-                            validator: (value) {
-                              String password = value.trim();
-                              if (!pass_valid.hasMatch(password)) {
-                                return 'password should contain capital,\nsmall,number,special characters';
-                              }
-                              if (value.length < 8) {
-                                return 'Password should be 8 characters';
-                              }
-                              return null;
-                            },
                           ),
-                        ),
-                        const SizedBox(
-                          height: 20.0,
-                        ),
-                        _isLoading
-                            ? const CircularProgressIndicator()
-                            : ElevatedButton(
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {
-                                    if (mounted) {
-                                      setState(() {
-                                        _isLoading = true;
-                                      });
-                                    }
-                                    final u = await signUp(
-                                        name: _nameController.text,
-                                        userEmail: _emailController.text,
-                                        password: _passwordController.text,
-                                        context: context);
-                                    if (u != 'exist') {
-                                      
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (ctx) =>
-                                                  EmailVerificationScreen(
-                                                      email:
-                                                          _emailController.text,
-                                                      password:
-                                                          _passwordController
-                                                              .text)));
-                                    }
-                                    if (mounted) {
-                                      setState(() {
-                                        _isLoading = false;
-                                      });
-                                    }
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 4.0),
+                            child: TextInputField(
+                              hintText: 'Enter Email',
+                              suffixIcon: Text(''),
+                              textInputType: TextInputType.emailAddress,
+                              textEditingController: _emailController,
+                              isPassword: false,
+                              validator: (value) {
+                                if (!email_valid.hasMatch(value)) {
+                                  return 'Please enter valid email';
+                                }
+                                if (value.length > 40) {
+                                  return 'Enter email with less\n than 40 characters';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 4.0),
+                            child: TextInputField(
+                              hintText: 'Enter Password',
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscureText
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                ),
+                                onPressed: () {
+                                  if (mounted) {
+                                    setState(() {
+                                      _obscureText = !_obscureText;
+                                    });
                                   }
                                 },
-                                child: const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 75.0, vertical: 12.0),
-                                    child: Text('Signup')),
                               ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text("Already have an account?"),
-                            TextButton(
-                                onPressed: () {
-                                  navigateWithNoBack(
-                                      context, const LoginScreen());
-                                },
-                                child: const Text('Login'))
-                          ],
-                        )
-                      ],
+                              textInputType: TextInputType.text,
+                              textEditingController: _passwordController,
+                              isPassword: _obscureText,
+                              validator: (value) {
+                                String password = value.trim();
+                                if (!pass_valid.hasMatch(password)) {
+                                  return 'password should contain capital,\nsmall,number,special characters';
+                                }
+                                if (value.length < 8) {
+                                  return 'Password should be 8 characters';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20.0,
+                          ),
+                          _isLoading
+                              ? const CircularProgressIndicator()
+                              : ElevatedButton(
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      if (mounted) {
+                                        setState(() {
+                                          _isLoading = true;
+                                        });
+                                      }
+                                      final u = await signUp(
+                                          name: _nameController.text,
+                                          userEmail: _emailController.text,
+                                          password: _passwordController.text,
+                                          context: context);
+                                      if (u != 'exist') {
+
+                                        Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (ctx) =>
+                                                    EmailVerificationScreen(
+                                                        email:
+                                                            _emailController.text,
+                                                        password:
+                                                            _passwordController
+                                                                .text)));
+                                      }
+                                      if (mounted) {
+                                        setState(() {
+                                          _isLoading = false;
+                                        });
+                                      }
+                                    }
+                                  },
+                                  child: const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 75.0, vertical: 12.0),
+                                      child: Text('Signup')),
+                                ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text("Already have an account?"),
+                              TextButton(
+                                  onPressed: () {
+                                    navigateWithNoBack(
+                                        context, const LoginScreen());
+                                  },
+                                  child: const Text('Login'))
+                            ],
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                ])),
+                  ])),
+            ),
       ),
     );
   }

@@ -71,6 +71,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
   Widget build(BuildContext context) {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     double height = MediaQuery.of(context).size.height;
+    final orientation = MediaQuery.of(context).orientation;
     return WillPopScope(
       onWillPop: () async {
         navigateWithNoBack(context, MainScreenUser());
@@ -118,8 +119,8 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                         }
                         return GridView.builder(
                           gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
+                               SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: orientation == Orientation.portrait?2:4,
                                   crossAxisSpacing: 6,
                                   mainAxisSpacing: 6,
                                   mainAxisExtent: 230),

@@ -119,124 +119,127 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                         navigateWithNoBack(context, MainScreenUser());
                       },
                     )),
-                body: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextInputField(
-                        hintText: 'Enter Review',
-                        suffixIcon: Text(''),
-                        isPassword: false,
-                        textInputType: TextInputType.text,
-                        textEditingController: _reviewController,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Review';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(
-                        height: 60,
-                      ),
-                      ReviewSlider(
-                          onChange: (int value) {
-                            //values are from 0 to 4
-                            rating = value;
+                body: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextInputField(
+                          hintText: 'Enter Review',
+                          suffixIcon: Text(''),
+                          isPassword: false,
+                          textInputType: TextInputType.text,
+                          textEditingController: _reviewController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter Review';
+                            }
+                            return null;
                           },
-                          optionStyle: TextStyle(
-                            color: themeNotifier.getTheme() ==
-                                    ThemeData.dark(useMaterial3: true).copyWith(
-                                      colorScheme: ColorScheme.dark().copyWith(
-                                        primary: darkprimarycolor,
-                                        error: Colors.red,
-                                        onPrimary: darkprimarycolor,
-                                        outline: darkprimarycolor,
-                                        primaryVariant: darkprimarycolor,
-                                        onPrimaryContainer: darkprimarycolor,
-                                      ),
-                                    )
-                                ? darkprimarycolor
-                                : primarycolor,
-                          )),
-                      const SizedBox(
-                        height: 60,
-                      ),
-                      isLoading
-                          ? CircularProgressIndicator()
-                          : ElevatedButton(
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  if (mounted) {
-                                    setState(() {
-                                      isLoading = true;
-                                    });
-                                  }
-                                  //user liked code//
-                                  // List userid=[FirebaseAuth.instance.currentUser!.uid];
-                                  // List usersReviewed=widget.book.userliked;
-                                  // usersReviewed.addAll(userid);
-                                  // DocumentReference docRef = firestoreInstance
-                                  //     .collection('books')
-                                  //     .doc(widget.book.bookid);
+                        ),
+                        const SizedBox(
+                          height: 60,
+                        ),
+                        ReviewSlider(
+                            onChange: (int value) {
+                              //values are from 0 to 4
+                              rating = value;
+                            },
+                            optionStyle: TextStyle(
+                              color: themeNotifier.getTheme() ==
+                                      ThemeData.dark(useMaterial3: true).copyWith(
+                                        colorScheme: ColorScheme.dark().copyWith(
+                                          primary: darkprimarycolor,
+                                          error: Colors.red,
+                                          onPrimary: darkprimarycolor,
+                                          outline: darkprimarycolor,
+                                          primaryVariant: darkprimarycolor,
+                                          onPrimaryContainer: darkprimarycolor,
+                                        ),
+                                      )
+                                  ? darkprimarycolor
+                                  : primarycolor,
+                            )),
+                        const SizedBox(
+                          height: 60,
+                        ),
+                        isLoading
+                            ? CircularProgressIndicator()
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    if (mounted) {
+                                      setState(() {
+                                        isLoading = true;
+                                      });
+                                    }
+                                    //user liked code//
+                                    // List userid=[FirebaseAuth.instance.currentUser!.uid];
+                                    // List usersReviewed=widget.book.userliked;
+                                    // usersReviewed.addAll(userid);
+                                    // DocumentReference docRef = firestoreInstance
+                                    //     .collection('books')
+                                    //     .doc(widget.book.bookid);
 
-                                  // docRef
-                                  //     .update({
-                                  //       'userliked': '',
-                                  //     })
-                                  //     .then((value) => print(
-                                  //         'Attribute updated successfully!'))
-                                  //     .catchError((error) => print(
-                                  //         'Failed to update attribute: $error'));
-                                  CollectionReference reviewCollection =
-                                      firestoreInstance.collection("reviews");
-                                  String reviewid = reviewCollection.doc().id;
-                                  Review review = Review(
-                                      reviewId: reviewid,
-                                      bookId: widget.book.bookid,
-                                      uploadedByUserId: FirebaseAuth
-                                          .instance.currentUser!.uid,
-                                      rating: rating,
-                                      reviewtext: _reviewController.text,
-                                      created_at: Timestamp.now());
-                                  try {
-                                    await reviewCollection
-                                        .doc(reviewid)
-                                        .set(review.toMap())
-                                        .then((value) async {})
-                                        .onError((error, stackTrace) async {
-                                      flutterToast('Error:' + error.toString());
-                                    }).then((_) {
-                                      flutterToast('Review submitted');
-                                      if (FirebaseAuth
-                                              .instance.currentUser!.uid !=
-                                          widget.book.userid) {
-                                        reviewNotification(
-                                            widget.book.title,
-                                            FirebaseAuth
-                                                .instance.currentUser!.uid,
-                                            widget.book.userid);
-                                      }
-                                    });
-                                  } catch (e) {
-                                    flutterToast('Error:' + e.toString());
+                                    // docRef
+                                    //     .update({
+                                    //       'userliked': '',
+                                    //     })
+                                    //     .then((value) => print(
+                                    //         'Attribute updated successfully!'))
+                                    //     .catchError((error) => print(
+                                    //         'Failed to update attribute: $error'));
+                                    CollectionReference reviewCollection =
+                                        firestoreInstance.collection("reviews");
+                                    String reviewid = reviewCollection.doc().id;
+                                    Review review = Review(
+                                        reviewId: reviewid,
+                                        bookId: widget.book.bookid,
+                                        uploadedByUserId: FirebaseAuth
+                                            .instance.currentUser!.uid,
+                                        rating: rating,
+                                        reviewtext: _reviewController.text,
+                                        created_at: Timestamp.now());
+                                    try {
+                                      await reviewCollection
+                                          .doc(reviewid)
+                                          .set(review.toMap())
+                                          .then((value) async {})
+                                          .onError((error, stackTrace) async {
+                                        flutterToast('Error:' + error.toString());
+                                      }).then((_) {
+                                        flutterToast('Review submitted');
+                                        if (FirebaseAuth
+                                                .instance.currentUser!.uid !=
+                                            widget.book.userid) {
+                                          reviewNotification(
+                                              widget.book.title,
+                                              FirebaseAuth
+                                                  .instance.currentUser!.uid,
+                                              widget.book.userid);
+                                        }
+                                      });
+                                    } catch (e) {
+                                      flutterToast('Error:' + e.toString());
+                                    }
+                                    if (mounted) {
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                    }
                                   }
-                                  if (mounted) {
-                                    setState(() {
-                                      isLoading = false;
-                                    });
-                                  }
-                                }
-                              },
-                              child: const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 75.0, vertical: 12.0),
-                                  child: Text('Submit')),
-                            ),
-                    ],
+                                },
+                                child: const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 75.0, vertical: 12.0),
+                                    child: Text('Submit')),
+                              ),
+                      ],
+                    ),
                   ),
                 )),
       ),

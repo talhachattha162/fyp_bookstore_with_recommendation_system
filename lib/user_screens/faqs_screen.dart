@@ -61,7 +61,10 @@ class _FaqScreenState extends State<FaqScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: onWillPop,
+      onWillPop: () async {
+        navigateWithNoBack(context, MainScreenUser());
+        return false;
+      },
       child: SafeArea(
         child: Scaffold(
             appBar: AppBar(
@@ -72,7 +75,8 @@ class _FaqScreenState extends State<FaqScreen> {
                   },
                 ),
                 title: const Text('FAQS')),
-            body: const Steps()),
+            body:  SingleChildScrollView(
+    scrollDirection: Axis.vertical,child: Steps())),
       ),
     );
   }

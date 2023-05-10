@@ -35,15 +35,16 @@ class _LibraryScreenState extends State<LibraryScreen> {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    return WillPopScope(
-      onWillPop: onWillPop,
-      child: SafeArea(
-        child: Scaffold(
-            appBar: AppBar(
-              title: const Text('Library'),
-              automaticallyImplyLeading: false,
-            ),
-            body: Column(
+    final orientation = MediaQuery.of(context).orientation;
+    return SafeArea(
+      child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Library'),
+            automaticallyImplyLeading: false,
+          ),
+          body: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(
@@ -122,7 +123,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       },
                       child: SizedBox(
                         width: width * 0.49,
-                        height: height * 0.3,
+                        height: orientation == Orientation.portrait?height * 0.3:height * 0.5,
                         child: Card(
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -187,7 +188,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       },
                       child: SizedBox(
                         width: width * 0.49,
-                        height: height * 0.3,
+                        height: orientation == Orientation.portrait?height * 0.3:height * 0.5,
                         child: Card(
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -249,8 +250,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
                   ],
                 ),
               ],
-            )),
-      ),
+            ),
+          )),
     );
   }
 }
