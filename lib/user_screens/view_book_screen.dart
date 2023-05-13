@@ -984,21 +984,17 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                           paymentCreationTime!.toDate().add(Duration(days: duration));
                                           expirationDates.add(expirationDate);
                                         }
-// print(expirationDates);
+print(expirationDates);
                                         DateTime maxExpirationDate = expirationDates.reduce((a, b) => a.isAfter(b) ? a : b);
-
+                                        
                                         Duration timeLeft = maxExpirationDate.difference(DateTime.now());
-                                        // print(maxExpirationDate);
+                                        print(maxExpirationDate);
                                         if (!timeLeft.isNegative) {
                                          pass=true;
                                         }
 
-                                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                                          if (mounted) {
-                                            setState(() {
-                                              _timeLeft = timeLeft;
-                                            });
-                                          }
+                                        setState(() {
+                                          _timeLeft = timeLeft;
                                         });
 
                                         if (pass == true) {

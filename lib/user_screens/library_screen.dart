@@ -1,4 +1,5 @@
 import 'package:bookstore_recommendation_system_fyp/user_screens/order_history.dart';
+import 'package:bookstore_recommendation_system_fyp/user_screens/recommendations.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -247,7 +248,74 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         ),
                       ),
                     ),
+
                   ],
+                ),
+
+                InkWell(
+                  onTap: () {
+                    navigateWithNoBack(context, BookRecommendationScreen());
+                  },
+                  child: SizedBox(
+                    width: width * 0.49,
+                    height: orientation == Orientation.portrait?height * 0.3:height * 0.5,
+                    child: Card(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 26.0,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                            Icons.thumb_up,
+                              size: 20,
+                              color: themeNotifier.getTheme() ==
+                                  ThemeData.dark(useMaterial3: true)
+                                      .copyWith(
+                                    colorScheme:
+                                    ColorScheme.dark().copyWith(
+                                      primary: darkprimarycolor,
+                                      error: Colors.red,
+                                      onPrimary: darkprimarycolor,
+                                      outline: darkprimarycolor,
+                                      primaryVariant: darkprimarycolor,
+                                      onPrimaryContainer:
+                                      darkprimarycolor,
+                                    ),
+                                  )
+                                  ? darkprimarycolor
+                                  : primarycolor,
+                            ),
+                            Text('Recommendations',
+                                style: TextStyle(
+                                    color: themeNotifier.getTheme() ==
+                                        ThemeData.dark(
+                                            useMaterial3: true)
+                                            .copyWith(
+                                          colorScheme:
+                                          ColorScheme.dark()
+                                              .copyWith(
+                                            primary: darkprimarycolor,
+                                            error: Colors.red,
+                                            onPrimary: darkprimarycolor,
+                                            outline: darkprimarycolor,
+                                            primaryVariant:
+                                            darkprimarycolor,
+                                            onPrimaryContainer:
+                                            darkprimarycolor,
+                                          ),
+                                        )
+                                        ? darkprimarycolor
+                                        : primarycolor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20)),
+                          ],
+                        ),
+                      ),
+                      elevation: 50,
+                    ),
+                  ),
                 ),
               ],
             ),
