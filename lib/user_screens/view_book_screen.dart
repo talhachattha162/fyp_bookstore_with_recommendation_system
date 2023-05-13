@@ -970,40 +970,44 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       .snapshots(),
                                   builder: (BuildContext context,
                                       AsyncSnapshot<QuerySnapshot> snapshot) {
+                                    var pass=false;
                                     if (snapshot.data != null) {
-                                      Timestamp? paymentCreationTime;
-                                      int duration = 0;
 
-                                      Duration? difference = Duration.zero;
-                                      if (snapshot.data!.docs.isNotEmpty) {
-                                        duration = snapshot
-                                            .data!.docs.first['durationDays'];
-                                        paymentCreationTime = snapshot.data!
-                                            .docs.first['dateTimeCreated'];
+                                      if (snapshot.data!.docs.length != 0) {
+                                        print(snapshot.data!
+                                            .docs.length);
+                                        List<DateTime> expirationDates = [];
+                                        for (var document in snapshot.data!.docs) {
+                                          Timestamp? paymentCreationTime = document['dateTimeCreated'];
+                                          int duration = document['durationDays'];
+                                          DateTime expirationDate =
+                                          paymentCreationTime!.toDate().add(Duration(days: duration));
+                                          expirationDates.add(expirationDate);
+                                        }
+// print(expirationDates);
+                                        DateTime maxExpirationDate = expirationDates.reduce((a, b) => a.isAfter(b) ? a : b);
 
-                                        DateTime expirationDate =
-                                            paymentCreationTime!
-                                                .toDate()
-                                                .add(Duration(days: duration));
-                                        WidgetsBinding.instance
-                                            .addPostFrameCallback((_) {
+                                        Duration timeLeft = maxExpirationDate.difference(DateTime.now());
+                                        // print(maxExpirationDate);
+                                        if (!timeLeft.isNegative) {
+                                         pass=true;
+                                        }
+
+                                        WidgetsBinding.instance.addPostFrameCallback((_) {
                                           if (mounted) {
                                             setState(() {
-                                              _timeLeft = expirationDate
-                                                  .difference(DateTime.now());
+                                              _timeLeft = timeLeft;
                                             });
                                           }
                                         });
-                                      }
 
-                                      if (snapshot.data!.docs.length != 0) {
-                                        if (!_timeLeft.isNegative) {
+                                        if (pass == true) {
                                           return Column(
                                             children: [
                                               Row(
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
+                                                MainAxisAlignment
+                                                    .spaceEvenly,
                                                 children: [
                                                   ElevatedButton.icon(
                                                     onPressed: () {
@@ -1017,7 +1021,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                           ));
                                                     },
                                                     icon:
-                                                        Icon(Icons.headphones),
+                                                    Icon(Icons.headphones),
                                                     label: Text('Listen'),
                                                   ),
                                                   ElevatedButton.icon(
@@ -1035,16 +1039,21 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                 ],
                                               ),
                                               Text(
-                                                  'Timeleft ${_timeLeft.inDays}d:'
-                                                  '${_timeLeft.inHours.remainder(24)}h:'
-                                                  '${_timeLeft.inMinutes.remainder(60)}m:'
-                                                  '${_timeLeft.inSeconds.remainder(60)}s')
+                                                  'Timeleft ${_timeLeft
+                                                      .inDays}d:'
+                                                      '${_timeLeft.inHours
+                                                      .remainder(24)}h:'
+                                                      '${_timeLeft.inMinutes
+                                                      .remainder(60)}m:'
+                                                      '${_timeLeft.inSeconds
+                                                      .remainder(60)}s')
                                             ],
                                           );
                                         }
                                       }
                                     }
 
+                                    // print('snaptalha:');
                                     return Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceEvenly,
