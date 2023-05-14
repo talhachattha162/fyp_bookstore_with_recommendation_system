@@ -273,6 +273,14 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     bookpath = storeFile();
     // _checkIfBookIsFavorited();
   }
+  CollectionReference books = FirebaseFirestore.instance.collection('books');
+  Future<void> deleteBook(String bookId) {
+    return books
+        .doc(bookId) // Reference to the document with the given ID
+        .delete() // Delete the document
+        .then((value) => flutterToast("Book deleted successfully"))
+        .catchError((error) => print("Failed to delete book: $error"));
+  }
 
   Future<void> _checkIfBookIsFavorited() async {
     final isFavorited = await isBookFavorited();
@@ -936,6 +944,12 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                         ? Colors.amber
                                         : Colors.grey,
                                   )),
+                              FirebaseAuth.instance.currentUser!.uid==widget.book.userid?IconButton(
+                                  onPressed: () async {
+                                    deleteBook(widget.book.bookid);
+                                    navigateWithNoBack(context, MainScreenUser());
+                                  },
+                                  icon: Icon(Icons.delete)):Container(),
                               //  IconButton(
                               //     onPressed: null, icon: Icon(Icons.download))
                             ],

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:bookstore_recommendation_system_fyp/providers/bottomnavbarnotifier.dart';
 import 'package:bookstore_recommendation_system_fyp/providers/internetavailabilitynotifier.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/intro_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/login_screen.dart';
@@ -60,6 +61,9 @@ Future<void> main() async {
           create: (_) => InternetNotifier(false)),
       ChangeNotifierProvider<AuthState>(create: (context) => AuthState()),
       ChangeNotifierProvider(create: (_) => PaymentProvider()),
+      ChangeNotifierProvider(
+        create: (_) => BottomNavigationBarState(),
+      ),
 
       // Other providers here
     ], child: beforeSplash()),

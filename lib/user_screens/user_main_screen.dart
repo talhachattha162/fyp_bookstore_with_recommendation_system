@@ -11,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/authstatenotifier.dart';
+import '../providers/bottomnavbarnotifier.dart';
 import '../providers/internetavailabilitynotifier.dart';
 import '../providers/themenotifier.dart';
 import '../utils/global_variables.dart';
@@ -35,10 +36,13 @@ class _MainScreenUserState extends State<MainScreenUser> {
   ];
 
   void _onItemTapped(int index) {
-    if (mounted) {
-      setState(() {
-        _selectedIndex = index;
-      });
+    final state = Provider.of<BottomNavigationBarState>(context, listen: false);
+    if(state.isEnabled) {
+      if (mounted) {
+        setState(() {
+          _selectedIndex = index;
+        });
+      }
     }
   }
 
@@ -142,7 +146,8 @@ class _MainScreenUserState extends State<MainScreenUser> {
                 ? null
                 : Provider.of<AuthState>(context, listen: true).user == null
                     ? null
-                    : BottomNavigationBar(
+                    :
+            BottomNavigationBar(
                         items: <BottomNavigationBarItem>[
                             BottomNavigationBarItem(
                               icon: Icon(
