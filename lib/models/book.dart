@@ -89,6 +89,8 @@ class Book {
 
   set setUserid(userid) => this.userid = userid;
 
+  Timestamp uploadDate;
+
   Book(
       this.bookid,
       this.title,
@@ -106,7 +108,8 @@ class Book {
       this.freeRentPaid,
       this.userliked,
       this.userid,
-      this.isPermitted);
+      this.isPermitted,
+      this.uploadDate);
 
   // Getters
 
@@ -128,7 +131,8 @@ class Book {
       'freeRentPaid': freeRentPaid,
       'userliked': userliked,
       'userid': userid,
-      'isPermitted': isPermitted
+      'isPermitted': isPermitted,
+      'uploadDate': uploadDate
     };
   }
 
@@ -151,6 +155,7 @@ class Book {
       map['userliked'],
       map['userid'],
       map['isPermitted'],
+      map['uploadDate'],
     );
   }
 
@@ -159,7 +164,6 @@ class Book {
     Book b=Book.fromMap(data);
     return b;
   }
-
 
 
 }

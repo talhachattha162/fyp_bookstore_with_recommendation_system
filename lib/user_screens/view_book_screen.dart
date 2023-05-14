@@ -332,7 +332,31 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
         .onError((error, stackTrace) async {
       Fluttertoast.showToast(msg: 'Error:' + error.toString());
     }).then((value) {
-      Fluttertoast.showToast(msg: " Payment Successful");
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // set up the button
+          Widget okButton = TextButton(
+            child: Text("OK"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          );
+
+          // set up the AlertDialog
+          AlertDialog alert = AlertDialog(
+            title: Text("Payment Successful"),
+            content: Text("Thank you for your payment!"),
+            actions: [
+              okButton,
+            ],
+          );
+
+          // return the alert dialog
+          return alert;
+        },
+      );
+
       purchaseNotification(widget.book.title,
           FirebaseAuth.instance.currentUser!.uid, widget.book.userid);
     });
@@ -365,11 +389,57 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    Fluttertoast.showToast(msg: "Payment failed");
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // set up the button
+        Widget okButton = TextButton(
+          child: Text("OK"),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        );
+
+        // set up the AlertDialog
+        AlertDialog alert = AlertDialog(
+          title: Text("Payment Failed"),
+          content: Text("Try next time"),
+          actions: [
+            okButton,
+          ],
+        );
+
+        // return the alert dialog
+        return alert;
+      },
+    );
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    Fluttertoast.showToast(msg: "Payment Successful ");
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // set up the button
+        Widget okButton = ElevatedButton(
+          child: Text("OK"),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        );
+
+        // set up the AlertDialog
+        AlertDialog alert = AlertDialog(
+          title: Text("Payment Successful"),
+          content: Text("Thank you for your payment!"),
+          actions: [
+            okButton,
+          ],
+        );
+
+        // return the alert dialog
+        return alert;
+      },
+    );
   }
 
   Future<dynamic> createOrder() async {
@@ -974,8 +1044,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                     if (snapshot.data != null) {
 
                                       if (snapshot.data!.docs.length != 0) {
-                                        print(snapshot.data!
-                                            .docs.length);
+                                        // print(snapshot.data!
+                                        //     .docs.length);
                                         List<DateTime> expirationDates = [];
                                         for (var document in snapshot.data!.docs) {
                                           Timestamp? paymentCreationTime = document['dateTimeCreated'];
@@ -984,18 +1054,18 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                           paymentCreationTime!.toDate().add(Duration(days: duration));
                                           expirationDates.add(expirationDate);
                                         }
-print(expirationDates);
+// print(expirationDates);
                                         DateTime maxExpirationDate = expirationDates.reduce((a, b) => a.isAfter(b) ? a : b);
                                         
                                         Duration timeLeft = maxExpirationDate.difference(DateTime.now());
-                                        print(maxExpirationDate);
+                                        // print(maxExpirationDate);
                                         if (!timeLeft.isNegative) {
                                          pass=true;
                                         }
-
-                                        setState(() {
+                                        WidgetsBinding.instance!.addPostFrameCallback((_) => setState(() {
                                           _timeLeft = timeLeft;
-                                        });
+                                        }));
+
 
                                         if (pass == true) {
                                           return Column(

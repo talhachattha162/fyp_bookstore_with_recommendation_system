@@ -391,7 +391,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                             child: RadioListTile(
                               contentPadding: const EdgeInsets.all(0.0),
                               title: const Text(
-                                "Price",
+                                "Paid",
                               ),
                               activeColor: themeNotifier.getTheme() ==
                                       ThemeData.dark(useMaterial3: true)
@@ -608,6 +608,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                           if (FirebaseAuth
                                                   .instance.currentUser ==
                                               null) {
+                                            DateTime now = DateTime.now();
+                                            int timestamp = now.millisecondsSinceEpoch;
                                             books = await Book(
                                                 bookid,
                                                 _titleController.text,
@@ -629,8 +631,10 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                 freeRentPaid,
                                                 [],
                                                 'admin',
-                                                false);
+                                                false,Timestamp.now());
                                           } else {
+                                            DateTime now = DateTime.now();
+                                            int timestamp = now.millisecondsSinceEpoch;
                                             books = await Book(
                                                 bookid,
                                                 _titleController.text,
@@ -653,7 +657,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                 [],
                                                 FirebaseAuth.instance
                                                     .currentUser!.uid,
-                                                false);
+                                                false,Timestamp.now());
                                           }
                                           try {
                                             await bookCollection

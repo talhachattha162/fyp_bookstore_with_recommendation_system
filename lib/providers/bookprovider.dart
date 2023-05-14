@@ -34,7 +34,8 @@ class BookProvider with ChangeNotifier {
               doc['freeRentPaid'],
               doc['userliked'],
               doc['userid'],
-              doc['isPermitted']);
+              doc['isPermitted'],
+              doc['uploadDate']);
           _book = book;
         }
       }

@@ -120,7 +120,7 @@ class _PermissionsState extends State<Permissions> {
 
   deleteNotification(title, userid) async {
     NotificationItem item =
-        NotificationItem(title + ' book is denied', userid, Timestamp.now());
+        NotificationItem(title + ' book is Deleted', userid, Timestamp.now());
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final CollectionReference collectionReference =
         firestore.collection('notifications');
@@ -128,8 +128,11 @@ class _PermissionsState extends State<Permissions> {
     print('notification:' + item.toMap().toString());
   }
 
-  Stream<QuerySnapshot> bookStream =
-      FirebaseFirestore.instance.collection('books').snapshots();
+  Stream<QuerySnapshot> bookStream = FirebaseFirestore.instance
+      .collection('books')
+      .orderBy('uploadDate', descending: true)
+      .snapshots();
+
 
   viewPdf(bookid) async {
     Directory appDocDir = await getApplicationDocumentsDirectory();
@@ -175,7 +178,7 @@ class _PermissionsState extends State<Permissions> {
       body: Column(
         children: [
           Container(
-              height: height * 0.7,
+              height: height * 0.77,
               padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
               child: StreamBuilder<QuerySnapshot>(
                 stream: bookStream,
@@ -277,7 +280,15 @@ class _PermissionsState extends State<Permissions> {
                                     context: context,
                                     builder: (BuildContext context) {
                                       return AlertDialog(
-                                        title: Text(book['title']),
+                                        title: Column(
+                                          children: [
+                                            Text(book['title'],style:TextStyle(fontSize: 14)),
+                                            Text('Category:'+book['selectedcategory'],style:TextStyle(fontSize: 12)),
+                                            Text('Price: \$'+book['price'].toString(),style:TextStyle(fontSize: 12)),
+                                          Text('Author:'+book['author'].toString(),style:TextStyle(fontSize: 12)),
+
+                                      ],
+                                        ),
                                         content: FutureBuilder<Uint8List?>(
                                           future: getPdfBytes(book['bookFile']),
                                           builder: (BuildContext context,
@@ -330,39 +341,32 @@ class _PermissionsState extends State<Permissions> {
                                 ),
                               ),
                               book['isPermitted'] == true
-                                  ? Text(
-                                      'Permitted',
-                                      style: TextStyle(fontSize: 11),
-                                    )
-                                  : Row(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(0.0),
-                                          child: IconButton(
-                                              onPressed: () async {
-                                                updatePermission(
-                                                    book['bookid'], true);
-                                                admitNotification(book['title'],
-                                                    book['userid']);
-                                                subscriptionNotification(
-                                                    book['title'],
-                                                    book['userid']);
-                                              },
-                                              icon: Icon(Icons.check)),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(0.0),
-                                          child: IconButton(
-                                              onPressed: () async {
-                                                deleteNotification(
-                                                    book['title'],
-                                                    book['userid']);
-                                                deleteBook(book['bookid']);
-                                              },
-                                              icon: Icon(Icons.clear)),
-                                        )
-                                      ],
-                                    ),
+                                  ? IconButton(
+                                  onPressed:null,
+                                  icon: Icon(Icons.check))
+                                  : IconButton(
+                                      onPressed: () async {
+                                        updatePermission(
+                                            book['bookid'], true);
+                                        admitNotification(book['title'],
+                                            book['userid']);
+                                        subscriptionNotification(
+                                            book['title'],
+                                            book['userid']);
+                                      },
+                                      icon: Icon(Icons.check)),
+
+                              Padding(
+                                padding: const EdgeInsets.all(0.0),
+                                child: IconButton(
+                                    onPressed: () async {
+                                      deleteNotification(
+                                          book['title'],
+                                          book['userid']);
+                                      deleteBook(book['bookid']);
+                                    },
+                                    icon: Icon(Icons.clear)),
+                              )
                             ],
                           ),
                           const Divider(
