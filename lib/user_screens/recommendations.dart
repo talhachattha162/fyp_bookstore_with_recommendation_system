@@ -18,41 +18,50 @@ class BookRecommendationScreen extends StatefulWidget {
 
 class _BookRecommendationScreenState extends State<BookRecommendationScreen> {
 
-  final openAI = OpenAI.instance.build(token: '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',baseOption: HttpSetup(receiveTimeout:  20000),isLogger: true);
+  final openAI = OpenAI.instance.build(token: '',baseOption: HttpSetup(receiveTimeout:  20000),isLogger: true);
   String _inputText = '';
   String _recommendation = '';
 bool isLoading=false;
   List<String> bookList=[];
 
-  final String _apiKey = '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';
 
   Future<void> _generateRecommendation() async {
+    if(mounted){
     setState(() {
       isLoading = true;
     });
+    }
     try {
       final request = CompleteText(
           prompt: 'Recommend me 5-7 books similar to $_inputText. The books should be popular, highly rated, and recent. Please include the title and author name for each book.',
           model: kTranslateModelV3,
           maxTokens: 100);
       final response = await openAI.onCompleteText(request: request);
+     if(mounted){
       setState(() {
         _recommendation = response!.choices.first.text;
       });
+     }
       List<String> bookList1 = _recommendation.split('\n').map((book) =>
           book.replaceFirst(RegExp(r'\d+\.\s+'), '').trim()).toList();
+          if(mounted){
       setState(() {
         bookList = bookList1;
       });
+      }
     }
     catch(e){
+      if(mounted){
       setState(() {
         _recommendation = 'error';
       });
+      }
     }
+    if(mounted){
     setState(() {
       isLoading = false;
     });
+    }
   }
 
   @override
@@ -78,9 +87,11 @@ bool isLoading=false;
                 labelText: 'Book Title',
               ),
               onChanged: (value) {
+                if(mounted){
                 setState(() {
                   _inputText = value;
                 });
+                }
               },
             ),
             SizedBox(height: 16.0),

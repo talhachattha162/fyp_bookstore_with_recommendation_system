@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:bookstore_recommendation_system_fyp/Widgets/text_field.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/pick_file.dart';
@@ -671,6 +670,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                   () {
                                                 _controller.stop();
                                               });
+
                                               // flutterToast('Book Added');
                                             });
                                           } catch (e) {

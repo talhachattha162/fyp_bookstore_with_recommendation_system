@@ -207,11 +207,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               isPassword: _obscureText,
                               validator: (value) {
                                 String password = value.trim();
-                                if (!pass_valid.hasMatch(password)) {
-                                  return 'password should contain capital,\nsmall,number,special characters';
+                                if (password.length < 8) {
+                                  return 'Password must be at least 8 characters';
                                 }
-                                if (value.length < 8) {
-                                  return 'Password should be 8 characters';
+                                if (!RegExp(r'[A-Z]').hasMatch(password)) {
+                                  return 'Include at least 1 uppercase letter';
+                                }
+                                if (!RegExp(r'[a-z]').hasMatch(password)) {
+                                  return 'Include at least 1 lowercase letter';
+                                }
+                                if (!RegExp(r'\d').hasMatch(password)) {
+                                  return 'Include at least 1 digit';
+                                }
+                                if (!RegExp(r'\W').hasMatch(password)) {
+                                  return 'Include at least 1 special character';
                                 }
                                 return null;
                               },

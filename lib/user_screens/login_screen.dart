@@ -35,7 +35,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  RegExp pass_valid = RegExp(r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)");
   RegExp email_valid = RegExp(r'\S+@\S+\.\S+');
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _passwordController = TextEditingController();
@@ -240,11 +239,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                 isPassword: _obscureText,
                                 validator: (value) {
                                   String password = value.trim();
-                                  if (!pass_valid.hasMatch(password)) {
-                                    return 'Enter valid password ';
+                                  if (password.length < 8) {
+                                    return 'Password must be at least 8 characters';
                                   }
-                                  if (value.length < 8) {
-                                    return 'Enter valid password ';
+                                  if (!RegExp(r'[A-Z]').hasMatch(password)) {
+                                    return 'Include at least 1 uppercase letter';
+                                  }
+                                  if (!RegExp(r'[a-z]').hasMatch(password)) {
+                                    return 'Include at least 1 lowercase letter';
+                                  }
+                                  if (!RegExp(r'\d').hasMatch(password)) {
+                                    return 'Include at least 1 digit';
+                                  }
+                                  if (!RegExp(r'\W').hasMatch(password)) {
+                                    return 'Include at least 1 special character';
                                   }
                                   return null;
                                 },
