@@ -38,6 +38,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../utils/snackbar.dart';
+import 'edit_screen.dart';
 
 class ViewBookScreen extends StatefulWidget {
   Book book;
@@ -783,6 +784,52 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     print('notification2:' + item.toMap().toString());
   }
 
+  void deleteBookAndNavigate(BuildContext context) {
+    deleteBook(widget.book.bookid);
+    Navigator.of(context).pop();
+    navigateWithNoBack(context, MainScreenUser());
+  }
+
+  void showConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmation'),
+          content: Text('Are you sure you want to delete this book?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                deleteBookAndNavigate(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void handleMenuItemSelected(String menuItem) {
+    switch (menuItem) {
+      case 'Delete':
+        showConfirmationDialog(context);
+        break;
+      case 'Edit':
+        navigateWithNoBack(context, EditBookScreen(book:widget.book));
+        break;
+    }
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
@@ -817,7 +864,23 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                           onPressed: () {
                             navigateWithNoBack(context, MainScreenUser());
                           },
-                        )),
+                        ),
+                        actions: [
+                          FirebaseAuth.instance.currentUser!.uid==widget.book.userid? PopupMenuButton<String>(
+                        onSelected: handleMenuItemSelected,
+                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                          PopupMenuItem<String>(
+                            value: 'Edit',
+                            child: Text('Edit'),
+                          ),
+                          PopupMenuItem<String>(
+                            value: 'Delete',
+                            child: Text('Delete'),
+                          ),
+
+                        ],
+                      ):Container()
+                    ]),
                     body: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -944,12 +1007,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                         ? Colors.amber
                                         : Colors.grey,
                                   )),
-                              FirebaseAuth.instance.currentUser!.uid==widget.book.userid?IconButton(
-                                  onPressed: () async {
-                                    deleteBook(widget.book.bookid);
-                                    navigateWithNoBack(context, MainScreenUser());
-                                  },
-                                  icon: Icon(Icons.delete)):Container(),
+
                               //  IconButton(
                               //     onPressed: null, icon: Icon(Icons.download))
                             ],

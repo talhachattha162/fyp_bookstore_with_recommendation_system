@@ -138,7 +138,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
     return SafeArea(
       child:  Scaffold(
               appBar: AppBar(
-                title: const Text('Book Details'),
+                title: const Text('Upload Book'),
                 automaticallyImplyLeading: false,
               ),
               resizeToAvoidBottomInset: false,

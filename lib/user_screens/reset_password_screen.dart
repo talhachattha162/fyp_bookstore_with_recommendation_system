@@ -124,7 +124,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       onPressed: () {
                         navigateWithNoBack(context, const LoginScreen());
                       },
-                    )),
+                    )
+                ),
                 body: Column(
                   children: [
                     Padding(

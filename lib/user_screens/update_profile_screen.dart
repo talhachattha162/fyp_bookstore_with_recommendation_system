@@ -15,6 +15,7 @@ import '../models/user.dart';
 import '../providers/internetavailabilitynotifier.dart';
 import '../utils/InternetChecker.dart';
 import '../utils/navigation.dart';
+import '../utils/snackbar.dart';
 import 'user_main_screen.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
@@ -250,7 +251,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                           'age': _ageController.text,
                                           'photo': downloadUrl,
                                         }).then((value) {
-                                          flutterToast('Updated');
+                                          showSnackBar(context,'Updated');
                                         });
                                       } else {
                                         if (photoURL.isEmpty) {

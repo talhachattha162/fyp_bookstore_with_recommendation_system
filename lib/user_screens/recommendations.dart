@@ -18,7 +18,7 @@ class BookRecommendationScreen extends StatefulWidget {
 
 class _BookRecommendationScreenState extends State<BookRecommendationScreen> {
 
-  final openAI = OpenAI.instance.build(token: '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',baseOption: HttpSetup(receiveTimeout:  20000),isLogger: true);
+  final openAI = OpenAI.instance.build(token: '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',baseOption: HttpSetup(receiveTimeout:  20000),isLogger: true);
   String _inputText = '';
   String _recommendation = '';
 bool isLoading=false;
@@ -35,7 +35,7 @@ bool isLoading=false;
       final request = CompleteText(
           prompt: 'Recommend me 5-7 books similar to $_inputText. The books should be popular, highly rated, and recent. Please include the title and author name for each book.',
           model: kTranslateModelV3,
-          maxTokens: 100);
+          maxTokens: 130);
       final response = await openAI.onCompleteText(request: request);
      if(mounted){
       setState(() {

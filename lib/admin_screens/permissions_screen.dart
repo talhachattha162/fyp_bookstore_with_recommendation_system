@@ -284,7 +284,7 @@ class _PermissionsState extends State<Permissions> {
                                           children: [
                                             Text(book['title'],style:TextStyle(fontSize: 14)),
                                             Text('Category:'+book['selectedcategory'],style:TextStyle(fontSize: 12)),
-                                            Text('Price: \$'+book['price'].toString(),style:TextStyle(fontSize: 12)),
+                                            Text(book['freeRentPaid']+' \$'+book['price'].toString(),style:TextStyle(fontSize: 12)),
                                           Text('Author:'+book['author'].toString(),style:TextStyle(fontSize: 12)),
 
                                       ],

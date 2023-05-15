@@ -5,6 +5,7 @@ import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_scree
 import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
+import 'package:bookstore_recommendation_system_fyp/utils/snackbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -212,7 +213,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                                           .onError((error, stackTrace) async {
                                         flutterToast('Error:' + error.toString());
                                       }).then((_) {
-                                        flutterToast('Review submitted');
+                                        showSnackBar(context,'Review submitted');
                                         if (FirebaseAuth
                                                 .instance.currentUser!.uid !=
                                             widget.book.userid) {
