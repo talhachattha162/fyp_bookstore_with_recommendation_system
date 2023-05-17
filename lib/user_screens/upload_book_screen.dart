@@ -39,6 +39,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
   RegExp price_valid = RegExp(r"^\d+$");
   RegExp name_valid = RegExp(r"^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$");
   RegExp tags_valid = RegExp(r"^(\d|\w)+$");
+  RegExp endspace =RegExp(r"\s+$");
+
   bool isLoading = false;
   bool errortextexist = false;
   String errortext = '';
@@ -176,6 +178,9 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                           textInputType: TextInputType.name,
                           textEditingController: _authorController,
                           validator: (value) {
+                            if (endspace.hasMatch(value)) {
+                              return 'Dont use extra space at end';
+                            }
                             if (!name_valid.hasMatch(value)) {
                               return 'Enter valid author name';
                             }
@@ -185,15 +190,18 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                             return null;
                           },
                         ),
-                        TextInputField(
-                          hintText: 'Enter Published Year',
-                          suffixIcon: Text(''),
-                          isPassword: false,
-                          textInputType: TextInputType.text,
-                          textEditingController: _publishyearController,
+                        TextFormField(
+                        keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            hintText: 'Enter Published Year',
+                            suffixIcon: Text(''),
+                          ),
+                          obscureText: false,
+                          controller: _publishyearController,
+
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Enter publised year';
+                              return 'Enter published year';
                             }
                             if (!year_valid.hasMatch(value)) {
                               return 'Enter valid year';
@@ -201,6 +209,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                             return null;
                           },
                         ),
+
                         ButtonTheme(
                           alignedDropdown: true,
                           height: 20,
@@ -257,6 +266,9 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                     if (value == null || value.isEmpty) {
                                       return 'Enter tag 1';
                                     }
+                                    if (endspace.hasMatch(value)) {
+                                      return 'space at end';
+                                    }
                                     if (!tags_valid.hasMatch(value)) {
                                       return 'spaces/special \nnot allowed';
                                     }
@@ -276,6 +288,9 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                     if (value == null || value.isEmpty) {
                                       return 'Enter tag 2';
                                     }
+                                    if (endspace.hasMatch(value)) {
+                                      return 'space at end';
+                                    }
                                     if (!tags_valid.hasMatch(value)) {
                                       return 'spaces/special \nnot allowed';
                                     }
@@ -294,6 +309,9 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Enter tag 3';
+                                    }
+                                    if (endspace.hasMatch(value)) {
+                                      return 'space at end';
                                     }
                                     if (!tags_valid.hasMatch(value)) {
                                       return 'spaces/special\n not allowed';
@@ -441,6 +459,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   }
                                 },
                                 textInputType: TextInputType.number,
+
                               ),
                             )),
                         const Text(
@@ -565,7 +584,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                       if (_formKey.currentState!.validate() &&
                                           selectedCategory.isNotEmpty) {
                                         if (_filename1 ==
-                                                "<5 mb image allowed" ||
+                                            "<5 mb image allowed" ||
                                             _filename2 ==
                                                 "<25 mb pdf allowed" ||
                                             _filename3 ==
@@ -578,36 +597,40 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
 
                                           setState(() {
                                             isLoading = true;
-                                          });}
+                                          });
                                           if (categories.isNotEmpty) {
-                                            final state = context.read<BottomNavigationBarState>();
+                                            final state = context.read<
+                                                BottomNavigationBarState>();
                                             state.setEnabled(false);
                                             String coverpic =
-                                                await uploadFileToFirebaseStorage(
-                                                    _file1!, 'coverpic');
+                                            await uploadFileToFirebaseStorage(
+                                                _file1!, 'coverpic');
                                             String book =
-                                                await uploadFileToFirebaseStorage(
-                                                    _file2!, 'book');
+                                            await uploadFileToFirebaseStorage(
+                                                _file2!, 'book');
                                             String copyrightpic =
-                                                await uploadFileToFirebaseStorage(
-                                                    _file3!, 'copyrightpic');
+                                            await uploadFileToFirebaseStorage(
+                                                _file3!, 'copyrightpic');
                                             // textToSpeech();
                                             // createAudioScript();
                                             // _showResult(text);
                                             // await createAudioScript(text);
 
                                             CollectionReference
-                                                bookCollection =
-                                                firestoreInstance
-                                                    .collection("books");
+                                            bookCollection =
+                                            firestoreInstance
+                                                .collection("books");
                                             String bookid =
-                                                bookCollection.doc().id;
+                                                bookCollection
+                                                    .doc()
+                                                    .id;
                                             Book books;
                                             if (FirebaseAuth
-                                                    .instance.currentUser ==
+                                                .instance.currentUser ==
                                                 null) {
                                               DateTime now = DateTime.now();
-                                              int timestamp = now.millisecondsSinceEpoch;
+                                              int timestamp = now
+                                                  .millisecondsSinceEpoch;
                                               books = await Book(
                                                   bookid,
                                                   _titleController.text,
@@ -619,8 +642,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                   _priceController.text == ''
                                                       ? 0
                                                       : int.parse(
-                                                          _priceController
-                                                              .text),
+                                                      _priceController
+                                                          .text),
                                                   coverpic,
                                                   book,
                                                   copyrightpic,
@@ -629,10 +652,12 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                   freeRentPaid,
                                                   [],
                                                   'admin',
-                                                  false,Timestamp.now());
+                                                  false,
+                                                  Timestamp.now());
                                             } else {
                                               DateTime now = DateTime.now();
-                                              int timestamp = now.millisecondsSinceEpoch;
+                                              int timestamp = now
+                                                  .millisecondsSinceEpoch;
                                               books = await Book(
                                                   bookid,
                                                   _titleController.text,
@@ -644,8 +669,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                   _priceController.text == ''
                                                       ? 0
                                                       : int.parse(
-                                                          _priceController
-                                                              .text),
+                                                      _priceController
+                                                          .text),
                                                   coverpic,
                                                   book,
                                                   copyrightpic,
@@ -655,7 +680,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                   [],
                                                   FirebaseAuth.instance
                                                       .currentUser!.uid,
-                                                  false,Timestamp.now());
+                                                  false,
+                                                  Timestamp.now());
                                             }
                                             try {
                                               await bookCollection
@@ -663,15 +689,15 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                   .set(books.toMap())
                                                   .then((value) async {})
                                                   .onError((error,
-                                                      stackTrace) async {
+                                                  stackTrace) async {
                                                 flutterToast('Error:' +
                                                     error.toString());
                                               }).then((_) {
                                                 _controller.play();
                                                 Timer(Duration(seconds: 2),
-                                                    () {
-                                                  _controller.stop();
-                                                });
+                                                        () {
+                                                      _controller.stop();
+                                                    });
 
                                                 // flutterToast('Book Added');
                                               });
@@ -694,12 +720,15 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                           _filename3 = "<5 mb image allowed";
                                           _file1 = null;
                                           _file2 = null;
-                                          _file3 = null; if (mounted) {
-                                          final state = context.read<BottomNavigationBarState>();
-                                          state.setEnabled(true);
-                                          setState(() {
-                                            isLoading = false;
-                                          });
+                                          _file3 = null;
+                                          if (mounted) {
+                                            final state = context.read<
+                                                BottomNavigationBarState>();
+                                            state.setEnabled(true);
+                                            setState(() {
+                                              isLoading = false;
+                                            });
+                                          }
                                         }
                                       }
                                     },
