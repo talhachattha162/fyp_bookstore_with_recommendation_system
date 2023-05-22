@@ -137,7 +137,7 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
                           padding: EdgeInsets.symmetric(
                               horizontal: width * 0.05, vertical: height * 0.015),
                           child: _pdfPath.isNotEmpty
-                              ? SfPdfViewer.file(File(_pdfPath))
+                              ? SfPdfViewer.file(File(_pdfPath),)
                               : Center(
                                   child: LoadingAnimationWidget.fourRotatingDots(
                                   color: themeNotifier.getTheme() ==

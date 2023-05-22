@@ -186,10 +186,10 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                                                       child: Text(
                                                         bookData['title']
                                                                     .length >
-                                                                20
+                                                                15
                                                             ? bookData['title']
                                                                     .substring(
-                                                                        0, 20) +
+                                                                        0, 15) +
                                                                 '...'
                                                             : bookData['title'],
                                                         style: TextStyle(

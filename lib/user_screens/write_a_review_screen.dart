@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart';
@@ -213,7 +214,27 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                                           .onError((error, stackTrace) async {
                                         flutterToast('Error:' + error.toString());
                                       }).then((_) {
-                                        showSnackBar(context,'Review submitted');
+
+                                        final snackBar = SnackBar(
+                                          /// need to set following properties for best effect of awesome_snackbar_content
+                                          elevation: 0,
+                                          behavior: SnackBarBehavior.floating,
+                                          backgroundColor: Colors.transparent,
+
+                                          content: AwesomeSnackbarContent(
+                                            title: 'Success!',
+                                            message:
+                                            'Review submitted.',
+
+                                            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                            contentType: ContentType.success,
+                                          ),
+                                        );
+
+                                        ScaffoldMessenger.of(context)
+                                          ..hideCurrentSnackBar()
+                                          ..showSnackBar(snackBar);
+                                        // showSnackBar(context,'Review submitted');
                                         if (FirebaseAuth
                                                 .instance.currentUser!.uid !=
                                             widget.book.userid) {

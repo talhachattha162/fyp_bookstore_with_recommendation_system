@@ -124,7 +124,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                       builder: (context, provider, child) {
 
                         if (provider.payments.isEmpty) {
-                          print(FirebaseAuth.instance.currentUser!.uid.toString()+'talhaxyz'+provider.payments.length.toString());
+                          // print(FirebaseAuth.instance.currentUser!.uid.toString()+'talhaxyz'+provider.payments.length.toString());
                           provider.fetchPayments(
                               FirebaseAuth.instance.currentUser!.uid);
                           return Center(child: Text('No orders found'));

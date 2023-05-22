@@ -4,11 +4,13 @@ import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:widget_circular_animator/widget_circular_animator.dart';
 import '../models/user.dart';
 import '../providers/authstatenotifier.dart';
 import '../providers/themenotifier.dart';
@@ -94,13 +96,26 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    height: 30,
+                    height: 10,
                   ),
-                  CircleAvatar(
-                    maxRadius: 60,
+          WidgetCircularAnimator(
+            size: 200,
+            innerIconsSize: 3,
+            outerIconsSize: 3,
+            innerAnimation: Curves.easeInOutBack,
+            outerAnimation: Curves.easeInOutBack,
+            innerColor: Colors.deepPurple,
+            outerColor: Colors.orangeAccent,
+            innerAnimationSeconds: 10,
+            outerAnimationSeconds: 10,
+            child: Container(
+              decoration:
+              BoxDecoration(shape: BoxShape.circle, color: Colors.grey[200]),
+              child: CircleAvatar(
+                    maxRadius: 40,
                     backgroundImage:
                         photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
-                  ),
+                  ))),
                   const SizedBox(height: 10),
                   Text(name1,
                       style: TextStyle(
@@ -146,8 +161,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                               appBarTheme: AppBarTheme(
                                                   color: Colors.green[300]),
                                               primarySwatch: primarycolor,
-                                              fontFamily: 'RobotoMono')
-                                      ? ThemeData.dark(useMaterial3: true)
+                                              fontFamily: GoogleFonts.acme().fontFamily)
+                                      ? ThemeData.dark(useMaterial3: true,)
                                           .copyWith(
                                           colorScheme:
                                               ColorScheme.dark().copyWith(
@@ -159,12 +174,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                             onPrimaryContainer:
                                                 darkprimarycolor,
                                           ),
-                                        )
+                                  )
                                       : ThemeData(
                                           appBarTheme: AppBarTheme(
                                               color: Colors.green[300]),
                                           primarySwatch: primarycolor,
-                                          fontFamily: 'RobotoMono'));
+
+                                      fontFamily: GoogleFonts.acme().fontFamily));
                                   if (mounted) {
                                     setState(() {
                                       _isSwitched = value;
@@ -177,7 +193,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                               appBarTheme: AppBarTheme(
                                                   color: Colors.green[300]),
                                               primarySwatch: primarycolor,
-                                              fontFamily: 'RobotoMono')){
+                                              fontFamily: GoogleFonts.acme().fontFamily)){
 firestoreInstance
                                       .collection("darkmode")
                                       .doc(FirebaseAuth

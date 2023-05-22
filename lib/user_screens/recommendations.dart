@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class BookRecommendationScreen extends StatefulWidget {
 
 class _BookRecommendationScreenState extends State<BookRecommendationScreen> {
 
-  final openAI = OpenAI.instance.build(token: '',baseOption: HttpSetup(receiveTimeout:  25000),isLogger: true);
+  final openAI = OpenAI.instance.build(token: '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',baseOption: HttpSetup(receiveTimeout:  25000),isLogger: true);
   String _inputText = '';
   String _recommendation = '';
 bool isLoading=false;
@@ -65,11 +66,25 @@ bool isLoading=false;
       }
     }
     catch(e){
-      if(mounted){
-      setState(() {
-        _recommendation = 'error';
-      });
-      }
+      final snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+
+        content: AwesomeSnackbarContent(
+          title: 'Error!',
+          message:
+          e.toString(),
+
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+        ),
+      );
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
     }
     if(mounted){
     setState(() {

@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:motion_toast/motion_toast.dart';
 import 'package:provider/provider.dart';
 import '../providers/internetavailabilitynotifier.dart';
 import '../utils/InternetChecker.dart';
@@ -31,6 +33,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   static Future<User?> signInUsingEmailPassword({
     required String email,
     required String password,
+    context
   }) async {
     User? user;
 
@@ -42,7 +45,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       user = userCredential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        flutterToast('No user found for that email.');
+        MotionToast.success(
+          title:  Text("Success Motion Toast"),
+          description:  Text("No user found for that email."),
+        ).show(context);
       } else if (e.code == 'wrong-password') {
         flutterToast('Wrong password provided.');
       }
@@ -93,7 +99,26 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
     if (isEmailVerified) {
       // TODO: implement your code after email verification
-      showSnackBar(context, 'Email Successfully Verified');
+      final snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+
+        content: AwesomeSnackbarContent(
+          title: 'Success!',
+          message:
+          'Email Successfully Verified',
+
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.success,
+        ),
+      );
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+      // showSnackBar(context, 'Email Successfully Verified');
       auth.signOut();
       navigateWithNoBack(context, LoginScreen());
       timer?.cancel();
@@ -182,7 +207,25 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                               FirebaseAuth.instance.currentUser
                                   ?.sendEmailVerification();
                             } catch (e) {
-                              debugPrint('$e');
+                              final snackBar = SnackBar(
+                                /// need to set following properties for best effect of awesome_snackbar_content
+                                elevation: 0,
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.transparent,
+
+                                content: AwesomeSnackbarContent(
+                                  title: 'Error!',
+                                  message:
+                                  e.toString(),
+
+                                  /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                  contentType: ContentType.failure,
+                                ),
+                              );
+
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(snackBar);
                             }
                           },
                         ),

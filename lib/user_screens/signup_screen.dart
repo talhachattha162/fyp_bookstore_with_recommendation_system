@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/login_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -90,11 +91,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('The password provided is too weak.')));
+        final snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+
+          content: AwesomeSnackbarContent(
+            title: 'Error!',
+            message:
+            'The password provided is too weak.',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+          ),
+        );
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        //     content: Text('The password provided is too weak.')));
       } else if (e.code == 'email-already-in-use') {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('The account already exists for that email.')));
+        final snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+
+          content: AwesomeSnackbarContent(
+            title: 'Error!',
+            message:
+            'The account already exists for that email.',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+          ),
+        );
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        //     content: Text('The account already exists for that email.')));
         return 'exist';
       }
       return null;

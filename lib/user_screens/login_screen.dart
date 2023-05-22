@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:bookstore_recommendation_system_fyp/admin_screens/admin_main_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -53,10 +54,12 @@ class _LoginScreenState extends State<LoginScreen> {
       try {
         final result = await InternetAddress.lookup('google.com');
         final result2 = await InternetAddress.lookup('facebook.com');
-        final result3 = await InternetAddress.lookup('microsoft.com');
+        // final result3 = await InternetAddress.lookup('microsoft.com');
         if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty) ||
-            (result2.isNotEmpty && result2[0].rawAddress.isNotEmpty) ||
-            (result3.isNotEmpty && result3[0].rawAddress.isNotEmpty)) {
+            (result2.isNotEmpty && result2[0].rawAddress.isNotEmpty)
+            // ||
+            // (result3.isNotEmpty && result3[0].rawAddress.isNotEmpty)
+        ) {
           internetAvailabilityNotifier.setInternetAvailability(true);
         } else {}
       } on SocketException catch (_) {
@@ -110,14 +113,35 @@ class _LoginScreenState extends State<LoginScreen> {
             .doc(firebaseUser!.uid)
             .set(user1.toMap())
             .then((value) async {})
-            .onError((error, stackTrace) async {});
+            .onError((error, stackTrace) async {
+
+        });
         // final data = documentSnapshot.data() as Map<String, dynamic>;
         // Users user2 = Users.fromMap(data);
       }
 
       return user;
     } catch (e) {
-      flutterToast('Error signing in with Google: ${e}');
+      final snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+
+        content: AwesomeSnackbarContent(
+          title: 'Error!',
+          message:
+          'Error signing in with Google: ${e}',
+
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+        ),
+      );
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+      // flutterToast('');
     }
   }
 
@@ -136,9 +160,47 @@ class _LoginScreenState extends State<LoginScreen> {
       user = userCredential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        flutterToast('No user found for that email.');
+        final snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+
+          content: AwesomeSnackbarContent(
+            title: 'Error!',
+            message:
+            'No user found',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+          ),
+        );
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+        // flutterToast('No user found for that email.');
       } else if (e.code == 'wrong-password') {
-        flutterToast('Wrong password provided.');
+        final snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+
+          content: AwesomeSnackbarContent(
+            title: 'Error!',
+            message:
+            'Wrong password}',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+          ),
+        );
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+        // flutterToast('Wrong password provided.');
       }
     }
 

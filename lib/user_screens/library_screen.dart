@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bookstore_recommendation_system_fyp/user_screens/order_history.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/recommendations.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
@@ -16,8 +18,33 @@ class LibraryScreen extends StatefulWidget {
   State<LibraryScreen> createState() => _LibraryScreenState();
 }
 
-class _LibraryScreenState extends State<LibraryScreen> {
+class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateMixin{
   DateTime currentBackPressTime = DateTime.now();
+  late AnimationController _animationController;
+  bool isCardVisible = true;
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 800),
+    )..repeat(reverse: true);
+    Timer.periodic(Duration(seconds: 1), (Timer timer)
+    {
+      if (mounted) {
+        setState(() {
+          isCardVisible = !isCardVisible;
+        });
+      }
+
+    });
+
+  }
+  @override
+  void dispose(){
+    _animationController.dispose();
+    super.dispose();
+  }
 
   Future<bool> onWillPop() async {
     final now = DateTime.now();
@@ -125,8 +152,35 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       child: SizedBox(
                         width: width * 0.49,
                         height: orientation == Orientation.portrait?height * 0.3:height * 0.5,
-                        child: Card(
-                          child: Container(
+                        child:Card (
+                          child: AnimatedOpacity(
+                            opacity: 1 ,
+                            duration: Duration(milliseconds: 500),
+                            curve: Curves.easeInOut,
+                            child:Container(
+                            decoration: BoxDecoration(
+                              // borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true)
+                                        .copyWith(
+                                      colorScheme:
+                                      ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer:
+                                        darkprimarycolor,
+                                      ),
+                                    )
+                                    ? darkprimarycolor
+                                    : primarycolor,
+                                width: isCardVisible?0.2:1.0,
+                              ),
+                            ),
+
                             padding: const EdgeInsets.symmetric(
                               horizontal: 26.0,
                             ),
@@ -179,6 +233,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
                               ],
                             ),
                           ),
+                          )
+                              ,
                           elevation: 50,
                         ),
                       ),
@@ -191,7 +247,28 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         width: width * 0.49,
                         height: orientation == Orientation.portrait?height * 0.3:height * 0.5,
                         child: Card(
-                          child: Container(
+                          child: Container( decoration: BoxDecoration(
+                            // borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: themeNotifier.getTheme() ==
+                                  ThemeData.dark(useMaterial3: true)
+                                      .copyWith(
+                                    colorScheme:
+                                    ColorScheme.dark().copyWith(
+                                      primary: darkprimarycolor,
+                                      error: Colors.red,
+                                      onPrimary: darkprimarycolor,
+                                      outline: darkprimarycolor,
+                                      primaryVariant: darkprimarycolor,
+                                      onPrimaryContainer:
+                                      darkprimarycolor,
+                                    ),
+                                  )
+                                  ? darkprimarycolor
+                                  : primarycolor,
+                              width: isCardVisible?0.2:1.0,
+                            ),
+                          ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 26.0,
                             ),
@@ -199,7 +276,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  Icons.history,
+                                  Icons.history_outlined,
                                   size: 20,
                                   color: themeNotifier.getTheme() ==
                                           ThemeData.dark(useMaterial3: true)
@@ -218,29 +295,56 @@ class _LibraryScreenState extends State<LibraryScreen> {
                                       ? darkprimarycolor
                                       : primarycolor,
                                 ),
-                                Text('Orders History',
-                                    style: TextStyle(
-                                        color: themeNotifier.getTheme() ==
+                                Column(
+                                  children: [
+                                    Text('Orders',
+                                        style: TextStyle(
+                                            color: themeNotifier.getTheme() ==
+                                                    ThemeData.dark(
+                                                            useMaterial3: true)
+                                                        .copyWith(
+                                                      colorScheme:
+                                                          ColorScheme.dark()
+                                                              .copyWith(
+                                                        primary: darkprimarycolor,
+                                                        error: Colors.red,
+                                                        onPrimary: darkprimarycolor,
+                                                        outline: darkprimarycolor,
+                                                        primaryVariant:
+                                                            darkprimarycolor,
+                                                        onPrimaryContainer:
+                                                            darkprimarycolor,
+                                                      ),
+                                                    )
+                                                ? darkprimarycolor
+                                                : primarycolor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20)),
+                                    Text('History',
+                                        style: TextStyle(
+                                            color: themeNotifier.getTheme() ==
                                                 ThemeData.dark(
-                                                        useMaterial3: true)
+                                                    useMaterial3: true)
                                                     .copyWith(
                                                   colorScheme:
-                                                      ColorScheme.dark()
-                                                          .copyWith(
+                                                  ColorScheme.dark()
+                                                      .copyWith(
                                                     primary: darkprimarycolor,
                                                     error: Colors.red,
                                                     onPrimary: darkprimarycolor,
                                                     outline: darkprimarycolor,
                                                     primaryVariant:
-                                                        darkprimarycolor,
+                                                    darkprimarycolor,
                                                     onPrimaryContainer:
-                                                        darkprimarycolor,
+                                                    darkprimarycolor,
                                                   ),
                                                 )
-                                            ? darkprimarycolor
-                                            : primarycolor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20)),
+                                                ? darkprimarycolor
+                                                : primarycolor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20)),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
@@ -259,10 +363,31 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         navigateWithNoBack(context, BookRecommendationScreen());
                       },
                       child: SizedBox(
-                        width: width * 0.49,
+                        width: width * 0.5,
                         height: orientation == Orientation.portrait?height * 0.3:height * 0.5,
                         child: Card(
-                          child: Container(
+                          child: Container( decoration: BoxDecoration(
+                            // borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: themeNotifier.getTheme() ==
+                                  ThemeData.dark(useMaterial3: true)
+                                      .copyWith(
+                                    colorScheme:
+                                    ColorScheme.dark().copyWith(
+                                      primary: darkprimarycolor,
+                                      error: Colors.red,
+                                      onPrimary: darkprimarycolor,
+                                      outline: darkprimarycolor,
+                                      primaryVariant: darkprimarycolor,
+                                      onPrimaryContainer:
+                                      darkprimarycolor,
+                                    ),
+                                  )
+                                  ? darkprimarycolor
+                                  : primarycolor,
+                              width: isCardVisible?0.1:1.0,
+                            ),
+                          ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 26.0,
                             ),
@@ -270,7 +395,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                Icons.thumb_up,
+                                Icons.thumb_up_alt_outlined,
                                   size: 20,
                                   color: themeNotifier.getTheme() ==
                                       ThemeData.dark(useMaterial3: true)
@@ -289,29 +414,56 @@ class _LibraryScreenState extends State<LibraryScreen> {
                                       ? darkprimarycolor
                                       : primarycolor,
                                 ),
-                                Text('Recommendations',
-                                    style: TextStyle(
-                                        color: themeNotifier.getTheme() ==
-                                            ThemeData.dark(
-                                                useMaterial3: true)
-                                                .copyWith(
-                                              colorScheme:
-                                              ColorScheme.dark()
-                                                  .copyWith(
-                                                primary: darkprimarycolor,
-                                                error: Colors.red,
-                                                onPrimary: darkprimarycolor,
-                                                outline: darkprimarycolor,
-                                                primaryVariant:
-                                                darkprimarycolor,
-                                                onPrimaryContainer:
-                                                darkprimarycolor,
-                                              ),
-                                            )
-                                            ? darkprimarycolor
-                                            : primarycolor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20)),
+                                Column(
+                                  children: [
+                                    Text('Recommend',
+                                        style: TextStyle(
+                                            color: themeNotifier.getTheme() ==
+                                                ThemeData.dark(
+                                                    useMaterial3: true)
+                                                    .copyWith(
+                                                  colorScheme:
+                                                  ColorScheme.dark()
+                                                      .copyWith(
+                                                    primary: darkprimarycolor,
+                                                    error: Colors.red,
+                                                    onPrimary: darkprimarycolor,
+                                                    outline: darkprimarycolor,
+                                                    primaryVariant:
+                                                    darkprimarycolor,
+                                                    onPrimaryContainer:
+                                                    darkprimarycolor,
+                                                  ),
+                                                )
+                                                ? darkprimarycolor
+                                                : primarycolor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20)),
+                                    Text('Books',
+                                        style: TextStyle(
+                                            color: themeNotifier.getTheme() ==
+                                                ThemeData.dark(
+                                                    useMaterial3: true)
+                                                    .copyWith(
+                                                  colorScheme:
+                                                  ColorScheme.dark()
+                                                      .copyWith(
+                                                    primary: darkprimarycolor,
+                                                    error: Colors.red,
+                                                    onPrimary: darkprimarycolor,
+                                                    outline: darkprimarycolor,
+                                                    primaryVariant:
+                                                    darkprimarycolor,
+                                                    onPrimaryContainer:
+                                                    darkprimarycolor,
+                                                  ),
+                                                )
+                                                ? darkprimarycolor
+                                                : primarycolor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20)),
+                                  ],
+                                ),
                               ],
                             ),
                           ),

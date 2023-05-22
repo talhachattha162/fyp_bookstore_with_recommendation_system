@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/fluttertoast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -251,11 +252,50 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                           'age': _ageController.text,
                                           'photo': downloadUrl,
                                         }).then((value) {
-                                          showSnackBar(context,'Updated');
+                                          final snackBar = SnackBar(
+                                            /// need to set following properties for best effect of awesome_snackbar_content
+                                            elevation: 0,
+                                            behavior: SnackBarBehavior.floating,
+                                            backgroundColor: Colors.transparent,
+
+                                            content: AwesomeSnackbarContent(
+                                              title: 'Success!',
+                                              message:
+                                              'Updated.',
+
+                                              /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                              contentType: ContentType.success,
+                                            ),
+                                          );
+
+                                          ScaffoldMessenger.of(context)
+                                            ..hideCurrentSnackBar()
+                                            ..showSnackBar(snackBar);
+                                          // showSnackBar(context,'Updated');
                                         });
                                       } else {
                                         if (photoURL.isEmpty) {
-                                          flutterToast('plz upload image');
+
+                                          final snackBar = SnackBar(
+                                            /// need to set following properties for best effect of awesome_snackbar_content
+                                            elevation: 0,
+                                            behavior: SnackBarBehavior.floating,
+                                            backgroundColor: Colors.transparent,
+
+                                            content: AwesomeSnackbarContent(
+                                              title: 'Error!',
+                                              message:
+                                              'plz upload image.',
+
+                                              /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                              contentType: ContentType.success,
+                                            ),
+                                          );
+
+                                          ScaffoldMessenger.of(context)
+                                            ..hideCurrentSnackBar()
+                                            ..showSnackBar(snackBar);
+                                          // flutterToast('plz upload image');
                                         } else {
                                           FirebaseFirestore.instance
                                               .collection('users')
@@ -265,7 +305,25 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                             'age': _ageController.text,
                                             'photo': photoURL,
                                           }).then((value) {
-                                            flutterToast('Updated');
+                                            final snackBar = SnackBar(
+                                              /// need to set following properties for best effect of awesome_snackbar_content
+                                              elevation: 0,
+                                              behavior: SnackBarBehavior.floating,
+                                              backgroundColor: Colors.transparent,
+
+                                              content: AwesomeSnackbarContent(
+                                                title: 'Success!',
+                                                message:
+                                                'Updated.',
+
+                                                /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                                contentType: ContentType.success,
+                                              ),
+                                            );
+
+                                            ScaffoldMessenger.of(context)
+                                              ..hideCurrentSnackBar()
+                                              ..showSnackBar(snackBar);
                                           });
                                         }
                                       }

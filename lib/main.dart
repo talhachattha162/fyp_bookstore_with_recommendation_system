@@ -1,3 +1,5 @@
+
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:bookstore_recommendation_system_fyp/providers/bottomnavbarnotifier.dart';
@@ -55,7 +57,7 @@ Future<void> main() async {
         create: (_) => ThemeNotifier(ThemeData(
             appBarTheme: AppBarTheme(color: Colors.green[300]),
             primarySwatch: primarycolor,
-            fontFamily: 'RobotoMono')),
+            fontFamily: GoogleFonts.acme().fontFamily)),
       ),
       ChangeNotifierProvider<InternetNotifier>(
           create: (_) => InternetNotifier(false)),
@@ -87,10 +89,10 @@ class _beforeSplashState extends State<beforeSplash> {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     return MaterialApp(
       theme: ThemeData(
-          appBarTheme: AppBarTheme(color: Colors.green[300]),
+          appBarTheme: AppBarTheme(color: Colors.green[300]),textTheme: GoogleFonts.acmeTextTheme(),
           primarySwatch: primarycolor,
           primaryColor: primarycolor,
-          fontFamily: 'RobotoMono'),
+          fontFamily: GoogleFonts.acme().fontFamily),
       darkTheme: themeNotifier.getTheme(),
       debugShowCheckedModeBanner: false,
       home: Splash(),
@@ -159,22 +161,24 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
-      final internetAvailabilityNotifier =
-          Provider.of<InternetNotifier>(context, listen: false);
-      try {
-        final result = await InternetAddress.lookup('google.com');
-        final result2 = await InternetAddress.lookup('facebook.com');
-        final result3 = await InternetAddress.lookup('microsoft.com');
-        if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty) ||
-            (result2.isNotEmpty && result2[0].rawAddress.isNotEmpty) ||
-            (result3.isNotEmpty && result3[0].rawAddress.isNotEmpty)) {
-          internetAvailabilityNotifier.setInternetAvailability(true);
-        } else {}
-      } on SocketException catch (_) {
-        internetAvailabilityNotifier.setInternetAvailability(false);
-      }
-    });
+    // timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    //   final internetAvailabilityNotifier =
+    //       Provider.of<InternetNotifier>(context, listen: false);
+    //   try {
+    //     final result = await InternetAddress.lookup('google.com');
+    //     final result2 = await InternetAddress.lookup('facebook.com');
+    //     // final result3 = await InternetAddress.lookup('microsoft.com');
+    //     if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty) ||
+    //         (result2.isNotEmpty && result2[0].rawAddress.isNotEmpty)
+    //         // ||
+    //         // (result3.isNotEmpty && result3[0].rawAddress.isNotEmpty)
+    //     ) {
+    //       internetAvailabilityNotifier.setInternetAvailability(true);
+    //     } else {}
+    //   } on SocketException catch (_) {
+    //     internetAvailabilityNotifier.setInternetAvailability(false);
+    //   }
+    // });
     Timer(
         Duration(seconds: 3),
         () => Navigator.pushReplacement(
@@ -233,10 +237,12 @@ class _MyAppState extends State<MyApp> {
       try {
         final result = await InternetAddress.lookup('google.com');
         final result2 = await InternetAddress.lookup('facebook.com');
-        final result3 = await InternetAddress.lookup('microsoft.com');
+        // final result3 = await InternetAddress.lookup('microsoft.com');
         if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty) ||
-            (result2.isNotEmpty && result2[0].rawAddress.isNotEmpty) ||
-            (result3.isNotEmpty && result3[0].rawAddress.isNotEmpty)) {
+            (result2.isNotEmpty && result2[0].rawAddress.isNotEmpty)
+            // ||
+            // (result3.isNotEmpty && result3[0].rawAddress.isNotEmpty)
+        ) {
           internetAvailabilityNotifier.setInternetAvailability(true);
         } else {}
       } on SocketException catch (_) {

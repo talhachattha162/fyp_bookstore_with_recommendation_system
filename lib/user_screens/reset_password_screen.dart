@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/signup_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +43,25 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           isLoading = false;
         });
       }
-      flutterToast('Link send to $email for reset');
+      final snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+
+        content: AwesomeSnackbarContent(
+          title: 'Success!',
+          message:
+          'Link send to $email for reset',
+
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.success,
+        ),
+      );
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
       navigateWithNoBack(context, LoginScreen());
     }).catchError((e) {
       if (mounted) {
@@ -50,7 +69,25 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           isLoading = false;
         });
       }
-      flutterToast(e.toString());
+      final snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+
+        content: AwesomeSnackbarContent(
+          title: 'Error!',
+          message:
+          e.toString(),
+
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+        ),
+      );
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
     });
   }
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:bookstore_recommendation_system_fyp/models/user.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
@@ -103,8 +104,28 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     final status = await Permission.storage.request();
     if (status.isDenied) {
       // Permission denied, show an error message and return.
+
+      final snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+
+        content: AwesomeSnackbarContent(
+          title: 'Error!',
+          message:
+          'Permission denied.',
+
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+        ),
+      );
+
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Permission denied.')));
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+      // ScaffoldMessenger.of(context)
+      //     .showSnackBar(SnackBar(content: Text('Permission denied.')));
       return;
     }
 
@@ -882,7 +903,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                       ):Container()
                     ]),
                     body: SingleChildScrollView(
-                      child: Column(
+                        child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           const SizedBox(
@@ -1128,7 +1149,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                         }
 // print(expirationDates);
                                         DateTime maxExpirationDate = expirationDates.reduce((a, b) => a.isAfter(b) ? a : b);
-                                        
+
                                         Duration timeLeft = maxExpirationDate.difference(DateTime.now());
                                         // print(maxExpirationDate);
                                         if (!timeLeft.isNegative) {
@@ -1898,7 +1919,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       )
                                     ]),
                         ],
-                      ),
+                        ),
                     )),
               ),
       ),

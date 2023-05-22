@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:ui';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:bookstore_recommendation_system_fyp/Widgets/text_field.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
@@ -489,8 +490,25 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                   _file1 = file.bytes!;
                                 } catch (err) {
                                   if (_filename1 == "<5 mb image allowed") {
-                                    showSnackBar(
-                                        context, 'Please reselect file');
+                                    final snackBar = SnackBar(
+                                      /// need to set following properties for best effect of awesome_snackbar_content
+                                      elevation: 0,
+                                      behavior: SnackBarBehavior.floating,
+                                      backgroundColor: Colors.transparent,
+
+                                      content: AwesomeSnackbarContent(
+                                        title: 'Error!',
+                                        message:
+                                        'Please reselect file',
+
+                                        /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                        contentType: ContentType.failure,
+                                      ),
+                                    );
+
+                                    ScaffoldMessenger.of(context)
+                                      ..hideCurrentSnackBar()
+                                      ..showSnackBar(snackBar);
                                   }
                                 }
                               },
@@ -562,13 +580,66 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                               .then((value) async {})
                                               .onError((error,
                                               stackTrace) async {
-                                            flutterToast('Error:' +
-                                                error.toString());
+                                            final snackBar = SnackBar(
+                                              /// need to set following properties for best effect of awesome_snackbar_content
+                                              elevation: 0,
+                                              behavior: SnackBarBehavior.floating,
+                                              backgroundColor: Colors.transparent,
+
+                                              content: AwesomeSnackbarContent(
+                                                title: 'Error!',
+                                                message:
+                                                e.toString(),
+
+                                                /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                                contentType: ContentType.failure,
+                                              ),
+                                            );
+
+                                            ScaffoldMessenger.of(context)
+                                              ..hideCurrentSnackBar()
+                                              ..showSnackBar(snackBar);
                                           }).then((_) {
-                                            showSnackBar(context,'Book Updated');
+                                            final snackBar = SnackBar(
+                                              /// need to set following properties for best effect of awesome_snackbar_content
+                                              elevation: 0,
+                                              behavior: SnackBarBehavior.floating,
+                                              backgroundColor: Colors.transparent,
+
+                                              content: AwesomeSnackbarContent(
+                                                title: 'Success!',
+                                                message:
+                                                'Book Updated',
+
+                                                /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                                contentType: ContentType.success,
+                                              ),
+                                            );
+
+                                            ScaffoldMessenger.of(context)
+                                              ..hideCurrentSnackBar()
+                                              ..showSnackBar(snackBar);
                                           });
                                         } catch (e) {
-                                          flutterToast(e.toString());
+    final snackBar = SnackBar(
+    /// need to set following properties for best effect of awesome_snackbar_content
+    elevation: 0,
+    behavior: SnackBarBehavior.floating,
+    backgroundColor: Colors.transparent,
+
+    content: AwesomeSnackbarContent(
+    title: 'Error!',
+    message:
+    e.toString(),
+
+    /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+    contentType: ContentType.failure,
+    ),
+    );
+
+    ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(snackBar);
                                         }
                                       } else {
                                         flutterToast('No categories');
@@ -621,10 +692,45 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                               .then((value) async {})
                                               .onError((error,
                                               stackTrace) async {
-                                            flutterToast('Error:' +
-                                                error.toString());
+                                            final snackBar = SnackBar(
+                                              /// need to set following properties for best effect of awesome_snackbar_content
+                                              elevation: 0,
+                                              behavior: SnackBarBehavior.floating,
+                                              backgroundColor: Colors.transparent,
+
+                                              content: AwesomeSnackbarContent(
+                                                title: 'Error!',
+                                                message:
+                                                e.toString(),
+
+                                                /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                                contentType: ContentType.failure,
+                                              ),
+                                            );
+
+                                            ScaffoldMessenger.of(context)
+                                              ..hideCurrentSnackBar()
+                                              ..showSnackBar(snackBar);
                                           }).then((_) {
-                                            showSnackBar(context,'Book Updated');
+    final snackBar = SnackBar(
+    /// need to set following properties for best effect of awesome_snackbar_content
+    elevation: 0,
+    behavior: SnackBarBehavior.floating,
+    backgroundColor: Colors.transparent,
+
+    content: AwesomeSnackbarContent(
+    title: 'Success!',
+    message:
+    'Book Updated',
+
+    /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+    contentType: ContentType.success,
+    ),
+    );
+
+    ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(snackBar);
                                           });
                                         } catch (e) {
                                           flutterToast(e.toString());

@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/notification_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart';
@@ -146,7 +147,35 @@ class _HomeScreenState extends State<HomeScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Book Store'),
+            // title: Text(''),
+          title: TextLiquidFill(loadDuration: Duration(seconds: 2),
+            boxBackgroundColor: themeNotifier.getTheme() ==
+                ThemeData.dark(useMaterial3: true)
+                    .copyWith(
+                  colorScheme:
+                  ColorScheme.dark().copyWith(
+                    primary: darkprimarycolor,
+                    error: Colors.red,
+                    onPrimary: darkprimarycolor,
+                    outline: darkprimarycolor,
+                    primaryVariant: darkprimarycolor,
+                    onPrimaryContainer:
+                    darkprimarycolor,
+                  ),
+                )
+                ? Colors.black
+                : Colors.green.shade300,
+            text: 'Book Store',
+            waveColor: Colors.white,
+            textStyle: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            // boxHeight: 50.0,
+          ),
+
+
           automaticallyImplyLeading: false,
           actions: [
             Stack(
@@ -317,11 +346,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               .spaceBetween,
                                                       children: [
                                                         Text(
-                                                          book.title.length > 20
+                                                          book.title.length > 15
                                                               ? book.title
                                                                       .substring(
                                                                           0,
-                                                                          20) +
+                                                                          15) +
                                                                   '...'
                                                               : book.title,
                                                           style: TextStyle(
