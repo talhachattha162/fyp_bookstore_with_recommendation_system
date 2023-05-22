@@ -571,8 +571,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                             [],
                                             FirebaseAuth.instance
                                                 .currentUser!.uid,
-                                            false,Timestamp.now());
-
+                                            true,Timestamp.now());
                                         try {
                                           await bookCollection
                                               .doc(widget.book.bookid)
@@ -683,7 +682,8 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                             [],
                                             FirebaseAuth.instance
                                                 .currentUser!.uid,
-                                            false,Timestamp.now());
+                                                
+                                            true,Timestamp.now());
 
                                         try {
                                           await bookCollection

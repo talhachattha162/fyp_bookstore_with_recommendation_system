@@ -144,256 +144,259 @@ class _HomeScreenState extends State<HomeScreen> {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final orientation = MediaQuery.of(context).orientation;
     // _fetchNotifications(context);
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-            // title: Text(''),
-          title: TextLiquidFill(loadDuration: Duration(seconds: 2),
-            boxBackgroundColor: themeNotifier.getTheme() ==
-                ThemeData.dark(useMaterial3: true)
-                    .copyWith(
-                  colorScheme:
-                  ColorScheme.dark().copyWith(
-                    primary: darkprimarycolor,
-                    error: Colors.red,
-                    onPrimary: darkprimarycolor,
-                    outline: darkprimarycolor,
-                    primaryVariant: darkprimarycolor,
-                    onPrimaryContainer:
-                    darkprimarycolor,
-                  ),
-                )
-                ? Colors.black
-                : Colors.green.shade300,
-            text: 'Book Store',
-            waveColor: Colors.white,
-            textStyle: TextStyle(
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+              // title: Text(''),
+            title: TextLiquidFill(loadDuration: Duration(seconds: 2),
+              boxBackgroundColor: themeNotifier.getTheme() ==
+                  ThemeData.dark(useMaterial3: true)
+                      .copyWith(
+                    colorScheme:
+                    ColorScheme.dark().copyWith(
+                      primary: darkprimarycolor,
+                      error: Colors.red,
+                      onPrimary: darkprimarycolor,
+                      outline: darkprimarycolor,
+                      primaryVariant: darkprimarycolor,
+                      onPrimaryContainer:
+                      darkprimarycolor,
+                    ),
+                  )
+                  ? Colors.black
+                  : Colors.green.shade300,
+              text: 'Book Store',
+              waveColor: Colors.white,
+              textStyle: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              // boxHeight: 50.0,
             ),
-            // boxHeight: 50.0,
+    
+    
+            automaticallyImplyLeading: false,
+            actions: [
+              Stack(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      navigateWithNoBack(context, NotificationScreen());
+                    },
+                    icon: const Icon(Icons.notifications),
+                  ),
+                  Positioned(
+                    top: 22.0,
+                    right: 5.0,
+                    child: Container(
+                      padding: EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.red,
+                      ),
+                      child: Text(
+                        notificationLength.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              IconButton(
+                onPressed: () {
+                  // method to show the search bar
+                  showSearch(
+                      context: context,
+                      // delegate to customize the search bar
+                      delegate: CustomSearchDelegate(
+                          searchData: searchData, books: books));
+                },
+                icon: const Icon(CupertinoIcons.search),
+              ),
+            ],
           ),
-
-
-          automaticallyImplyLeading: false,
-          actions: [
-            Stack(
-              children: [
-                IconButton(
-                  onPressed: () {
-                    navigateWithNoBack(context, NotificationScreen());
-                  },
-                  icon: const Icon(Icons.notifications),
-                ),
-                Positioned(
-                  top: 22.0,
-                  right: 5.0,
-                  child: Container(
-                    padding: EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.red,
-                    ),
-                    child: Text(
-                      notificationLength.toString(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+          resizeToAvoidBottomInset: false,
+          body: SingleChildScrollView(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(children: [
+                      Padding(
+                        padding: const EdgeInsets.all(3.0),
+                        child: ChipsChoice<int>.single(
+                          value: tag,
+                          onChanged: (val) {
+                            if (mounted) {
+                              setState(() {
+                                tag = val;
+                              });
+                            }
+                          },
+                          choiceItems: categories.isEmpty
+                              ? C2Choice.listFrom<int, String>(
+                                  source: options,
+                                  value: (i, v) => i,
+                                  label: (i, v) => v,
+                                )
+                              : C2Choice.listFrom<int, String>(
+                                  source: categories,
+                                  value: (i, v) => i,
+                                  label: (i, v) => v,
+                                ),
+                        ),
+                      )
+                    ]),
                   ),
-                ),
-              ],
-            ),
-            IconButton(
-              onPressed: () {
-                // method to show the search bar
-                showSearch(
-                    context: context,
-                    // delegate to customize the search bar
-                    delegate: CustomSearchDelegate(
-                        searchData: searchData, books: books));
-              },
-              icon: const Icon(CupertinoIcons.search),
-            ),
-          ],
-        ),
-        resizeToAvoidBottomInset: false,
-        body: SingleChildScrollView(
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: ChipsChoice<int>.single(
-                        value: tag,
-                        onChanged: (val) {
-                          if (mounted) {
-                            setState(() {
-                              tag = val;
-                            });
+                  Padding(
+                    padding:  EdgeInsets.symmetric(horizontal:orientation == Orientation.portrait?8:25.0,vertical:orientation == Orientation.portrait?2:8.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: height * 0.73,
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: _queryBooksByCategory(
+                            categories.isEmpty ? ' ' : categories[tag]),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
                           }
-                        },
-                        choiceItems: categories.isEmpty
-                            ? C2Choice.listFrom<int, String>(
-                                source: options,
-                                value: (i, v) => i,
-                                label: (i, v) => v,
-                              )
-                            : C2Choice.listFrom<int, String>(
-                                source: categories,
-                                value: (i, v) => i,
-                                label: (i, v) => v,
+    
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                                child: LoadingAnimationWidget.fourRotatingDots(
+                              color: themeNotifier.getTheme() ==
+                                      ThemeData.dark(useMaterial3: true).copyWith(
+                                        colorScheme: ColorScheme.dark().copyWith(
+                                          primary: darkprimarycolor,
+                                          error: Colors.red,
+                                          onPrimary: darkprimarycolor,
+                                          outline: darkprimarycolor,
+                                          primaryVariant: darkprimarycolor,
+                                          onPrimaryContainer: darkprimarycolor,
+                                        ),
+                                      )
+                                  ? darkprimarycolor
+                                  : primarycolor,
+                              size: 50,
+                            ));
+                          }
+                          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                            return Center(
+                              child: Visibility(
+                                visible: true,
+                                child: Text('No books found'),
                               ),
-                      ),
-                    )
-                  ]),
-                ),
-                Padding(
-                  padding:  EdgeInsets.symmetric(horizontal:orientation == Orientation.portrait?8:25.0,vertical:orientation == Orientation.portrait?2:8.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: height * 0.73,
-                    child: StreamBuilder<QuerySnapshot>(
-                      stream: _queryBooksByCategory(
-                          categories.isEmpty ? ' ' : categories[tag]),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        }
-
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                              child: LoadingAnimationWidget.fourRotatingDots(
-                            color: themeNotifier.getTheme() ==
-                                    ThemeData.dark(useMaterial3: true).copyWith(
-                                      colorScheme: ColorScheme.dark().copyWith(
-                                        primary: darkprimarycolor,
-                                        error: Colors.red,
-                                        onPrimary: darkprimarycolor,
-                                        outline: darkprimarycolor,
-                                        primaryVariant: darkprimarycolor,
-                                        onPrimaryContainer: darkprimarycolor,
-                                      ),
-                                    )
-                                ? darkprimarycolor
-                                : primarycolor,
-                            size: 50,
-                          ));
-                        }
-                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                          return Center(
-                            child: Visibility(
-                              visible: true,
-                              child: Text('No books found'),
-                            ),
-                          );
-                        }
-                        return
-                            GridView.builder(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: orientation == Orientation.portrait?2:4,
-                                      crossAxisSpacing: 6,
-                                      mainAxisSpacing: 6,
-                                      mainAxisExtent: 230),
-                              itemCount: snapshot.data!.docs.length,
-                              itemBuilder: (context, index) {
-                                Book book = Book.fromSnapshot(
-                                    snapshot.data!.docs[index]);
-                                return InkWell(
-                                  onTap: () {
-                                    navigateWithNoBack(
-                                        context, ViewBookScreen(book: book));
-                                  },
-                                  child: Card(
-                                    elevation: 10,
-                                    borderOnForeground: true,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: Column(
-                                        children: [
-                                          CachedNetworkImage(
-                                            height: 170,
-                                            width: double.infinity,
-                                            fit: BoxFit.fill,
-                                            imageUrl: book.coverPhotoFile,
-                                            placeholder: (context, url) => Center(
-                                                child:
-                                                    CircularProgressIndicator()),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    new Icon(Icons.error),
-                                          ),
-                                          SizedBox(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(4.0),
-                                              child: Row(
-                                                children: [
-                                                  Flexible(
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          book.title.length > 15
-                                                              ? book.title
-                                                                      .substring(
-                                                                          0,
-                                                                          15) +
-                                                                  '...'
-                                                              : book.title,
-                                                          style: TextStyle(
-                                                              fontSize: 12),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  // SizedBox(
-                                                  //   width: 30,
-                                                  // ),
-                                                  Text(
-                                                    book.freeRentPaid == 'free'
-                                                        ? 'Free'
-                                                        : '\$' +
-                                                            book.price
-                                                                .toString(),
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14),
-                                                  )
-                                                ],
-                                              ),
+                            );
+                          }
+                          return
+                              GridView.builder(
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: orientation == Orientation.portrait?2:4,
+                                        crossAxisSpacing: 6,
+                                        mainAxisSpacing: 6,
+                                        mainAxisExtent: 230),
+                                itemCount: snapshot.data!.docs.length,
+                                itemBuilder: (context, index) {
+                                  Book book = Book.fromSnapshot(
+                                      snapshot.data!.docs[index]);
+                                  return InkWell(
+                                    onTap: () {
+                                      navigateWithNoBack(
+                                          context, ViewBookScreen(book: book));
+                                    },
+                                    child: Card(
+                                      elevation: 10,
+                                      borderOnForeground: true,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Column(
+                                          children: [
+                                            CachedNetworkImage(
+                                              height: 170,
+                                              width: double.infinity,
+                                              fit: BoxFit.fill,
+                                              imageUrl: book.coverPhotoFile,
+                                              placeholder: (context, url) => Center(
+                                                  child:
+                                                      CircularProgressIndicator()),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      new Icon(Icons.error),
                                             ),
-                                          )
-                                        ],
+                                            SizedBox(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(4.0),
+                                                child: Row(
+                                                  children: [
+                                                    Flexible(
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            book.title.length > 15
+                                                                ? book.title
+                                                                        .substring(
+                                                                            0,
+                                                                            15) +
+                                                                    '...'
+                                                                : book.title,
+                                                            style: TextStyle(
+                                                                fontSize: 12),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    // SizedBox(
+                                                    //   width: 30,
+                                                    // ),
+                                                    Text(
+                                                      book.freeRentPaid == 'free'
+                                                          ? 'Free'
+                                                          : '\$' +
+                                                              book.price
+                                                                  .toString(),
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 14),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                            );
-                      },
+                                  );
+                                },
+                              );
+                        },
+                      ),
+    
+                      //stack
                     ),
-
-                    //stack
-                  ),
-                )
-              ]
-              //   },
-              // ),
-              ),
+                  )
+                ]
+                //   },
+                // ),
+                ),
+          ),
         ),
       ),
     );

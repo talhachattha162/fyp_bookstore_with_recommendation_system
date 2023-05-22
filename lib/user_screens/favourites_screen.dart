@@ -217,7 +217,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                                   return Center(
                                     child: Visibility(
                                       visible: true,
-                                      child: Text('No favourites found'),
+                                      child: Text(''),
                                     ),
                                   );
                                 }

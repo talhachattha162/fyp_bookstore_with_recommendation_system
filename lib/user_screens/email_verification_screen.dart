@@ -167,7 +167,15 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      
                       const SizedBox(height: 35),
+                      const Center(
+                        child: Text(
+                          'Note:Its not compulsory',
+                          textAlign: TextAlign.center,
+                          style:TextStyle(fontSize:8,color: Colors.grey)
+                        ),
+                      ),
                       const SizedBox(height: 30),
                       const Center(
                         child: Text(

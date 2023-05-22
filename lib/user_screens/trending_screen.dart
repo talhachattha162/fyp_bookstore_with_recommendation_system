@@ -88,124 +88,127 @@ class _TrendingScreenState extends State<TrendingScreen> {
     double height = MediaQuery.of(context).size.height;
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final orientation = MediaQuery.of(context).orientation;
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Trendings'),
-          automaticallyImplyLeading: false,
-        ),
-        resizeToAvoidBottomInset: false,
-        body: isLoading
-            ? Center(
-                child: Visibility(
-                child: LoadingAnimationWidget.fourRotatingDots(
-                  color: themeNotifier.getTheme() ==
-                                  ThemeData.dark(useMaterial3: true).copyWith(
-                                    colorScheme: ColorScheme.dark().copyWith(
-                                      primary: darkprimarycolor,
-                                      error: Colors.red,
-                                      onPrimary: darkprimarycolor,
-                                      outline: darkprimarycolor,
-                                      primaryVariant: darkprimarycolor,
-                                      onPrimaryContainer: darkprimarycolor,
-                                    ),
-                                  )
-                              ? darkprimarycolor
-                              : primarycolor,
-                  size: 50,
-                ),
-                visible: true,
-              ))
-            : _trendingBookIds.isEmpty
-                ? Center(child: Text('No trendings found'))
-                : StreamBuilder<List<Book>?>(
-                    stream: _bookStream(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Center(child: Text('Error fetching books'));
-                      }
-
-                      if (!snapshot.hasData) {
-                        return Center(child: Text('Loading...'));
-                      }
-                      if (snapshot.hasData) {
-                        final books = snapshot.data!;
-                        return GridView.builder(
-                          gridDelegate:
-                               SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: orientation == Orientation.portrait?2:4,
-                                  crossAxisSpacing: 6,
-                                  mainAxisSpacing: 6,
-                                  mainAxisExtent: 230),
-                          padding: const EdgeInsets.all(8.0),
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final book = books[index];
-                            return InkWell(
-                              onTap: () {
-                                navigateWithNoBack(
-                                    context, ViewBookScreen(book: book));
-                              },
-                              child: Card(
-                                elevation: 10,
-                                borderOnForeground: true,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: Column(
-                                    children: [
-                                      CachedNetworkImage(
-                                        height: 170,
-                                        width: double.infinity,
-                                        fit: BoxFit.fill,
-                                        imageUrl: book.coverPhotoFile,
-                                        placeholder: (context, url) => Center(
-                                            child:
-                                                CircularProgressIndicator()),
-                                        errorWidget: (context, url, error) =>
-                                            Center(child: Icon(Icons.error)),
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Trendings'),
+            automaticallyImplyLeading: false,
+          ),
+          resizeToAvoidBottomInset: false,
+          body: isLoading
+              ? Center(
+                  child: Visibility(
+                  child: LoadingAnimationWidget.fourRotatingDots(
+                    color: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
                                       ),
-                                      SizedBox(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(4.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment
-                                                    .spaceBetween,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Flexible(
-                                                child: Text(
-                                                  book.title.length > 15
-                                                      ? book.title.substring(
-                                                              0, 15) +
-                                                          '...'
-                                                      : book.title,
-                                                  style:
-                                                      TextStyle(fontSize: 12),
-                                                ),
-                                              ),
-                                              Text(
-                                                "\$" + book.price.toString(),
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              )
-                                            ],
-                                          ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                    size: 50,
+                  ),
+                  visible: true,
+                ))
+              : _trendingBookIds.isEmpty
+                  ? Center(child: Text('No trendings found'))
+                  : StreamBuilder<List<Book>?>(
+                      stream: _bookStream(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Center(child: Text('Error fetching books'));
+                        }
+    
+                        if (!snapshot.hasData) {
+                          return Center(child: Text('Loading...'));
+                        }
+                        if (snapshot.hasData) {
+                          final books = snapshot.data!;
+                          return GridView.builder(
+                            gridDelegate:
+                                 SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: orientation == Orientation.portrait?2:4,
+                                    crossAxisSpacing: 6,
+                                    mainAxisSpacing: 6,
+                                    mainAxisExtent: 230),
+                            padding: const EdgeInsets.all(8.0),
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final book = books[index];
+                              return InkWell(
+                                onTap: () {
+                                  navigateWithNoBack(
+                                      context, ViewBookScreen(book: book));
+                                },
+                                child: Card(
+                                  elevation: 10,
+                                  borderOnForeground: true,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Column(
+                                      children: [
+                                        CachedNetworkImage(
+                                          height: 170,
+                                          width: double.infinity,
+                                          fit: BoxFit.fill,
+                                          imageUrl: book.coverPhotoFile,
+                                          placeholder: (context, url) => Center(
+                                              child:
+                                                  CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) =>
+                                              Center(child: Icon(Icons.error)),
                                         ),
-                                      )
-                                    ],
+                                        SizedBox(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Flexible(
+                                                  child: Text(
+                                                    book.title.length > 15
+                                                        ? book.title.substring(
+                                                                0, 15) +
+                                                            '...'
+                                                        : book.title,
+                                                    style:
+                                                        TextStyle(fontSize: 12),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "\$" + book.price.toString(),
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        );
-                      }
-                      return Container();
-                    },
-                  ),
+                              );
+                            },
+                          );
+                        }
+                        return Container();
+                      },
+                    ),
+        ),
       ),
     );
   }

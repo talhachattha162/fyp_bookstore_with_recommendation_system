@@ -15,6 +15,8 @@ import 'package:http/http.dart' as http;
 import '../models/notificationitem.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+
 class Permissions extends StatefulWidget {
   const Permissions({super.key});
 
@@ -47,7 +49,12 @@ class _PermissionsState extends State<Permissions> {
 
 // Reference to the Firestore collection
   CollectionReference books = FirebaseFirestore.instance.collection('books');
-
+  CollectionReference payments =
+      FirebaseFirestore.instance.collection('payments');
+  CollectionReference reviews =
+      FirebaseFirestore.instance.collection('reviews');
+  CollectionReference favourities =
+      FirebaseFirestore.instance.collection('favourities');
 // Update the name attribute of a document with a specific ID
   Future<void> updatePermission(String bookid, bool isPermitted) {
     return books
@@ -60,12 +67,66 @@ class _PermissionsState extends State<Permissions> {
             (error) => print("Failed to update Book permission: $error"));
   }
 
+  deletePaymentsForBookId(String bookId) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collectionGroup('payments')
+        .where('bookId', isEqualTo: bookId)
+        .get();
+
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  }
+
+  deleteFavouritesForBookId(String bookId) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collection('favourities')
+        .where('bookid', isEqualTo: bookId)
+        .get();
+
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  }
+
+  deleteReviewsForBookId(String bookId) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collection('reviews')
+        .where('bookId', isEqualTo: bookId)
+        .get();
+
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  }
+
   Future<void> deleteBook(String bookId) {
     return books
         .doc(bookId) // Reference to the document with the given ID
         .delete() // Delete the document
-        .then((value) => flutterToast("Book deleted successfully"))
-        .catchError((error) => print("Failed to delete book: $error"));
+        .then((value) {
+      final snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+
+        content: AwesomeSnackbarContent(
+          title: 'Success!',
+          message: "Book deleted successfully",
+
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.success,
+        ),
+      );
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+    }).catchError((error) => print("Failed to delete book: $error"));
   }
 
   Future<String> getName(String userId) async {
@@ -132,7 +193,6 @@ class _PermissionsState extends State<Permissions> {
       .collection('books')
       .orderBy('uploadDate', descending: true)
       .snapshots();
-
 
   viewPdf(bookid) async {
     Directory appDocDir = await getApplicationDocumentsDirectory();
@@ -282,12 +342,22 @@ class _PermissionsState extends State<Permissions> {
                                       return AlertDialog(
                                         title: Column(
                                           children: [
-                                            Text(book['title'],style:TextStyle(fontSize: 14)),
-                                            Text('Category:'+book['selectedcategory'],style:TextStyle(fontSize: 12)),
-                                            Text(book['freeRentPaid']+' \$'+book['price'].toString(),style:TextStyle(fontSize: 12)),
-                                          Text('Author:'+book['author'].toString(),style:TextStyle(fontSize: 12)),
-
-                                      ],
+                                            Text(book['title'],
+                                                style: TextStyle(fontSize: 14)),
+                                            Text(
+                                                'Category:' +
+                                                    book['selectedcategory'],
+                                                style: TextStyle(fontSize: 12)),
+                                            Text(
+                                                book['freeRentPaid'] +
+                                                    ' \$' +
+                                                    book['price'].toString(),
+                                                style: TextStyle(fontSize: 12)),
+                                            Text(
+                                                'Author:' +
+                                                    book['author'].toString(),
+                                                style: TextStyle(fontSize: 12)),
+                                          ],
                                         ),
                                         content: FutureBuilder<Uint8List?>(
                                           future: getPdfBytes(book['bookFile']),
@@ -342,28 +412,26 @@ class _PermissionsState extends State<Permissions> {
                               ),
                               book['isPermitted'] == true
                                   ? IconButton(
-                                  onPressed:null,
-                                  icon: Icon(Icons.check))
+                                      onPressed: null, icon: Icon(Icons.check))
                                   : IconButton(
                                       onPressed: () async {
-                                        updatePermission(
-                                            book['bookid'], true);
-                                        admitNotification(book['title'],
-                                            book['userid']);
+                                        updatePermission(book['bookid'], true);
+                                        admitNotification(
+                                            book['title'], book['userid']);
                                         subscriptionNotification(
-                                            book['title'],
-                                            book['userid']);
+                                            book['title'], book['userid']);
                                       },
                                       icon: Icon(Icons.check)),
-
                               Padding(
                                 padding: const EdgeInsets.all(0.0),
                                 child: IconButton(
                                     onPressed: () async {
                                       deleteNotification(
-                                          book['title'],
-                                          book['userid']);
+                                          book['title'], book['userid']);
                                       deleteBook(book['bookid']);
+                                      deleteFavouritesForBookId(book['bookid']);
+                                      deletePaymentsForBookId(book['bookid']);
+                                      deleteReviewsForBookId(book['bookid']);
                                     },
                                     icon: Icon(Icons.clear)),
                               )

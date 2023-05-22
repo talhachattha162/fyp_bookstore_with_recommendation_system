@@ -118,7 +118,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                     leading: IconButton(
                       icon: const Icon(Icons.arrow_back),
                       onPressed: () {
-                        navigateWithNoBack(context, MainScreenUser());
+                        navigateWithNoBack(context, ViewBookScreen(book: widget.book));
                       },
                     )),
                 body: SingleChildScrollView(

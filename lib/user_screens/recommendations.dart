@@ -95,149 +95,155 @@ bool isLoading=false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar:   AppBar(
-    title: const Text('Recommendations'),
-    leading: IconButton(
-    icon: const Icon(Icons.arrow_back),
-    onPressed: () {
-    navigateWithNoBack(
-    context,
-    MainScreenUser());
-    },
-    )),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-
-            children: [
-              Text('Note',style: TextStyle(fontSize: 14.0, color: Colors.green)),
-              Padding(
-                padding: EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  'Add multiple titles,authors,languages,categories separated by comma',
-                  style: TextStyle(fontSize: 14.0, color: Colors.grey),
+    return WillPopScope(
+      onWillPop: () async {
+        navigateWithNoBack(context, MainScreenUser());
+        return false;
+      },
+      child: Scaffold(
+        appBar:   AppBar(
+      title: const Text('Recommendations'),
+      leading: IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+      navigateWithNoBack(
+      context,
+      MainScreenUser());
+      },
+      )),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(16.0),
+          child: Form(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+    
+              children: [
+                Text('Note',style: TextStyle(fontSize: 14.0, color: Colors.green)),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    'Add multiple titles,authors,languages,categories separated by comma',
+                    style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                  ),
                 ),
-              ),
-              TextFormField(
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Title is required';
-                  }
-                  return null; // Return null if the input is valid
-                },
-                decoration: InputDecoration(
-                  labelText: 'Enter Book Titles you like *',
-                ),
-                onChanged: (value) {
-                  if(mounted){
-                  setState(() {
-                    titles = value;
-                  });
-                  }
-                },
-              ),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Enter authors name you like (optional)',
-                ),
-                onChanged: (value) {
-                  if(mounted){
+                TextFormField(
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Title is required';
+                    }
+                    return null; // Return null if the input is valid
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Enter Book Titles you like *',
+                  ),
+                  onChanged: (value) {
+                    if(mounted){
                     setState(() {
-                      authors = value;
+                      titles = value;
                     });
-                  }
-                },
-              ),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Enter categories you like (optional)',
+                    }
+                  },
                 ),
-                onChanged: (value) {
-                  if(mounted){
-                    setState(() {
-                      categories = value;
-                    });
-                  }
-                },
-              ),
-              DropdownButton<String>(
-                value: _selectedItem,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedItem = newValue!;
-                  });
-                },
-                items: <String>[
-                  'Shorter',
-                  'Longer'
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Languages you prefer (optional)',
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Enter authors name you like (optional)',
+                  ),
+                  onChanged: (value) {
+                    if(mounted){
+                      setState(() {
+                        authors = value;
+                      });
+                    }
+                  },
                 ),
-                onChanged: (value) {
-                  if(mounted){
-                    setState(() {
-                      language = value;
-                    });
-                  }
-                },
-              ),
-
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Enter your age (optional)',
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Enter categories you like (optional)',
+                  ),
+                  onChanged: (value) {
+                    if(mounted){
+                      setState(() {
+                        categories = value;
+                      });
+                    }
+                  },
                 ),
-                onChanged: (value) {
-                  if(mounted){
+                DropdownButton<String>(
+                  value: _selectedItem,
+                  onChanged: (String? newValue) {
                     setState(() {
-                      age = value;
+                      _selectedItem = newValue!;
                     });
-                  }
-                },keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-
-              ),
-              DropdownButton<String>(
-                value: _selectedItem1,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedItem1 = newValue!;
-                  });
-                },
-                items: <String>[
-                  'New releases',
-                  'Popular books',
-                  'Hidden Gems'
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-              SizedBox(height: 16.0),
-              isLoading==true?Center(child: CircularProgressIndicator()):ElevatedButton(
-                child: Text('Generate'),
-                onPressed: titles.isEmpty ? null : _generateRecommendation,
-              ),
-              SizedBox(height: 16.0),
-              Text(
-                'Recommendations:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8.0),
-              Text(_recommendation),
-            ],
+                  },
+                  items: <String>[
+                    'Shorter',
+                    'Longer'
+                  ].map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Languages you prefer (optional)',
+                  ),
+                  onChanged: (value) {
+                    if(mounted){
+                      setState(() {
+                        language = value;
+                      });
+                    }
+                  },
+                ),
+    
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Enter your age (optional)',
+                  ),
+                  onChanged: (value) {
+                    if(mounted){
+                      setState(() {
+                        age = value;
+                      });
+                    }
+                  },keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+    
+                ),
+                DropdownButton<String>(
+                  value: _selectedItem1,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedItem1 = newValue!;
+                    });
+                  },
+                  items: <String>[
+                    'New releases',
+                    'Popular books',
+                    'Hidden Gems'
+                  ].map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+                SizedBox(height: 16.0),
+                isLoading==true?Center(child: CircularProgressIndicator()):ElevatedButton(
+                  child: Text('Generate'),
+                  onPressed: titles.isEmpty ? null : _generateRecommendation,
+                ),
+                SizedBox(height: 16.0),
+                Text(
+                  'Recommendations:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8.0),
+                Text(_recommendation),
+              ],
+            ),
           ),
         ),
       ),

@@ -81,182 +81,185 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Balance: \$$balance'),
-          automaticallyImplyLeading: false,
-        ),
-        body: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
-          WidgetCircularAnimator(
-            size: 200,
-            innerIconsSize: 3,
-            outerIconsSize: 3,
-            innerAnimation: Curves.easeInOutBack,
-            outerAnimation: Curves.easeInOutBack,
-            innerColor: Colors.deepPurple,
-            outerColor: Colors.orangeAccent,
-            innerAnimationSeconds: 10,
-            outerAnimationSeconds: 10,
-            child: Container(
-              decoration:
-              BoxDecoration(shape: BoxShape.circle, color: Colors.grey[200]),
-              child: CircleAvatar(
-                    maxRadius: 40,
-                    backgroundImage:
-                        photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
-                  ))),
-                  const SizedBox(height: 10),
-                  Text(name1,
-                      style: TextStyle(
-                          fontSize: subheadingSize,
-                          fontWeight: FontWeight.bold)),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  SizedBox(
-                      height: height * 0.44,
-                      width: width * 0.93,
-                      child: ListView(
-                        children: <Widget>[
-                          ListTile(
-                            leading: const Icon(Icons.account_circle_outlined),
-                            title: const Text('My Account'),
-                            trailing: const Icon(Icons.chevron_right_sharp),
-                            onTap: () {
-                              navigateWithNoBack(
-                                  context, const UpdateProfileScreen());
-                            },
-                          ),
-                          const Divider(),
-                          ListTile(
-                            leading: const Icon(Icons.question_mark_outlined),
-                            title: const Text('FAQS'),
-                            trailing: const Icon(Icons.chevron_right_sharp),
-                            onTap: () {
-                              navigateWithNoBack(context, const FaqScreen());
-                            },
-                          ),
-                          const Divider(),
-                          ListTile(
-                            leading: const Icon(Icons.mode_night_outlined),
-                            title: const Text('Change Mode'),
-                            trailing: Switch(
-                                value: _isSwitched,
-                                onChanged: (value) {
-                                  themeNotifier.setTheme(themeNotifier
-                                              .getTheme() ==
-                                          ThemeData(
-                                              // useMaterial3: true,
-                                              appBarTheme: AppBarTheme(
-                                                  color: Colors.green[300]),
-                                              primarySwatch: primarycolor,
-                                              fontFamily: GoogleFonts.acme().fontFamily)
-                                      ? ThemeData.dark(useMaterial3: true,)
-                                          .copyWith(
-                                          colorScheme:
-                                              ColorScheme.dark().copyWith(
-                                            primary: darkprimarycolor,
-                                            error: Colors.red,
-                                            onPrimary: darkprimarycolor,
-                                            outline: darkprimarycolor,
-                                            primaryVariant: darkprimarycolor,
-                                            onPrimaryContainer:
-                                                darkprimarycolor,
-                                          ),
-                                  )
-                                      : ThemeData(
-                                          appBarTheme: AppBarTheme(
-                                              color: Colors.green[300]),
-                                          primarySwatch: primarycolor,
-
-                                      fontFamily: GoogleFonts.acme().fontFamily));
-                                  if (mounted) {
-                                    setState(() {
-                                      _isSwitched = value;
-                                    });
-                                  }
-                                  if(themeNotifier
-                                              .getTheme() ==
-                                          ThemeData(
-                                              // useMaterial3: true,
-                                              appBarTheme: AppBarTheme(
-                                                  color: Colors.green[300]),
-                                              primarySwatch: primarycolor,
-                                              fontFamily: GoogleFonts.acme().fontFamily)){
-firestoreInstance
-                                      .collection("darkmode")
-                                      .doc(FirebaseAuth
-                                          .instance.currentUser!.uid)
-                                      .set({"darkmode1": false});
-                                              }
-                                              else{
-                                                firestoreInstance
-                                      .collection("darkmode")
-                                      .doc(FirebaseAuth
-                                          .instance.currentUser!.uid)
-                                      .set({"darkmode1": true});
-                                              }
-
-                                }),
-                          ),
-                          const Divider(),
-                          ListTile(
-                            leading: const Icon(Icons.privacy_tip_outlined),
-                            title: const Text('Privacy Policy'),
-                            trailing: const Icon(Icons.chevron_right_sharp),
-                            onTap: () {
-                              var url =
-                                  'https://doc-hosting.flycricket.io/booksavvy-privacy-policy/1c26b399-2650-460b-aae0-a2fc294cc458/privacy';
-                              launchUrl(Uri.parse(url));
-                            },
-                          ),
-                          const Divider(),
-                          ListTile(
-                              leading: const Icon(Icons.logout_outlined),
-                              title: const Text('Log out'),
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Balance: \$$balance'),
+            automaticallyImplyLeading: false,
+          ),
+          body: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(
+                      height: 10,
+                    ),
+            WidgetCircularAnimator(
+              size: 200,
+              innerIconsSize: 3,
+              outerIconsSize: 3,
+              innerAnimation: Curves.easeInOutBack,
+              outerAnimation: Curves.easeInOutBack,
+              innerColor: Colors.deepPurple,
+              outerColor: Colors.orangeAccent,
+              innerAnimationSeconds: 10,
+              outerAnimationSeconds: 10,
+              child: Container(
+                decoration:
+                BoxDecoration(shape: BoxShape.circle, color: Colors.grey[200]),
+                child: CircleAvatar(
+                      maxRadius: 40,
+                      backgroundImage:
+                          photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+                    ))),
+                    const SizedBox(height: 10),
+                    Text(name1,
+                        style: TextStyle(
+                            fontSize: subheadingSize,
+                            fontWeight: FontWeight.bold)),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    SizedBox(
+                        height: height * 0.44,
+                        width: width * 0.93,
+                        child: ListView(
+                          children: <Widget>[
+                            ListTile(
+                              leading: const Icon(Icons.account_circle_outlined),
+                              title: const Text('My Account'),
                               trailing: const Icon(Icons.chevron_right_sharp),
-                              onTap: () async {
-                                try {
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  bool isLoggedIn = false;
-                                  prefs.setBool('isLoggedIn', isLoggedIn);
-                                  // sign out of Firebase
-                                  await auth.signOut();
-
-                                  // sign out of Google Sign-In
-                                  await _googleSignIn.signOut();
-
-                                  // clear the cache
-                                  await _googleSignIn.disconnect();
-                                } catch (e) {
-                                  // handle error
-                                  print('error' + e.toString());
-                                }
-                                User? user;
-                                // navigateWithNoBackplus(context, LoginScreen());
-                                if (user == null) {
-                                  // print('hello');
-                                  context.read<AuthState>().user = null;
-                                  navigateWithNoBack(context, MyApp());
-                                }
-                              }),
-                        ],
-                      ))
-                ],
-              ),
-            ],
+                              onTap: () {
+                                navigateWithNoBack(
+                                    context, const UpdateProfileScreen());
+                              },
+                            ),
+                            const Divider(),
+                            ListTile(
+                              leading: const Icon(Icons.question_mark_outlined),
+                              title: const Text('FAQS'),
+                              trailing: const Icon(Icons.chevron_right_sharp),
+                              onTap: () {
+                                navigateWithNoBack(context, const FaqScreen());
+                              },
+                            ),
+                            const Divider(),
+                            ListTile(
+                              leading: const Icon(Icons.mode_night_outlined),
+                              title: const Text('Change Mode'),
+                              trailing: Switch(
+                                  value: _isSwitched,
+                                  onChanged: (value) {
+                                    themeNotifier.setTheme(themeNotifier
+                                                .getTheme() ==
+                                            ThemeData(
+                                                // useMaterial3: true,
+                                                appBarTheme: AppBarTheme(
+                                                    color: Colors.green[300]),
+                                                primarySwatch: primarycolor,
+                                                fontFamily: GoogleFonts.acme().fontFamily)
+                                        ? ThemeData.dark(useMaterial3: true,)
+                                            .copyWith(
+                                            colorScheme:
+                                                ColorScheme.dark().copyWith(
+                                              primary: darkprimarycolor,
+                                              error: Colors.red,
+                                              onPrimary: darkprimarycolor,
+                                              outline: darkprimarycolor,
+                                              primaryVariant: darkprimarycolor,
+                                              onPrimaryContainer:
+                                                  darkprimarycolor,
+                                            ),
+                                    )
+                                        : ThemeData(
+                                            appBarTheme: AppBarTheme(
+                                                color: Colors.green[300]),
+                                            primarySwatch: primarycolor,
+    
+                                        fontFamily: GoogleFonts.acme().fontFamily));
+                                    if (mounted) {
+                                      setState(() {
+                                        _isSwitched = value;
+                                      });
+                                    }
+                                    if(themeNotifier
+                                                .getTheme() ==
+                                            ThemeData(
+                                                // useMaterial3: true,
+                                                appBarTheme: AppBarTheme(
+                                                    color: Colors.green[300]),
+                                                primarySwatch: primarycolor,
+                                                fontFamily: GoogleFonts.acme().fontFamily)){
+    firestoreInstance
+                                        .collection("darkmode")
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .set({"darkmode1": false});
+                                                }
+                                                else{
+                                                  firestoreInstance
+                                        .collection("darkmode")
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .set({"darkmode1": true});
+                                                }
+    
+                                  }),
+                            ),
+                            const Divider(),
+                            ListTile(
+                              leading: const Icon(Icons.privacy_tip_outlined),
+                              title: const Text('Privacy Policy'),
+                              trailing: const Icon(Icons.chevron_right_sharp),
+                              onTap: () {
+                                var url =
+                                    'https://doc-hosting.flycricket.io/booksavvy-privacy-policy/1c26b399-2650-460b-aae0-a2fc294cc458/privacy';
+                                launchUrl(Uri.parse(url));
+                              },
+                            ),
+                            const Divider(),
+                            ListTile(
+                                leading: const Icon(Icons.logout_outlined),
+                                title: const Text('Log out'),
+                                trailing: const Icon(Icons.chevron_right_sharp),
+                                onTap: () async {
+                                  try {
+                                    SharedPreferences prefs =
+                                        await SharedPreferences.getInstance();
+                                    bool isLoggedIn = false;
+                                    prefs.setBool('isLoggedIn', isLoggedIn);
+                                    // sign out of Firebase
+                                    await auth.signOut();
+    
+                                    // sign out of Google Sign-In
+                                    await _googleSignIn.signOut();
+    
+                                    // clear the cache
+                                    await _googleSignIn.disconnect();
+                                  } catch (e) {
+                                    // handle error
+                                    print('error' + e.toString());
+                                  }
+                                  User? user;
+                                  // navigateWithNoBackplus(context, LoginScreen());
+                                  if (user == null) {
+                                    // print('hello');
+                                    context.read<AuthState>().user = null;
+                                    navigateWithNoBack(context, MyApp());
+                                  }
+                                }),
+                          ],
+                        ))
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

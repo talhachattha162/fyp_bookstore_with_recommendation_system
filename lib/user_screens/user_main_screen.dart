@@ -131,121 +131,118 @@ class _MainScreenUserState extends State<MainScreenUser> {
     // print('usermain');
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
-    return WillPopScope(
-      onWillPop: onWillPop,
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: internetAvailabilityNotifier.getInternetAvailability() == false
-            ? InternetChecker()
-            : Provider.of<AuthState>(context, listen: true).user == null
-                ? LoginScreen()
-                : Center(
-                    child: _bottomNavigationItems.elementAt(_selectedIndex),
-                  ),
-        bottomNavigationBar:
-            internetAvailabilityNotifier.getInternetAvailability() == false
-                ? null
-                : Provider.of<AuthState>(context, listen: true).user == null
-                    ? null
-                    :
-            BottomNavigationBar(
-                        items: <BottomNavigationBarItem>[
-                            BottomNavigationBarItem(
-                              icon: Icon(
-                                CupertinoIcons.home,
-                              ),
-                              label: 'Home',
-                              backgroundColor: themeNotifier.getTheme() ==
-                                      ThemeData.dark(useMaterial3: true).copyWith(
-                                        colorScheme: ColorScheme.dark().copyWith(
-                                          primary: darkprimarycolor,
-                                          error: Colors.red,
-                                          onPrimary: darkprimarycolor,
-                                          outline: darkprimarycolor,
-                                          primaryVariant: darkprimarycolor,
-                                          onPrimaryContainer: darkprimarycolor,
-                                        ),
-                                      )
-                                  ? darkprimarycolor
-                                  : primarycolor,
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: internetAvailabilityNotifier.getInternetAvailability() == false
+          ? InternetChecker()
+          : Provider.of<AuthState>(context, listen: true).user == null
+              ? LoginScreen()
+              : Center(
+                  child: _bottomNavigationItems.elementAt(_selectedIndex),
+                ),
+      bottomNavigationBar:
+          internetAvailabilityNotifier.getInternetAvailability() == false
+              ? null
+              : Provider.of<AuthState>(context, listen: true).user == null
+                  ? null
+                  :
+          BottomNavigationBar(
+                      items: <BottomNavigationBarItem>[
+                          BottomNavigationBarItem(
+                            icon: Icon(
+                              CupertinoIcons.home,
                             ),
-                            BottomNavigationBarItem(
-                              icon: Icon(Icons.recommend_outlined),
-                              label: 'Trendings',
-                              backgroundColor: themeNotifier.getTheme() ==
-                                      ThemeData.dark(useMaterial3: true).copyWith(
-                                        colorScheme: ColorScheme.dark().copyWith(
-                                          primary: darkprimarycolor,
-                                          error: Colors.red,
-                                          onPrimary: darkprimarycolor,
-                                          outline: darkprimarycolor,
-                                          primaryVariant: darkprimarycolor,
-                                          onPrimaryContainer: darkprimarycolor,
-                                        ),
-                                      )
-                                  ? darkprimarycolor
-                                  : primarycolor,
-                            ),
-                            BottomNavigationBarItem(
-                              icon: Icon(Icons.upload_outlined),
-                              label: 'Upload Book',
-                              backgroundColor: themeNotifier.getTheme() ==
-                                      ThemeData.dark(useMaterial3: true).copyWith(
-                                        colorScheme: ColorScheme.dark().copyWith(
-                                          primary: darkprimarycolor,
-                                          error: Colors.red,
-                                          onPrimary: darkprimarycolor,
-                                          outline: darkprimarycolor,
-                                          primaryVariant: darkprimarycolor,
-                                          onPrimaryContainer: darkprimarycolor,
-                                        ),
-                                      )
-                                  ? darkprimarycolor
-                                  : primarycolor,
-                            ),
-                            BottomNavigationBarItem(
-                              icon: Icon(Icons.library_books_outlined),
-                              label: 'Library',
-                              backgroundColor: themeNotifier.getTheme() ==
-                                      ThemeData.dark(useMaterial3: true).copyWith(
-                                        colorScheme: ColorScheme.dark().copyWith(
-                                          primary: darkprimarycolor,
-                                          error: Colors.red,
-                                          onPrimary: darkprimarycolor,
-                                          outline: darkprimarycolor,
-                                          primaryVariant: darkprimarycolor,
-                                          onPrimaryContainer: darkprimarycolor,
-                                        ),
-                                      )
-                                  ? darkprimarycolor
-                                  : primarycolor,
-                            ),
-                            BottomNavigationBarItem(
-                              icon: Icon(Icons.person_outline_outlined),
-                              label: 'Profile',
-                              backgroundColor: themeNotifier.getTheme() ==
-                                      ThemeData.dark(useMaterial3: true).copyWith(
-                                        colorScheme: ColorScheme.dark().copyWith(
-                                          primary: darkprimarycolor,
-                                          error: Colors.red,
-                                          onPrimary: darkprimarycolor,
-                                          outline: darkprimarycolor,
-                                          primaryVariant: darkprimarycolor,
-                                          onPrimaryContainer: darkprimarycolor,
-                                        ),
-                                      )
-                                  ? darkprimarycolor
-                                  : primarycolor,
-                            ),
-                          ],
-                        type: BottomNavigationBarType.shifting,
-                        currentIndex: _selectedIndex,
-                        selectedItemColor: Colors.white,
-                        iconSize: 24,
-                        selectedLabelStyle: const TextStyle(fontSize: 10),
-                        onTap: _onItemTapped,
-                        elevation: 5),
-      ),
+                            label: 'Home',
+                            backgroundColor: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                          ),
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.recommend_outlined),
+                            label: 'Trendings',
+                            backgroundColor: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                          ),
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.upload_outlined),
+                            label: 'Upload Book',
+                            backgroundColor: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                          ),
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.library_books_outlined),
+                            label: 'Library',
+                            backgroundColor: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                          ),
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.person_outline_outlined),
+                            label: 'Profile',
+                            backgroundColor: themeNotifier.getTheme() ==
+                                    ThemeData.dark(useMaterial3: true).copyWith(
+                                      colorScheme: ColorScheme.dark().copyWith(
+                                        primary: darkprimarycolor,
+                                        error: Colors.red,
+                                        onPrimary: darkprimarycolor,
+                                        outline: darkprimarycolor,
+                                        primaryVariant: darkprimarycolor,
+                                        onPrimaryContainer: darkprimarycolor,
+                                      ),
+                                    )
+                                ? darkprimarycolor
+                                : primarycolor,
+                          ),
+                        ],
+                      type: BottomNavigationBarType.shifting,
+                      currentIndex: _selectedIndex,
+                      selectedItemColor: Colors.white,
+                      iconSize: 24,
+                      selectedLabelStyle: const TextStyle(fontSize: 10),
+                      onTap: _onItemTapped,
+                      elevation: 5),
     );
   }
 }

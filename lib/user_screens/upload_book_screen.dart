@@ -138,702 +138,705 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
 
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    return SafeArea(
-      child:  Scaffold(
-              appBar: AppBar(
-                title: const Text('Upload Book'),
-                automaticallyImplyLeading: false,
-              ),
-              resizeToAvoidBottomInset: false,
-              body:AbsorbPointer(
-                absorbing: isLoading,
-                child: Stack(
-                children: [
-
-                  SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextInputField(
-                          hintText: 'Enter title',
-                          suffixIcon: Text(''),
-                          isPassword: false,
-                          textInputType: TextInputType.text,
-                          textEditingController: _titleController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter book title';
-                            }
-                            return null;
-                          },
-                        ),
-                        TextInputField(
-                          hintText: 'Enter Author Name',
-                          suffixIcon: Text(''),
-                          isPassword: false,
-                          textInputType: TextInputType.name,
-                          textEditingController: _authorController,
-                          validator: (value) {
-                            if (endspace.hasMatch(value)) {
-                              return 'Dont use extra space at end';
-                            }
-                            if (!name_valid.hasMatch(value)) {
-                              return 'Enter valid author name';
-                            }
-                            if (value.length > 30) {
-                              return 'The author name should be less than 30 characters';
-                            }
-                            return null;
-                          },
-                        ),
-                    TextInputField(
-                      textInputType: TextInputType.number,
-                      hintText: 'Enter Published Year',
-                      suffixIcon: Text(''),
-                          isPassword: false,
-                          textEditingController: _publishyearController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Enter published year';
-                            }
-                            if (!year_valid.hasMatch(value)) {
-                              return 'Enter valid year';
-                            }
-                            return null;
-                          },
-                        ),
-
-                        ButtonTheme(
-                          alignedDropdown: true,
-                          height: 20,
-                          child: DropdownButton(
-                            elevation: 50,
-                            isExpanded: true,
-                            iconEnabledColor: themeNotifier.getTheme() ==
-                              ThemeData.dark(useMaterial3: true).copyWith(
-                                colorScheme: ColorScheme.dark().copyWith(
-                                  primary: darkprimarycolor,
-                                  error: Colors.red,
-                                  onPrimary: darkprimarycolor,
-                                  outline: darkprimarycolor,
-                                  primaryVariant: darkprimarycolor,
-                                  onPrimaryContainer: darkprimarycolor,
-                                ),
-                              )
-                          ? darkprimarycolor
-                          : primarycolor,
-                            value: selectedCategory == ''
-                                ? 'Select Category'
-                                : selectedCategory,
-                            items: categories.isEmpty
-                                ? null
-                                : categories.map((category) {
-                                    return DropdownMenuItem(
-                                      value: category,
-                                      child: Text(category),
-                                    );
-                                  }).toList(),
-                            onChanged: (value) {
-                              if (mounted) {
-                                setState(() {
-                                  selectedCategory = value.toString();
-                                });
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: SafeArea(
+        child:  Scaffold(
+                appBar: AppBar(
+                  title: const Text('Upload Book'),
+                  automaticallyImplyLeading: false,
+                ),
+                resizeToAvoidBottomInset: false,
+                body:AbsorbPointer(
+                  absorbing: isLoading,
+                  child: Stack(
+                  children: [
+    
+                    SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextInputField(
+                            hintText: 'Enter title',
+                            suffixIcon: Text(''),
+                            isPassword: false,
+                            textInputType: TextInputType.text,
+                            textEditingController: _titleController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter book title';
                               }
+                              return null;
                             },
                           ),
-                        ),
-                        SizedBox(
-                          width: double.infinity,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          TextInputField(
+                            hintText: 'Enter Author Name',
+                            suffixIcon: Text(''),
+                            isPassword: false,
+                            textInputType: TextInputType.name,
+                            textEditingController: _authorController,
+                            validator: (value) {
+                              if (endspace.hasMatch(value)) {
+                                return 'Dont use extra space at end';
+                              }
+                              if (!name_valid.hasMatch(value)) {
+                                return 'Enter valid author name';
+                              }
+                              if (value.length > 30) {
+                                return 'The author name should be less than 30 characters';
+                              }
+                              return null;
+                            },
+                          ),
+                      TextInputField(
+                        textInputType: TextInputType.number,
+                        hintText: 'Enter Published Year',
+                        suffixIcon: Text(''),
+                            isPassword: false,
+                            textEditingController: _publishyearController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Enter published year';
+                              }
+                              if (!year_valid.hasMatch(value)) {
+                                return 'Enter valid year';
+                              }
+                              return null;
+                            },
+                          ),
+    
+                          ButtonTheme(
+                            alignedDropdown: true,
+                            height: 20,
+                            child: DropdownButton(
+                              elevation: 50,
+                              isExpanded: true,
+                              iconEnabledColor: themeNotifier.getTheme() ==
+                                ThemeData.dark(useMaterial3: true).copyWith(
+                                  colorScheme: ColorScheme.dark().copyWith(
+                                    primary: darkprimarycolor,
+                                    error: Colors.red,
+                                    onPrimary: darkprimarycolor,
+                                    outline: darkprimarycolor,
+                                    primaryVariant: darkprimarycolor,
+                                    onPrimaryContainer: darkprimarycolor,
+                                  ),
+                                )
+                            ? darkprimarycolor
+                            : primarycolor,
+                              value: selectedCategory == ''
+                                  ? 'Select Category'
+                                  : selectedCategory,
+                              items: categories.isEmpty
+                                  ? null
+                                  : categories.map((category) {
+                                      return DropdownMenuItem(
+                                        value: category,
+                                        child: Text(category),
+                                      );
+                                    }).toList(),
+                              onChanged: (value) {
+                                if (mounted) {
+                                  setState(() {
+                                    selectedCategory = value.toString();
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: width * 0.305,
+                                  child: TextInputField(
+                                    hintText: 'Tag1',
+                                    suffixIcon: Text(''),
+                                    isPassword: false,
+                                    textInputType: TextInputType.text,
+                                    textEditingController: _tag1Controller,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Enter tag 1';
+                                      }
+                                      if (endspace.hasMatch(value)) {
+                                        return 'space at end';
+                                      }
+                                      if (!tags_valid.hasMatch(value)) {
+                                        return 'spaces/special \nnot allowed';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: width * 0.305,
+                                  child: TextInputField(
+                                    hintText: 'Tag2',
+                                    suffixIcon: Text(''),
+                                    isPassword: false,
+                                    textInputType: TextInputType.text,
+                                    textEditingController: _tag2Controller,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Enter tag 2';
+                                      }
+                                      if (endspace.hasMatch(value)) {
+                                        return 'space at end';
+                                      }
+                                      if (!tags_valid.hasMatch(value)) {
+                                        return 'spaces/special \nnot allowed';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: width * 0.305,
+                                  child: TextInputField(
+                                    hintText: 'Tag3',
+                                    suffixIcon: Text(''),
+                                    isPassword: false,
+                                    textInputType: TextInputType.text,
+                                    textEditingController: _tag3Controller,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Enter tag 3';
+                                      }
+                                      if (endspace.hasMatch(value)) {
+                                        return 'space at end';
+                                      }
+                                      if (!tags_valid.hasMatch(value)) {
+                                        return 'spaces/special\n not allowed';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               SizedBox(
                                 width: width * 0.305,
-                                child: TextInputField(
-                                  hintText: 'Tag1',
-                                  suffixIcon: Text(''),
-                                  isPassword: false,
-                                  textInputType: TextInputType.text,
-                                  textEditingController: _tag1Controller,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Enter tag 1';
+                                child: RadioListTile(
+                                  contentPadding: const EdgeInsets.all(0.0),
+                                  title: Text(
+                                    "Free",
+                                  ),
+                                  activeColor: themeNotifier.getTheme() ==
+                                          ThemeData.dark(useMaterial3: true)
+                                              .copyWith(
+                                            colorScheme:
+                                                ColorScheme.dark().copyWith(
+                                              primary: darkprimarycolor,
+                                              error: Colors.red,
+                                              onPrimary: darkprimarycolor,
+                                              outline: darkprimarycolor,
+                                              primaryVariant: darkprimarycolor,
+                                              onPrimaryContainer:
+                                                  darkprimarycolor,
+                                            ),
+                                          )
+                                      ? darkprimarycolor
+                                      : primarycolor,
+                                  selected:
+                                      freeRentPaid == 'free' ? true : false,
+                                  value: "free",
+                                  groupValue: freeRentPaid,
+                                  onChanged: (value) {
+                                    if (mounted) {
+                                      setState(() {
+                                        freeRentPaid = value.toString();
+                                        _isvisible = false;
+                                      });
                                     }
-                                    if (endspace.hasMatch(value)) {
-                                      return 'space at end';
-                                    }
-                                    if (!tags_valid.hasMatch(value)) {
-                                      return 'spaces/special \nnot allowed';
-                                    }
-                                    return null;
                                   },
                                 ),
                               ),
                               SizedBox(
                                 width: width * 0.305,
-                                child: TextInputField(
-                                  hintText: 'Tag2',
-                                  suffixIcon: Text(''),
-                                  isPassword: false,
-                                  textInputType: TextInputType.text,
-                                  textEditingController: _tag2Controller,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Enter tag 2';
+                                child: RadioListTile(
+                                  contentPadding: const EdgeInsets.all(0.0),
+                                  title: const Text(
+                                    "Rent",
+                                  ),
+                                  activeColor: themeNotifier.getTheme() ==
+                                          ThemeData.dark(useMaterial3: true)
+                                              .copyWith(
+                                            colorScheme:
+                                                ColorScheme.dark().copyWith(
+                                              primary: darkprimarycolor,
+                                              error: Colors.red,
+                                              onPrimary: darkprimarycolor,
+                                              outline: darkprimarycolor,
+                                              primaryVariant: darkprimarycolor,
+                                              onPrimaryContainer:
+                                                  darkprimarycolor,
+                                            ),
+                                          )
+                                      ? darkprimarycolor
+                                      : primarycolor,
+                                  selected:
+                                      freeRentPaid == 'rent' ? true : false,
+                                  value: "rent",
+                                  groupValue: freeRentPaid,
+                                  onChanged: (value) {
+                                    if (mounted) {
+                                      setState(() {
+                                        freeRentPaid = value.toString();
+                                        _isvisible = true;
+                                      });
                                     }
-                                    if (endspace.hasMatch(value)) {
-                                      return 'space at end';
-                                    }
-                                    if (!tags_valid.hasMatch(value)) {
-                                      return 'spaces/special \nnot allowed';
-                                    }
-                                    return null;
                                   },
                                 ),
                               ),
                               SizedBox(
                                 width: width * 0.305,
-                                child: TextInputField(
-                                  hintText: 'Tag3',
-                                  suffixIcon: Text(''),
-                                  isPassword: false,
-                                  textInputType: TextInputType.text,
-                                  textEditingController: _tag3Controller,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Enter tag 3';
+                                child: RadioListTile(
+                                  contentPadding: const EdgeInsets.all(0.0),
+                                  title: const Text(
+                                    "Paid",
+                                  ),
+                                  activeColor: themeNotifier.getTheme() ==
+                                          ThemeData.dark(useMaterial3: true)
+                                              .copyWith(
+                                            colorScheme:
+                                                ColorScheme.dark().copyWith(
+                                              primary: darkprimarycolor,
+                                              error: Colors.red,
+                                              onPrimary: darkprimarycolor,
+                                              outline: darkprimarycolor,
+                                              primaryVariant: darkprimarycolor,
+                                              onPrimaryContainer:
+                                                  darkprimarycolor,
+                                            ),
+                                          )
+                                      ? darkprimarycolor
+                                      : primarycolor,
+                                  selected:
+                                      freeRentPaid == 'paid' ? true : false,
+                                  value: "paid",
+                                  groupValue: freeRentPaid,
+                                  onChanged: (value) {
+                                    if (mounted) {
+                                      setState(() {
+                                        freeRentPaid = value.toString();
+                                        _isvisible = true;
+                                      });
                                     }
-                                    if (endspace.hasMatch(value)) {
-                                      return 'space at end';
-                                    }
-                                    if (!tags_valid.hasMatch(value)) {
-                                      return 'spaces/special\n not allowed';
-                                    }
-                                    return null;
                                   },
                                 ),
                               )
                             ],
                           ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: width * 0.305,
-                              child: RadioListTile(
-                                contentPadding: const EdgeInsets.all(0.0),
-                                title: Text(
-                                  "Free",
-                                ),
-                                activeColor: themeNotifier.getTheme() ==
-                                        ThemeData.dark(useMaterial3: true)
-                                            .copyWith(
-                                          colorScheme:
-                                              ColorScheme.dark().copyWith(
-                                            primary: darkprimarycolor,
-                                            error: Colors.red,
-                                            onPrimary: darkprimarycolor,
-                                            outline: darkprimarycolor,
-                                            primaryVariant: darkprimarycolor,
-                                            onPrimaryContainer:
-                                                darkprimarycolor,
-                                          ),
-                                        )
-                                    ? darkprimarycolor
-                                    : primarycolor,
-                                selected:
-                                    freeRentPaid == 'free' ? true : false,
-                                value: "free",
-                                groupValue: freeRentPaid,
-                                onChanged: (value) {
-                                  if (mounted) {
-                                    setState(() {
-                                      freeRentPaid = value.toString();
-                                      _isvisible = false;
-                                    });
-                                  }
-                                },
-                              ),
-                            ),
-                            SizedBox(
-                              width: width * 0.305,
-                              child: RadioListTile(
-                                contentPadding: const EdgeInsets.all(0.0),
-                                title: const Text(
-                                  "Rent",
-                                ),
-                                activeColor: themeNotifier.getTheme() ==
-                                        ThemeData.dark(useMaterial3: true)
-                                            .copyWith(
-                                          colorScheme:
-                                              ColorScheme.dark().copyWith(
-                                            primary: darkprimarycolor,
-                                            error: Colors.red,
-                                            onPrimary: darkprimarycolor,
-                                            outline: darkprimarycolor,
-                                            primaryVariant: darkprimarycolor,
-                                            onPrimaryContainer:
-                                                darkprimarycolor,
-                                          ),
-                                        )
-                                    ? darkprimarycolor
-                                    : primarycolor,
-                                selected:
-                                    freeRentPaid == 'rent' ? true : false,
-                                value: "rent",
-                                groupValue: freeRentPaid,
-                                onChanged: (value) {
-                                  if (mounted) {
-                                    setState(() {
-                                      freeRentPaid = value.toString();
-                                      _isvisible = true;
-                                    });
-                                  }
-                                },
-                              ),
-                            ),
-                            SizedBox(
-                              width: width * 0.305,
-                              child: RadioListTile(
-                                contentPadding: const EdgeInsets.all(0.0),
-                                title: const Text(
-                                  "Paid",
-                                ),
-                                activeColor: themeNotifier.getTheme() ==
-                                        ThemeData.dark(useMaterial3: true)
-                                            .copyWith(
-                                          colorScheme:
-                                              ColorScheme.dark().copyWith(
-                                            primary: darkprimarycolor,
-                                            error: Colors.red,
-                                            onPrimary: darkprimarycolor,
-                                            outline: darkprimarycolor,
-                                            primaryVariant: darkprimarycolor,
-                                            onPrimaryContainer:
-                                                darkprimarycolor,
-                                          ),
-                                        )
-                                    ? darkprimarycolor
-                                    : primarycolor,
-                                selected:
-                                    freeRentPaid == 'paid' ? true : false,
-                                value: "paid",
-                                groupValue: freeRentPaid,
-                                onChanged: (value) {
-                                  if (mounted) {
-                                    setState(() {
-                                      freeRentPaid = value.toString();
-                                      _isvisible = true;
-                                    });
-                                  }
-                                },
-                              ),
-                            )
-                          ],
-                        ),
-                        Visibility(
-                            visible: _isvisible,
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 10.0),
-                              child: TextInputField(
-                                hintText: 'Enter Price',
-                                suffixIcon: Text(''),
-                                isPassword: false,
-                                textEditingController: _priceController,
-                                validator: (value) {
-                                  if (_isvisible == true) {
-                                    if (value.isEmpty) {
-                                      return 'Enter valid price';
+                          Visibility(
+                              visible: _isvisible,
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 10.0),
+                                child: TextInputField(
+                                  hintText: 'Enter Price',
+                                  suffixIcon: Text(''),
+                                  isPassword: false,
+                                  textEditingController: _priceController,
+                                  validator: (value) {
+                                    if (_isvisible == true) {
+                                      if (value.isEmpty) {
+                                        return 'Enter valid price';
+                                      }
+                                      if (!price_valid.hasMatch(value)) {
+                                        return 'only digits allowed';
+                                      }
                                     }
-                                    if (!price_valid.hasMatch(value)) {
-                                      return 'only digits allowed';
-                                    }
+                                  },
+                                  textInputType: TextInputType.number,
+    
+                                ),
+                              )),
+                          const Text(
+                            'Upload Cover photo',
+                            style: TextStyle(
+                                fontSize: subheadingSize,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                try {
+                                  PlatformFile file = await pickFile(
+                                      [], FileType.image, 5000000, context);
+                                  if (mounted) {
+                                    setState(() {
+                                      _filename1 = file.name;
+                                    });
                                   }
-                                },
-                                textInputType: TextInputType.number,
-
-                              ),
-                            )),
-                        const Text(
-                          'Upload Cover photo',
-                          style: TextStyle(
-                              fontSize: subheadingSize,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              try {
-                                PlatformFile file = await pickFile(
-                                    [], FileType.image, 5000000, context);
-                                if (mounted) {
-                                  setState(() {
-                                    _filename1 = file.name;
-                                  });
+                                  _file1 = file.bytes!;
+                                } catch (err) {
+                                  if (_filename1 == "<5 mb image allowed") {
+                                    final snackBar = SnackBar(
+                                      /// need to set following properties for best effect of awesome_snackbar_content
+                                      elevation: 0,
+                                      behavior: SnackBarBehavior.floating,
+                                      backgroundColor: Colors.transparent,
+    
+                                      content: AwesomeSnackbarContent(
+                                        title: 'Error!',
+                                        message:
+                                        'Please reselect file.',
+    
+                                        /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                        contentType: ContentType.failure,
+                                      ),
+                                    );
+    
+                                    ScaffoldMessenger.of(context)
+                                      ..hideCurrentSnackBar()
+                                      ..showSnackBar(snackBar);
+                                    // showSnackBar(
+                                    //     context, 'Please reselect file');
+                                  }
                                 }
-                                _file1 = file.bytes!;
-                              } catch (err) {
-                                if (_filename1 == "<5 mb image allowed") {
-                                  final snackBar = SnackBar(
-                                    /// need to set following properties for best effect of awesome_snackbar_content
-                                    elevation: 0,
-                                    behavior: SnackBarBehavior.floating,
-                                    backgroundColor: Colors.transparent,
-
-                                    content: AwesomeSnackbarContent(
-                                      title: 'Error!',
-                                      message:
-                                      'Please reselect file.',
-
-                                      /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-                                      contentType: ContentType.failure,
-                                    ),
-                                  );
-
-                                  ScaffoldMessenger.of(context)
-                                    ..hideCurrentSnackBar()
-                                    ..showSnackBar(snackBar);
-                                  // showSnackBar(
-                                  //     context, 'Please reselect file');
-                                }
-                              }
-                            },
-                            label: const Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10.0, vertical: 12.0),
-                                child: Text('Upload')),
-                            icon: const Icon(Icons.upload_file),
+                              },
+                              label: const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10.0, vertical: 12.0),
+                                  child: Text('Upload')),
+                              icon: const Icon(Icons.upload_file),
+                            ),
                           ),
-                        ),
-                        Text(_filename1),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const Text(
-                          'Upload Book',
-                          style: TextStyle(
-                              fontSize: subheadingSize,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              try {
-                                PlatformFile file = await pickFile(['pdf'],
-                                    FileType.custom, 25000000, context);
-                                if (mounted) {
-                                  setState(() {
-                                    _filename2 = file.name;
-                                  });
-                                }
-                                _file2 = file.bytes!;
-                              } catch (err) {
-                                if (_filename2 == "<25 mb pdf allowed") {
-                                  final snackBar = SnackBar(
-                                    /// need to set following properties for best effect of awesome_snackbar_content
-                                    elevation: 0,
-                                    behavior: SnackBarBehavior.floating,
-                                    backgroundColor: Colors.transparent,
-
-                                    content: AwesomeSnackbarContent(
-                                      title: 'Error!',
-                                      message:
-                                      'Please reselect file.',
-
-                                      /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-                                      contentType: ContentType.failure,
-                                    ),
-                                  );
-
-                                  ScaffoldMessenger.of(context)
-                                    ..hideCurrentSnackBar()
-                                    ..showSnackBar(snackBar);
-                                }
-                              }
-                            },
-                            label: const Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10.0, vertical: 12.0),
-                                child: Text('Upload')),
-                            icon: const Icon(Icons.upload_file),
+                          Text(_filename1),
+                          const SizedBox(
+                            height: 10,
                           ),
-                        ),
-                        Text(_filename2),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const Text(
-                          'Upload Copyright photo',
-                          style: TextStyle(
-                              fontSize: subheadingSize,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              try {
-                                PlatformFile file = await pickFile(
-                                    [], FileType.image, 5000000, context);
-                                if (mounted) {
-                                  setState(() {
-                                    _filename3 = file.name;
-                                  });
-                                }
-                                _file3 = file.bytes!;
-                              } catch (err) {
-                                if (_filename3 == "<5 mb image allowed") {
-                                  final snackBar = SnackBar(
-                                    /// need to set following properties for best effect of awesome_snackbar_content
-                                    elevation: 0,
-                                    behavior: SnackBarBehavior.floating,
-                                    backgroundColor: Colors.transparent,
-
-                                    content: AwesomeSnackbarContent(
-                                      title: 'Error!',
-                                      message:
-                                      'Please reselect file.',
-
-                                      /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-                                      contentType: ContentType.failure,
-                                    ),
-                                  );
-
-                                  ScaffoldMessenger.of(context)
-                                    ..hideCurrentSnackBar()
-                                    ..showSnackBar(snackBar);
-                                }
-                              }
-                            },
-                            label: const Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10.0, vertical: 12.0),
-                                child: Text('Upload')),
-                            icon: const Icon(Icons.upload_file),
+                          const Text(
+                            'Upload Book',
+                            style: TextStyle(
+                                fontSize: subheadingSize,
+                                fontWeight: FontWeight.bold),
                           ),
-                        ),
-                        Text(_filename3),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            isLoading
-                                ? Container(
-                                    child: CircularProgressIndicator())
-                                : ElevatedButton(
-                                    onPressed: () async {
-                                      if (_formKey.currentState!.validate() &&
-                                          selectedCategory.isNotEmpty) {
-                                        if (_filename1 ==
-                                            "<5 mb image allowed" ||
-                                            _filename2 ==
-                                                "<25 mb pdf allowed" ||
-                                            _filename3 ==
-                                                "<5 mb image allowed") {
-                                          final snackBar = SnackBar(
-                                            /// need to set following properties for best effect of awesome_snackbar_content
-                                            elevation: 0,
-                                            behavior: SnackBarBehavior.floating,
-                                            backgroundColor: Colors.transparent,
-
-                                            content: AwesomeSnackbarContent(
-                                              title: 'Error!',
-                                              message:
-                                              'Please upload file.',
-
-                                              /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-                                              contentType: ContentType.failure,
-                                            ),
-                                          );
-
-                                          ScaffoldMessenger.of(context)
-                                            ..hideCurrentSnackBar()
-                                            ..showSnackBar(snackBar);
-                                        } else {
-                                          // _convertTextToSpeech();
-                                          // createAudioScript(); if (mounted) {
-
-                                          setState(() {
-                                            isLoading = true;
-                                          });
-                                          if (categories.isNotEmpty) {
-                                            final state = context.read<
-                                                BottomNavigationBarState>();
-                                            state.setEnabled(false);
-                                            String coverpic =
-                                            await uploadFileToFirebaseStorage(
-                                                _file1!, 'coverpic');
-                                            String book =
-                                            await uploadFileToFirebaseStorage(
-                                                _file2!, 'book');
-                                            String copyrightpic =
-                                            await uploadFileToFirebaseStorage(
-                                                _file3!, 'copyrightpic');
-                                            // textToSpeech();
-                                            // createAudioScript();
-                                            // _showResult(text);
-                                            // await createAudioScript(text);
-
-                                            CollectionReference
-                                            bookCollection =
-                                            firestoreInstance
-                                                .collection("books");
-                                            String bookid =
-                                                bookCollection
-                                                    .doc()
-                                                    .id;
-                                            Book books;
-                                            if (FirebaseAuth
-                                                .instance.currentUser ==
-                                                null) {
-                                              DateTime now = DateTime.now();
-                                              int timestamp = now
-                                                  .millisecondsSinceEpoch;
-                                              books = await Book(
-                                                  bookid,
-                                                  _titleController.text,
-                                                  _publishyearController.text,
-                                                  _authorController.text,
-                                                  _tag1Controller.text,
-                                                  _tag2Controller.text,
-                                                  _tag3Controller.text,
-                                                  _priceController.text == ''
-                                                      ? 0
-                                                      : int.parse(
-                                                      _priceController
-                                                          .text),
-                                                  coverpic,
-                                                  book,
-                                                  copyrightpic,
-                                                  selectedCategory,
-                                                  'audiobook',
-                                                  freeRentPaid,
-                                                  [],
-                                                  'admin',
-                                                  false,
-                                                  Timestamp.now());
-                                            } else {
-                                              DateTime now = DateTime.now();
-                                              int timestamp = now
-                                                  .millisecondsSinceEpoch;
-                                              books = await Book(
-                                                  bookid,
-                                                  _titleController.text,
-                                                  _publishyearController.text,
-                                                  _authorController.text,
-                                                  _tag1Controller.text,
-                                                  _tag2Controller.text,
-                                                  _tag3Controller.text,
-                                                  _priceController.text == ''
-                                                      ? 0
-                                                      : int.parse(
-                                                      _priceController
-                                                          .text),
-                                                  coverpic,
-                                                  book,
-                                                  copyrightpic,
-                                                  selectedCategory,
-                                                  'audiobook',
-                                                  freeRentPaid,
-                                                  [],
-                                                  FirebaseAuth.instance
-                                                      .currentUser!.uid,
-                                                  false,
-                                                  Timestamp.now());
-                                            }
-                                            try {
-                                              await bookCollection
-                                                  .doc(bookid)
-                                                  .set(books.toMap())
-                                                  .then((value) async {})
-                                                  .onError((error,
-                                                  stackTrace) async {
-                                                flutterToast('Error:' +
-                                                    error.toString());
-                                              }).then((_) {
-                                                _controller.play();
-                                                Timer(Duration(seconds: 2),
-                                                        () {
-                                                      _controller.stop();
-                                                    });
-
-                                                // flutterToast('Book Added');
-                                              });
-                                            } catch (e) {
-                                              flutterToast(e.toString());
-                                            }
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                try {
+                                  PlatformFile file = await pickFile(['pdf'],
+                                      FileType.custom, 25000000, context);
+                                  if (mounted) {
+                                    setState(() {
+                                      _filename2 = file.name;
+                                    });
+                                  }
+                                  _file2 = file.bytes!;
+                                } catch (err) {
+                                  if (_filename2 == "<25 mb pdf allowed") {
+                                    final snackBar = SnackBar(
+                                      /// need to set following properties for best effect of awesome_snackbar_content
+                                      elevation: 0,
+                                      behavior: SnackBarBehavior.floating,
+                                      backgroundColor: Colors.transparent,
+    
+                                      content: AwesomeSnackbarContent(
+                                        title: 'Error!',
+                                        message:
+                                        'Please reselect file.',
+    
+                                        /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                        contentType: ContentType.failure,
+                                      ),
+                                    );
+    
+                                    ScaffoldMessenger.of(context)
+                                      ..hideCurrentSnackBar()
+                                      ..showSnackBar(snackBar);
+                                  }
+                                }
+                              },
+                              label: const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10.0, vertical: 12.0),
+                                  child: Text('Upload')),
+                              icon: const Icon(Icons.upload_file),
+                            ),
+                          ),
+                          Text(_filename2),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text(
+                            'Upload Copyright photo',
+                            style: TextStyle(
+                                fontSize: subheadingSize,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                try {
+                                  PlatformFile file = await pickFile(
+                                      [], FileType.image, 5000000, context);
+                                  if (mounted) {
+                                    setState(() {
+                                      _filename3 = file.name;
+                                    });
+                                  }
+                                  _file3 = file.bytes!;
+                                } catch (err) {
+                                  if (_filename3 == "<5 mb image allowed") {
+                                    final snackBar = SnackBar(
+                                      /// need to set following properties for best effect of awesome_snackbar_content
+                                      elevation: 0,
+                                      behavior: SnackBarBehavior.floating,
+                                      backgroundColor: Colors.transparent,
+    
+                                      content: AwesomeSnackbarContent(
+                                        title: 'Error!',
+                                        message:
+                                        'Please reselect file.',
+    
+                                        /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                        contentType: ContentType.failure,
+                                      ),
+                                    );
+    
+                                    ScaffoldMessenger.of(context)
+                                      ..hideCurrentSnackBar()
+                                      ..showSnackBar(snackBar);
+                                  }
+                                }
+                              },
+                              label: const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10.0, vertical: 12.0),
+                                  child: Text('Upload')),
+                              icon: const Icon(Icons.upload_file),
+                            ),
+                          ),
+                          Text(_filename3),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              isLoading
+                                  ? Container(
+                                      child: CircularProgressIndicator())
+                                  : ElevatedButton(
+                                      onPressed: () async {
+                                        if (_formKey.currentState!.validate() &&
+                                            selectedCategory.isNotEmpty) {
+                                          if (_filename1 ==
+                                              "<5 mb image allowed" ||
+                                              _filename2 ==
+                                                  "<25 mb pdf allowed" ||
+                                              _filename3 ==
+                                                  "<5 mb image allowed") {
+                                            final snackBar = SnackBar(
+                                              /// need to set following properties for best effect of awesome_snackbar_content
+                                              elevation: 0,
+                                              behavior: SnackBarBehavior.floating,
+                                              backgroundColor: Colors.transparent,
+    
+                                              content: AwesomeSnackbarContent(
+                                                title: 'Error!',
+                                                message:
+                                                'Please upload file.',
+    
+                                                /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                                contentType: ContentType.failure,
+                                              ),
+                                            );
+    
+                                            ScaffoldMessenger.of(context)
+                                              ..hideCurrentSnackBar()
+                                              ..showSnackBar(snackBar);
                                           } else {
-                                            flutterToast('No categories');
-                                          }
-                                          _titleController.clear();
-                                          _tag1Controller.clear();
-                                          _tag2Controller.clear();
-                                          _tag3Controller.clear();
-                                          _publishyearController.clear();
-                                          _priceController.clear();
-                                          _authorController.clear();
-                                          _categoryController.clear();
-                                          _filename1 = "<5 mb image allowed";
-                                          _filename2 = "<25 mb pdf allowed";
-                                          _filename3 = "<5 mb image allowed";
-                                          _file1 = null;
-                                          _file2 = null;
-                                          _file3 = null;
-                                          if (mounted) {
-                                            final state = context.read<
-                                                BottomNavigationBarState>();
-                                            state.setEnabled(true);
+                                            // _convertTextToSpeech();
+                                            // createAudioScript(); if (mounted) {
+    
                                             setState(() {
-                                              isLoading = false;
+                                              isLoading = true;
                                             });
+                                            if (categories.isNotEmpty) {
+                                              final state = context.read<
+                                                  BottomNavigationBarState>();
+                                              state.setEnabled(false);
+                                              String coverpic =
+                                              await uploadFileToFirebaseStorage(
+                                                  _file1!, 'coverpic');
+                                              String book =
+                                              await uploadFileToFirebaseStorage(
+                                                  _file2!, 'book');
+                                              String copyrightpic =
+                                              await uploadFileToFirebaseStorage(
+                                                  _file3!, 'copyrightpic');
+                                              // textToSpeech();
+                                              // createAudioScript();
+                                              // _showResult(text);
+                                              // await createAudioScript(text);
+    
+                                              CollectionReference
+                                              bookCollection =
+                                              firestoreInstance
+                                                  .collection("books");
+                                              String bookid =
+                                                  bookCollection
+                                                      .doc()
+                                                      .id;
+                                              Book books;
+                                              if (FirebaseAuth
+                                                  .instance.currentUser ==
+                                                  null) {
+                                                DateTime now = DateTime.now();
+                                                int timestamp = now
+                                                    .millisecondsSinceEpoch;
+                                                books = await Book(
+                                                    bookid,
+                                                    _titleController.text,
+                                                    _publishyearController.text,
+                                                    _authorController.text,
+                                                    _tag1Controller.text,
+                                                    _tag2Controller.text,
+                                                    _tag3Controller.text,
+                                                    _priceController.text == ''
+                                                        ? 0
+                                                        : int.parse(
+                                                        _priceController
+                                                            .text),
+                                                    coverpic,
+                                                    book,
+                                                    copyrightpic,
+                                                    selectedCategory,
+                                                    'audiobook',
+                                                    freeRentPaid,
+                                                    [],
+                                                    'admin',
+                                                    false,
+                                                    Timestamp.now());
+                                              } else {
+                                                DateTime now = DateTime.now();
+                                                int timestamp = now
+                                                    .millisecondsSinceEpoch;
+                                                books = await Book(
+                                                    bookid,
+                                                    _titleController.text,
+                                                    _publishyearController.text,
+                                                    _authorController.text,
+                                                    _tag1Controller.text,
+                                                    _tag2Controller.text,
+                                                    _tag3Controller.text,
+                                                    _priceController.text == ''
+                                                        ? 0
+                                                        : int.parse(
+                                                        _priceController
+                                                            .text),
+                                                    coverpic,
+                                                    book,
+                                                    copyrightpic,
+                                                    selectedCategory,
+                                                    'audiobook',
+                                                    freeRentPaid,
+                                                    [],
+                                                    FirebaseAuth.instance
+                                                        .currentUser!.uid,
+                                                    false,
+                                                    Timestamp.now());
+                                              }
+                                              try {
+                                                await bookCollection
+                                                    .doc(bookid)
+                                                    .set(books.toMap())
+                                                    .then((value) async {})
+                                                    .onError((error,
+                                                    stackTrace) async {
+                                                  flutterToast('Error:' +
+                                                      error.toString());
+                                                }).then((_) {
+                                                  _controller.play();
+                                                  Timer(Duration(seconds: 2),
+                                                          () {
+                                                        _controller.stop();
+                                                      });
+    
+                                                  // flutterToast('Book Added');
+                                                });
+                                              } catch (e) {
+                                                flutterToast(e.toString());
+                                              }
+                                            } else {
+                                              flutterToast('No categories');
+                                            }
+                                            _titleController.clear();
+                                            _tag1Controller.clear();
+                                            _tag2Controller.clear();
+                                            _tag3Controller.clear();
+                                            _publishyearController.clear();
+                                            _priceController.clear();
+                                            _authorController.clear();
+                                            _categoryController.clear();
+                                            _filename1 = "<5 mb image allowed";
+                                            _filename2 = "<25 mb pdf allowed";
+                                            _filename3 = "<5 mb image allowed";
+                                            _file1 = null;
+                                            _file2 = null;
+                                            _file3 = null;
+                                            if (mounted) {
+                                              final state = context.read<
+                                                  BottomNavigationBarState>();
+                                              state.setEnabled(true);
+                                              setState(() {
+                                                isLoading = false;
+                                              });
+                                            }
                                           }
                                         }
-                                      }
-                                    },
-                                    child: const Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 75, vertical: 12.0),
-                                        child: Text('Upload Book')),
-                                  ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                  ),
-                  if(isLoading)
-                    Container(
-                      color: Colors.black.withOpacity(0.5),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                                      },
+                                      child: const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 75, vertical: 12.0),
+                                          child: Text('Upload Book')),
+                                    ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ConfettiWidget(
-                    confettiController: _controller,
-                    blastDirection: 0.7 / 2,
-                    maxBlastForce: 10,
-                    minBlastForce: 1,
-                    emissionFrequency: 0.08,
-                    numberOfParticles: 20,
-                    gravity: 0.2,
                   ),
-                ],
+                    ),
+                    if(isLoading)
+                      Container(
+                        color: Colors.black.withOpacity(0.5),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                      ),
+                    ConfettiWidget(
+                      confettiController: _controller,
+                      blastDirection: 0.7 / 2,
+                      maxBlastForce: 10,
+                      minBlastForce: 1,
+                      emissionFrequency: 0.08,
+                      numberOfParticles: 20,
+                      gravity: 0.2,
+                    ),
+                  ],
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }

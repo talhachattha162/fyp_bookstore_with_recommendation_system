@@ -288,7 +288,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                               'plz upload image.',
 
                                               /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-                                              contentType: ContentType.success,
+                                              contentType: ContentType.failure
                                             ),
                                           );
 

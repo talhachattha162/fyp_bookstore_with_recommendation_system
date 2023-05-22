@@ -26,6 +26,35 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
   void initState() {
     super.initState();
   }
+// Function to log in as a user
+  Future<void> login(String email, String password) async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      // print('Logged in successfully');
+    } catch (e) {
+      // print('Failed to log in: $e');
+    }
+  }
+
+// Function to delete the authenticated user
+  Future<void> deleteCurrentUser(String email, String password) async {
+    try {
+      await login(email, password);
+      await Future.delayed(Duration(seconds: 2)); // Add a delay to ensure login is completed
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await user.delete();
+        // print('User deleted successfully');
+      } else {
+        print('No user is currently logged in');
+      }
+    } catch (e) {
+      // print('Failed to delete user: $e');
+    }
+  }
 
   Stream<QuerySnapshot> getUsers() {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -76,16 +105,18 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
       );
     } else {
       // If the user hasn't uploaded any book collections, delete their account
-      if (users.authenticationmethod == 'email') {
-        User? user;
-        UserCredential userCredential = await auth.signInWithEmailAndPassword(
-          email: users.email,
-          password: users.password,
-        );
-        user = userCredential.user;
-        await user!.delete();
-        auth.signOut();
-      }
+      // if (users.authenticationmethod == 'email') {
+      //   User? user;
+      //   UserCredential userCredential = await auth.signInWithEmailAndPassword(
+      //     email: users.email,
+      //     password: users.password,
+      //   );
+      //   user = userCredential.user;
+      //   await user!.delete();
+      //   auth.signOut();
+      // }
+      
+        await deleteCurrentUser(users.email, users.password);
       FirebaseFirestore.instance.collection('users').doc(users.uid).delete();
     }
   }
@@ -211,10 +242,10 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
                 'Gmail',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
-                'Delete',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+              // Text(
+              //   'Delete',
+              //   style: TextStyle(fontWeight: FontWeight.bold),
+              // ),
             ],
           ),
           Container(
@@ -247,10 +278,10 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
                                   ? user.name
                                   : user.name.substring(0, 8)),
                               Text(email),
-                              IconButton(
-                                onPressed: () => _deleteUser(user),
-                                icon: Icon(Icons.delete),
-                              ),
+                              // IconButton(
+                              //   onPressed: () => _deleteUser(user),
+                              //   icon: Icon(Icons.delete),
+                              // ),
                             ],
                           ),
                           const Divider(

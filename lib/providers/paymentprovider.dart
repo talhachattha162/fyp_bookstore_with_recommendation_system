@@ -13,13 +13,13 @@ class PaymentProvider extends ChangeNotifier {
   List<Payment> get payments => _payments;
 
   void fetchPayments(currentuserid) async {
-    final snapshot = await _firestore.collection('payments').where('userId', isEqualTo: currentuserid).get();
+    final snapshot = await _firestore.collection('payments').where('userId', isEqualTo: currentuserid).orderBy('dateTimeCreated', descending: true).get();
     _payments = snapshot.docs.map((doc) => Payment.fromSnapshot(doc)).toList();
     notifyListeners();
   }
   void clearPayments() {
   payments.clear();
-  print("talhaxyza");
+  // print("talhaxyza");
   notifyListeners();
 
 }

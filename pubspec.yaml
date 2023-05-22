@@ -76,6 +76,7 @@ dependencies:
   widget_circular_animator: ^1.0.0
   animated_text_kit: ^4.2.2
   google_fonts: ^4.0.4
+  firebase_admin: ^0.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

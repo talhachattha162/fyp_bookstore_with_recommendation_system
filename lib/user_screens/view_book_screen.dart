@@ -113,8 +113,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
 
         content: AwesomeSnackbarContent(
           title: 'Error!',
-          message:
-          'Permission denied.',
+          message: 'Permission denied.',
 
           /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
           contentType: ContentType.failure,
@@ -255,9 +254,36 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     } else {}
   }
 
+  deleteFavouritesForBookId(String bookId) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collection('favourities')
+        .where('bookid', isEqualTo: bookId)
+        .get();
+
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  }
+
+  deleteReviewsForBookId(String bookId) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collection('reviews')
+        .where('bookId', isEqualTo: bookId)
+        .get();
+
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  }
+
+
+
   bool hasDataf = false;
   @override
   void initState() {
+    checkPaymentsExistForBookId(widget.book.bookid);
     _getRecommendations(widget.book.title);
     getUserData();
     subscriptionChecker();
@@ -295,13 +321,32 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     bookpath = storeFile();
     // _checkIfBookIsFavorited();
   }
+
   CollectionReference books = FirebaseFirestore.instance.collection('books');
   Future<void> deleteBook(String bookId) {
     return books
         .doc(bookId) // Reference to the document with the given ID
         .delete() // Delete the document
-        .then((value) => flutterToast("Book deleted successfully"))
-        .catchError((error) => print("Failed to delete book: $error"));
+        .then((value) {
+      final snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+
+        content: AwesomeSnackbarContent(
+          title: 'Success!',
+          message: "Book deleted successfully",
+
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.success,
+        ),
+      );
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+    }).catchError((error) => print("Failed to delete book: $error"));
   }
 
   Future<void> _checkIfBookIsFavorited() async {
@@ -806,9 +851,29 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   }
 
   void deleteBookAndNavigate(BuildContext context) {
+
+    deleteFavouritesForBookId(widget.book.bookid);
+    deleteReviewsForBookId(widget.book.bookid);
     deleteBook(widget.book.bookid);
     Navigator.of(context).pop();
     navigateWithNoBack(context, MainScreenUser());
+  }
+
+  bool paymentsExist = false;
+  checkPaymentsExistForBookId(String bookId) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collection('payments')
+        .where('bookId', isEqualTo: bookId)
+        .get();
+    // print('fcghello1');
+    if (querySnapshot.docs.isNotEmpty) {
+      print(querySnapshot.docs.isNotEmpty);
+      // print('fcghello');
+      setState(() {
+        paymentsExist = true;
+      });
+    }
   }
 
   void showConfirmationDialog(BuildContext context) {
@@ -837,19 +902,45 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     );
   }
 
-  void handleMenuItemSelected(String menuItem) {
-    switch (menuItem) {
-      case 'Delete':
-        showConfirmationDialog(context);
-        break;
-      case 'Edit':
-        navigateWithNoBack(context, EditBookScreen(book:widget.book));
-        break;
+  void showDeletionErrorDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Cant delete'),
+          content: Text('Someone once purchased your book'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  checkDelete(context) {
+    // print('fcg:'+paymentsExist.toString());
+    if (paymentsExist) {
+      showDeletionErrorDialog(context);
+    } else {
+      showConfirmationDialog(context);
     }
   }
 
-
-
+  void handleMenuItemSelected(String menuItem) {
+    switch (menuItem) {
+      case 'Delete':
+        checkDelete(context);
+        break;
+      case 'Edit':
+        navigateWithNoBack(context, EditBookScreen(book: widget.book));
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -860,7 +951,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
 
     // print(hasDataf);
     return WillPopScope(
-      onWillPop:  () async {
+      onWillPop: () async {
         navigateWithNoBack(context, MainScreenUser());
         return false;
       },
@@ -887,23 +978,26 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                           },
                         ),
                         actions: [
-                          FirebaseAuth.instance.currentUser!.uid==widget.book.userid? PopupMenuButton<String>(
-                        onSelected: handleMenuItemSelected,
-                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                          PopupMenuItem<String>(
-                            value: 'Edit',
-                            child: Text('Edit'),
-                          ),
-                          PopupMenuItem<String>(
-                            value: 'Delete',
-                            child: Text('Delete'),
-                          ),
-
-                        ],
-                      ):Container()
-                    ]),
+                          FirebaseAuth.instance.currentUser!.uid ==
+                                  widget.book.userid
+                              ? PopupMenuButton<String>(
+                                  onSelected: handleMenuItemSelected,
+                                  itemBuilder: (BuildContext context) =>
+                                      <PopupMenuEntry<String>>[
+                                    PopupMenuItem<String>(
+                                      value: 'Edit',
+                                      child: Text('Edit'),
+                                    ),
+                                    PopupMenuItem<String>(
+                                      value: 'Delete',
+                                      child: Text('Delete'),
+                                    ),
+                                  ],
+                                )
+                              : Container()
+                        ]),
                     body: SingleChildScrollView(
-                        child: Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           const SizedBox(
@@ -922,18 +1016,22 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                   placeholder: (context, url) =>
                                       LoadingAnimationWidget.fourRotatingDots(
                                     color: themeNotifier.getTheme() ==
-                                    ThemeData.dark(useMaterial3: true).copyWith(
-                                      colorScheme: ColorScheme.dark().copyWith(
-                                        primary: darkprimarycolor,
-                                        error: Colors.red,
-                                        onPrimary: darkprimarycolor,
-                                        outline: darkprimarycolor,
-                                        primaryVariant: darkprimarycolor,
-                                        onPrimaryContainer: darkprimarycolor,
-                                      ),
-                                    )
-                                ? darkprimarycolor
-                                : primarycolor,
+                                            ThemeData.dark(useMaterial3: true)
+                                                .copyWith(
+                                              colorScheme:
+                                                  ColorScheme.dark().copyWith(
+                                                primary: darkprimarycolor,
+                                                error: Colors.red,
+                                                onPrimary: darkprimarycolor,
+                                                outline: darkprimarycolor,
+                                                primaryVariant:
+                                                    darkprimarycolor,
+                                                onPrimaryContainer:
+                                                    darkprimarycolor,
+                                              ),
+                                            )
+                                        ? darkprimarycolor
+                                        : primarycolor,
                                     size: 50,
                                   ),
                                   errorWidget: (context, url, error) =>
@@ -1133,40 +1231,47 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       .snapshots(),
                                   builder: (BuildContext context,
                                       AsyncSnapshot<QuerySnapshot> snapshot) {
-                                    var pass=false;
+                                    var pass = false;
                                     if (snapshot.data != null) {
-
                                       if (snapshot.data!.docs.length != 0) {
                                         // print(snapshot.data!
                                         //     .docs.length);
                                         List<DateTime> expirationDates = [];
-                                        for (var document in snapshot.data!.docs) {
-                                          Timestamp? paymentCreationTime = document['dateTimeCreated'];
-                                          int duration = document['durationDays'];
+                                        for (var document
+                                            in snapshot.data!.docs) {
+                                          Timestamp? paymentCreationTime =
+                                              document['dateTimeCreated'];
+                                          int duration =
+                                              document['durationDays'];
                                           DateTime expirationDate =
-                                          paymentCreationTime!.toDate().add(Duration(days: duration));
+                                              paymentCreationTime!.toDate().add(
+                                                  Duration(days: duration));
                                           expirationDates.add(expirationDate);
                                         }
 // print(expirationDates);
-                                        DateTime maxExpirationDate = expirationDates.reduce((a, b) => a.isAfter(b) ? a : b);
+                                        DateTime maxExpirationDate =
+                                            expirationDates.reduce(
+                                                (a, b) => a.isAfter(b) ? a : b);
 
-                                        Duration timeLeft = maxExpirationDate.difference(DateTime.now());
+                                        Duration timeLeft = maxExpirationDate
+                                            .difference(DateTime.now());
                                         // print(maxExpirationDate);
                                         if (!timeLeft.isNegative) {
-                                         pass=true;
+                                          pass = true;
                                         }
-                                        WidgetsBinding.instance!.addPostFrameCallback((_) => setState(() {
-                                          _timeLeft = timeLeft;
-                                        }));
-
+                                        WidgetsBinding.instance!
+                                            .addPostFrameCallback(
+                                                (_) => setState(() {
+                                                      _timeLeft = timeLeft;
+                                                    }));
 
                                         if (pass == true) {
                                           return Column(
                                             children: [
                                               Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment
-                                                    .spaceEvenly,
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
                                                 children: [
                                                   ElevatedButton.icon(
                                                     onPressed: () {
@@ -1180,7 +1285,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                           ));
                                                     },
                                                     icon:
-                                                    Icon(Icons.headphones),
+                                                        Icon(Icons.headphones),
                                                     label: Text('Listen'),
                                                   ),
                                                   ElevatedButton.icon(
@@ -1198,14 +1303,10 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                 ],
                                               ),
                                               Text(
-                                                  'Timeleft ${_timeLeft
-                                                      .inDays}d:'
-                                                      '${_timeLeft.inHours
-                                                      .remainder(24)}h:'
-                                                      '${_timeLeft.inMinutes
-                                                      .remainder(60)}m:'
-                                                      '${_timeLeft.inSeconds
-                                                      .remainder(60)}s')
+                                                  'Timeleft ${_timeLeft.inDays}d:'
+                                                  '${_timeLeft.inHours.remainder(24)}h:'
+                                                  '${_timeLeft.inMinutes.remainder(60)}m:'
+                                                  '${_timeLeft.inSeconds.remainder(60)}s')
                                             ],
                                           );
                                         }
@@ -1919,7 +2020,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       )
                                     ]),
                         ],
-                        ),
+                      ),
                     )),
               ),
       ),
