@@ -1,3 +1,4 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/login_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -21,11 +22,148 @@ class AddRemoveUser extends StatefulWidget {
 
 class _AddRemoveUserState extends State<AddRemoveUser> {
   List<Users> _users = [];
-
+bool isLoading=false;
   @override
   void initState() {
     super.initState();
   }
+
+
+  deletePaymentsForUserId(String userId) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collectionGroup('payments')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  }
+
+  deleteFavouritesForUserId(String userId) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collection('favourities')
+        .where('userid', isEqualTo: userId)
+        .get();
+
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  }
+
+  deleteReviewsForUserId(String userId) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collection('reviews')
+        .where('uploadedByUserId', isEqualTo: userId)
+        .get();
+
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  }
+  deleteNotificationsForUserId(String userId) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collection('notifications')
+        .where('forUserId', isEqualTo: userId)
+        .get();
+
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  }
+
+  CollectionReference books = FirebaseFirestore.instance.collection('books');
+  Future<void> deleteBookForuserid(String userID) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collection('books')
+        .where('userid', isEqualTo: userID)
+        .get();
+
+
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });// Delete
+  }
+
+  Future<void> deleteBooksAndRelatedData(String userId) async {
+    try {
+      // Get all books uploaded by the user
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+      await FirebaseFirestore.instance
+          .collection('books')
+          .where('userid', isEqualTo: userId)
+          .get();
+
+      // Delete each book and its related data
+      for (QueryDocumentSnapshot<Map<String, dynamic>> bookSnapshot
+      in querySnapshot.docs) {
+        String bookId = bookSnapshot.id;
+
+        // Delete payments for the book
+        await deletePaymentsForBookId(bookId);
+
+        // Delete favorites for the book
+        await deleteFavoritesForBookId(bookId);
+
+        // Delete reviews for the book
+        await deleteReviewsForBookId(bookId);
+
+        // Delete the book itself
+        await deleteBookData(bookId);
+      }
+
+      print('All books and related data deleted successfully.');
+    } catch (e) {
+      print('Error deleting books and related data: $e');
+    }
+  }
+
+  Future<void> deletePaymentsForBookId(String bookId) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collectionGroup('payments')
+        .where('bookId', isEqualTo: bookId)
+        .get();
+
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  }
+
+  Future<void> deleteFavoritesForBookId(String bookId) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collection('favourities')
+        .where('bookid', isEqualTo: bookId)
+        .get();
+
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  }
+
+  Future<void> deleteReviewsForBookId(String bookId) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collection('reviews')
+        .where('bookId', isEqualTo: bookId)
+        .get();
+
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  }
+
+  Future<void> deleteBookData(String bookId) {
+    return FirebaseFirestore.instance.collection('books').doc(bookId).delete();
+  }
+
+
 // Function to log in as a user
   Future<void> login(String email, String password) async {
     try {
@@ -79,52 +217,135 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
   }
 
   Future<void> _deleteUser(Users users) async {
+    if(mounted){
+      setState(() {
+        isLoading=true;
+      });
+    }
     // Check if the user has any book collection
     final bookCollectionQuery = FirebaseFirestore.instance
         .collection('books')
         .where('userid', isEqualTo: users.uid);
 
     final bookCollectionSnapshot = await bookCollectionQuery.get();
-    if (bookCollectionSnapshot.docs.isNotEmpty) {
-      // If the user has book collections, show an error message
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Text('Error'),
-          content: Text(
-              'You cannot delete your account as you have uploaded books.'),
+
+      // If the user hasn't uploaded any book collections, delete their account
+      if (users.authenticationmethod == 'email') {
+
+        // print(users.password);
+
+        User? user;
+        UserCredential userCredential = await auth.signInWithEmailAndPassword(
+          email: users.email,
+          password: users.password,
+        );
+
+        user = userCredential.user;
+        // print();
+
+        deleteBookForuserid(userCredential.user!.uid);
+        deleteFavouritesForUserId(userCredential.user!.uid);
+        deletePaymentsForUserId(userCredential.user!.uid);
+        deleteReviewsForUserId(userCredential.user!.uid);
+        deleteBooksAndRelatedData(userCredential.user!.uid);
+        deleteNotificationsForUserId(userCredential.user!.uid);
+        // await deleteCurrentUser(users.email, users.password);
+        FirebaseFirestore.instance.collection('users').doc(users.uid).delete();
+        await user!.delete();
+        final snackBar = SnackBar(
+
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+
+          content: AwesomeSnackbarContent(
+            title: 'Success!',
+            message: "User Deleted successfully",
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.success,
+          ),
+        );
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+
+        auth.signOut();
+
+      }
+      else{
+        deleteBookForuserid(users.uid);
+        deleteFavouritesForUserId(users.uid);
+        deletePaymentsForUserId(users.uid);
+        deleteReviewsForUserId(users.uid);
+        deleteBooksAndRelatedData(users.uid);
+        deleteNotificationsForUserId(users.uid);
+        // await deleteCurrentUser(users.email, users.password);
+        FirebaseFirestore.instance.collection('users').doc(users.uid).delete();
+        final snackBar = SnackBar(
+
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+
+          content: AwesomeSnackbarContent(
+            title: 'Success!',
+            message: "User Deleted successfully",
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.success,
+          ),
+        );
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+
+
+      }
+    if(mounted){
+      setState(() {
+        isLoading=false;
+      });
+    }
+    }
+
+
+  void showConfirmationDialog(BuildContext context,user) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmation'),
+          content: Text('Are you sure you want to delete this user?'),
           actions: <Widget>[
             TextButton(
+              child: Text('Cancel'),
               onPressed: () {
-                Navigator.pop(context); // Close the dialog
+                Navigator.of(context).pop();
               },
-              child: Text('Ok'),
+            ),
+            isLoading?CircularProgressIndicator():TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                _deleteUser(user);
+                Navigator.of(context).pop();
+              },
             ),
           ],
-        ),
-      );
-    } else {
-      // If the user hasn't uploaded any book collections, delete their account
-      // if (users.authenticationmethod == 'email') {
-      //   User? user;
-      //   UserCredential userCredential = await auth.signInWithEmailAndPassword(
-      //     email: users.email,
-      //     password: users.password,
-      //   );
-      //   user = userCredential.user;
-      //   await user!.delete();
-      //   auth.signOut();
-      // }
-      
-        await deleteCurrentUser(users.email, users.password);
-      FirebaseFirestore.instance.collection('users').doc(users.uid).delete();
-    }
+        );
+      },
+    );
   }
 
 // Define TextEditingController objects to control the text fields
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
+  final _formKey = GlobalKey<FormState>();
 // Show a dialog when the button is pressed
   void _showDialog(BuildContext context) {
     showDialog(
@@ -132,23 +353,40 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Create Account'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextFormField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Enter Email';
+                    }
+
+                    return null;
+                  },
                 ),
-              ),
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
+                TextFormField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Enter Password';
+                    }
+
+                    return null;
+                  },
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: <Widget>[
             ElevatedButton(
@@ -160,31 +398,60 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
             ElevatedButton(
               child: Text('Create Account'),
               onPressed: () async {
-                String email = _emailController.text.trim();
-                String password = _passwordController.text.trim();
+        if (_formKey.currentState!.validate()) {
+          String email = _emailController.text.trim();
+          String password = _passwordController.text.trim();
 
-                try {
-                  UserCredential userCredential = await FirebaseAuth.instance
-                      .createUserWithEmailAndPassword(
-                    email: email,
-                    password: password,
-                  );
-                  Users u = Users(userCredential.user!.uid, '', '', email,
-                      password, '', 0, 'email', 0);
-                  // Add user to Firestore
-                  await FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(userCredential.user!.uid)
-                      .set(u.toMap());
-                  auth.signOut();
-                  // Navigate to the home screen or do something else
-                  // ...
+          try {
+            UserCredential userCredential = await FirebaseAuth.instance
+                .createUserWithEmailAndPassword(
+              email: email,
+              password: password,
+            );
+            Users u = Users(
+                userCredential.user!.uid,
+                '',
+                '',
+                email,
+                password,
+                '',
+                0,
+                'email',
+                0);
+            // Add user to Firestore
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(userCredential.user!.uid)
+                .set(u.toMap());
+            final snackBar = SnackBar(
 
-                  Navigator.of(context).pop();
-                } catch (e) {
-                  // Handle error
-                  // ...
-                }
+              /// need to set following properties for best effect of awesome_snackbar_content
+              elevation: 0,
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.transparent,
+
+              content: AwesomeSnackbarContent(
+                title: 'Success!',
+                message: "User Added successfully",
+
+                /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                contentType: ContentType.success,
+              ),
+            );
+
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(snackBar);
+            auth.signOut();
+            // Navigate to the home screen or do something else
+            // ...
+
+            Navigator.of(context).pop();
+          } catch (e) {
+            // Handle error
+            // ...
+          }
+        }
               },
             ),
           ],
@@ -278,10 +545,10 @@ class _AddRemoveUserState extends State<AddRemoveUser> {
                                   ? user.name
                                   : user.name.substring(0, 8)),
                               Text(email),
-                              // IconButton(
-                              //   onPressed: () => _deleteUser(user),
-                              //   icon: Icon(Icons.delete),
-                              // ),
+                              isLoading?Container(height:10,width:10,child:CircularProgressIndicator()):IconButton(
+                                onPressed: () => showConfirmationDialog(context,user),
+                                icon: Icon(Icons.delete),
+                              ),
                             ],
                           ),
                           const Divider(

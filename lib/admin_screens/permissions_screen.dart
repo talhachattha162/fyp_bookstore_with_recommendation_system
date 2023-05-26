@@ -106,27 +106,7 @@ class _PermissionsState extends State<Permissions> {
   Future<void> deleteBook(String bookId) {
     return books
         .doc(bookId) // Reference to the document with the given ID
-        .delete() // Delete the document
-        .then((value) {
-      final snackBar = SnackBar(
-        /// need to set following properties for best effect of awesome_snackbar_content
-        elevation: 0,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.transparent,
-
-        content: AwesomeSnackbarContent(
-          title: 'Success!',
-          message: "Book deleted successfully",
-
-          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-          contentType: ContentType.success,
-        ),
-      );
-
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(snackBar);
-    }).catchError((error) => print("Failed to delete book: $error"));
+        .delete(); // Delete
   }
 
   Future<String> getName(String userId) async {

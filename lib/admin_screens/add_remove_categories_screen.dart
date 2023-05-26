@@ -1,3 +1,4 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,11 +27,30 @@ class _AddRemoveCategoriesState extends State<AddRemoveCategories> {
     'Science',
   ];
 
+  final _formKey = GlobalKey<FormState>();
   TextEditingController _categoryController = TextEditingController();
   Future<void> addCategory(String categoryName) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     CollectionReference categoriesRef = firestore.collection('categories');
     await categoriesRef.add({'name': categoryName});
+    final snackBar = SnackBar(
+      /// need to set following properties for best effect of awesome_snackbar_content
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+
+      content: AwesomeSnackbarContent(
+        title: 'Success!',
+        message: "Category Added successfully",
+
+        /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+        contentType: ContentType.success,
+      ),
+    );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
   }
 
   Stream<QuerySnapshot> getCategories() {
@@ -49,7 +69,24 @@ class _AddRemoveCategoriesState extends State<AddRemoveCategories> {
 
     if (booksSnapshot.docs.isEmpty) {
       await categoriesRef.doc(categoryId).delete();
-      flutterToast('Category deleted successfully');
+      final snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+
+        content: AwesomeSnackbarContent(
+          title: 'Success!',
+          message: "Category deleted successfully",
+
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.success,
+        ),
+      );
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
     } else {
       showDialog(
         context: context,
@@ -127,10 +164,19 @@ class _AddRemoveCategoriesState extends State<AddRemoveCategories> {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: Text('Add Category'),
-                      content: TextField(
-                        controller: _categoryController,
-                        decoration:
-                            InputDecoration(hintText: 'Enter category name'),
+                      content: Form(
+                        key: _formKey,
+                        child: TextFormField(
+                          controller: _categoryController,
+                          decoration:
+                              InputDecoration(hintText: 'Enter category name'),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Enter Category';
+                              }
+                            }
+                        ),
+
                       ),
                       actions: <Widget>[
                         TextButton(
@@ -142,10 +188,12 @@ class _AddRemoveCategoriesState extends State<AddRemoveCategories> {
                         TextButton(
                           child: Text('Add'),
                           onPressed: () {
-                            String categoryName = _categoryController.text;
-                            // Call a function to add the category to Firestore
-                            addCategory(categoryName);
-                            Navigator.of(context).pop();
+    if (_formKey.currentState!.validate()) {
+      String categoryName = _categoryController.text;
+      // Call a function to add the category to Firestore
+      addCategory(categoryName);
+      Navigator.of(context).pop();
+    }
                           },
                         ),
                       ],

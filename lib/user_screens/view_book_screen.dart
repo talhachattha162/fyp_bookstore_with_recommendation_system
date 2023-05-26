@@ -948,7 +948,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-
+// print(_userData!.name);
     // print(hasDataf);
     return WillPopScope(
       onWillPop: () async {
@@ -2003,15 +2003,15 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
                                   children: [
-                                      Text(_userData != null
+                                      Text(_userData != null && _userData!.name != 'admin'
                                           ? _userData!.name.length > 10
                                               ? 'Uploaded by ' +
                                                   _userData!.name
                                                       .substring(0, 10)
                                               : 'Uploaded by ' + _userData!.name
                                           : 'Uploaded by Admin'),
-                                      ElevatedButton(
-                                        onPressed: _isSubscribed
+                                    ElevatedButton(
+                                        onPressed: _userData != null &&  _userData!.name=='admin'?null:_isSubscribed
                                             ? _unsubscribe
                                             : _subscribe,
                                         child: Text(_isSubscribed

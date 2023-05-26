@@ -150,31 +150,35 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Scaffold(
           appBar: AppBar(
               // title: Text(''),
-            title: TextLiquidFill(loadDuration: Duration(seconds: 2),
-              boxBackgroundColor: themeNotifier.getTheme() ==
-                  ThemeData.dark(useMaterial3: true)
-                      .copyWith(
-                    colorScheme:
-                    ColorScheme.dark().copyWith(
-                      primary: darkprimarycolor,
-                      error: Colors.red,
-                      onPrimary: darkprimarycolor,
-                      outline: darkprimarycolor,
-                      primaryVariant: darkprimarycolor,
-                      onPrimaryContainer:
-                      darkprimarycolor,
-                    ),
-                  )
-                  ? Colors.black
-                  : Colors.green.shade300,
-              text: 'Book Store',
-              waveColor: Colors.white,
-              textStyle: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+            title: Align(
+                alignment: Alignment.topLeft,
+              child: TextLiquidFill(loadDuration: Duration(seconds: 2),
+                boxBackgroundColor: themeNotifier.getTheme() ==
+                    ThemeData.dark(useMaterial3: true)
+                        .copyWith(
+                      colorScheme:
+                      ColorScheme.dark().copyWith(
+                        primary: darkprimarycolor,
+                        error: Colors.red,
+                        onPrimary: darkprimarycolor,
+                        outline: darkprimarycolor,
+                        primaryVariant: darkprimarycolor,
+                        onPrimaryContainer:
+                        darkprimarycolor,
+                      ),
+                    )
+                    ? Colors.black
+                    : Colors.green.shade300,
+                text: 'Book Store',
+                waveColor: Colors.white,
+                textStyle: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+                // boxHeight: 50.0,
               ),
-              // boxHeight: 50.0,
             ),
     
     
