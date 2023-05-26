@@ -46,9 +46,9 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
   bool errortextexist = false;
   String errortext = '';
   final _formKey = GlobalKey<FormState>();
-  String _filename1 = "<5 mb image allowed";
-  String _filename2 = "<25 mb pdf allowed";
-  String _filename3 = "<5 mb image allowed";
+  String _filename1 = "<2 mb image allowed";
+  String _filename2 = "<1 mb pdf allowed";
+  String _filename3 = "<2 mb image allowed";
   String freeRentPaid = "free";
   bool _isvisible = false;
   Uint8List? _file1, _file2, _file3;
@@ -474,7 +474,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                               onPressed: () async {
                                 try {
                                   PlatformFile file = await pickFile(
-                                      [], FileType.image, 5000000, context);
+                                      [], FileType.image, 2000000, context);
                                   if (mounted) {
                                     setState(() {
                                       _filename1 = file.name;
@@ -482,7 +482,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   }
                                   _file1 = file.bytes!;
                                 } catch (err) {
-                                  if (_filename1 == "<5 mb image allowed") {
+                                  if (_filename1 == "<2 mb image allowed") {
                                     final snackBar = SnackBar(
                                       /// need to set following properties for best effect of awesome_snackbar_content
                                       elevation: 0,
@@ -490,9 +490,9 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                       backgroundColor: Colors.transparent,
     
                                       content: AwesomeSnackbarContent(
-                                        title: 'Error!',
+                                        title: 'File Error!',
                                         message:
-                                        'Please reselect file.',
+                                        '<2 mb image allowed Reselect file.',
     
                                         /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
                                         contentType: ContentType.failure,
@@ -530,7 +530,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                               onPressed: () async {
                                 try {
                                   PlatformFile file = await pickFile(['pdf'],
-                                      FileType.custom, 25000000, context);
+                                      FileType.custom, 1000000, context);
                                   if (mounted) {
                                     setState(() {
                                       _filename2 = file.name;
@@ -538,7 +538,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   }
                                   _file2 = file.bytes!;
                                 } catch (err) {
-                                  if (_filename2 == "<25 mb pdf allowed") {
+                                  if (_filename2 == "<1 mb pdf allowed") {
                                     final snackBar = SnackBar(
                                       /// need to set following properties for best effect of awesome_snackbar_content
                                       elevation: 0,
@@ -546,9 +546,9 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                       backgroundColor: Colors.transparent,
     
                                       content: AwesomeSnackbarContent(
-                                        title: 'Error!',
+                                        title: 'File Error!',
                                         message:
-                                        'Please reselect file.',
+                                        '<1 mb image allowed Reselect file',
     
                                         /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
                                         contentType: ContentType.failure,
@@ -584,7 +584,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                               onPressed: () async {
                                 try {
                                   PlatformFile file = await pickFile(
-                                      [], FileType.image, 5000000, context);
+                                      [], FileType.image, 2000000, context);
                                   if (mounted) {
                                     setState(() {
                                       _filename3 = file.name;
@@ -592,7 +592,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   }
                                   _file3 = file.bytes!;
                                 } catch (err) {
-                                  if (_filename3 == "<5 mb image allowed") {
+                                  if (_filename3 == "<2 mb image allowed") {
                                     final snackBar = SnackBar(
                                       /// need to set following properties for best effect of awesome_snackbar_content
                                       elevation: 0,
@@ -600,9 +600,9 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                       backgroundColor: Colors.transparent,
     
                                       content: AwesomeSnackbarContent(
-                                        title: 'Error!',
+                                        title: 'File Error!',
                                         message:
-                                        'Please reselect file.',
+                                        '<2 mb image allowed Reselect file',
     
                                         /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
                                         contentType: ContentType.failure,
@@ -637,11 +637,11 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                         if (_formKey.currentState!.validate() &&
                                             selectedCategory.isNotEmpty) {
                                           if (_filename1 ==
-                                              "<5 mb image allowed" ||
+                                              "<2 mb image allowed" ||
                                               _filename2 ==
-                                                  "<25 mb pdf allowed" ||
+                                                  "<1 mb pdf allowed" ||
                                               _filename3 ==
-                                                  "<5 mb image allowed") {
+                                                  "<2 mb image allowed") {
                                             final snackBar = SnackBar(
                                               /// need to set following properties for best effect of awesome_snackbar_content
                                               elevation: 0,
@@ -785,9 +785,9 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                             _priceController.clear();
                                             _authorController.clear();
                                             _categoryController.clear();
-                                            _filename1 = "<5 mb image allowed";
-                                            _filename2 = "<25 mb pdf allowed";
-                                            _filename3 = "<5 mb image allowed";
+                                            _filename1 = "<2 mb image allowed";
+                                            _filename2 = "<1 mb pdf allowed";
+                                            _filename3 = "<2 mb image allowed";
                                             _file1 = null;
                                             _file2 = null;
                                             _file3 = null;
