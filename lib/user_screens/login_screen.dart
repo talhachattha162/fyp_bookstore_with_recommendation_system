@@ -355,6 +355,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   password:
                                                       _passwordController.text);
                                           if (user != null) {
+                                            DocumentReference documentReference = firestore.collection('users').doc(user.uid);
+                                            await documentReference.update({
+                                              'password': _passwordController.text,
+                                            });
                                             context.read<AuthState>().user = 1;
                                             navigateWithNoBack(context, MyApp());
                                             // here
