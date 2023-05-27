@@ -306,6 +306,7 @@ bool isLoading=false;
 
 
       }
+
     if(mounted){
       setState(() {
         isLoading=false;
@@ -330,9 +331,9 @@ bool isLoading=false;
             ),
             isLoading?CircularProgressIndicator():TextButton(
               child: Text('Delete'),
-              onPressed: () {
-                _deleteUser(user);
-                Navigator.of(context).pop();
+              onPressed: ()async {
+               await _deleteUser(user);
+               Navigator.of(context).pop();
               },
             ),
           ],
@@ -342,6 +343,7 @@ bool isLoading=false;
   }
 
 // Define TextEditingController objects to control the text fields
+  TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
@@ -358,6 +360,19 @@ bool isLoading=false;
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Name',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Enter Name';
+                    }
+
+                    return null;
+                  },
+                ),
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -410,7 +425,7 @@ bool isLoading=false;
             );
             Users u = Users(
                 userCredential.user!.uid,
-                '',
+                _nameController.text,
                 '',
                 email,
                 password,

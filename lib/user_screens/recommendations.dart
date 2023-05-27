@@ -1,5 +1,6 @@
 import 'dart:convert';
-
+import 'dart:async';
+import 'dart:io';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
@@ -7,7 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/internetavailabilitynotifier.dart';
 import '../utils/navigation.dart';
 
 class BookRecommendationScreen extends StatefulWidget {
@@ -36,6 +39,30 @@ bool isLoading=false;
   String language='';
 
 
+  Timer? timer;
+  @override
+  void initState() {
+    super.initState();
+
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+      final internetAvailabilityNotifier =
+      Provider.of<InternetNotifier>(context, listen: false);
+      try {
+        final result = await InternetAddress.lookup('google.com');
+        if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty) ) {
+          internetAvailabilityNotifier.setInternetAvailability(true);
+        } else {}
+      } on SocketException catch (_) {
+        internetAvailabilityNotifier.setInternetAvailability(false);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
   Future<void> _generateRecommendation() async {
     if(mounted){
     setState(() {

@@ -48,15 +48,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    timer = Timer.periodic(Duration(seconds: 0), (Timer t) async {
+
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
+      internetAvailabilityNotifier.setInternetAvailability(true);
       try {
         final result = await InternetAddress.lookup('google.com');
-        final result2 = await InternetAddress.lookup('facebook.com');
         // final result3 = await InternetAddress.lookup('microsoft.com');
-        if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty) ||
-            (result2.isNotEmpty && result2[0].rawAddress.isNotEmpty)
+        if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty)
             // ||
             // (result3.isNotEmpty && result3[0].rawAddress.isNotEmpty)
         ) {
@@ -234,9 +234,8 @@ class _LoginScreenState extends State<LoginScreen> {
     return WillPopScope(
       onWillPop: onWillPop,
       child: SafeArea(
-        child: internetAvailabilityNotifier.getInternetAvailability() == false
-            ? InternetChecker()
-            :  Scaffold(
+        child: internetAvailabilityNotifier.getInternetAvailability() == true
+            ?  Scaffold(
                     resizeToAvoidBottomInset: false,
                     body:SizedBox(
                       height:height ,
@@ -471,7 +470,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ])),
               ),
-            ),
+            ):InternetChecker()
       ),
     );
   }

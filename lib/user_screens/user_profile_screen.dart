@@ -38,7 +38,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   Future<void> loadData() async {
     final DocumentSnapshot documentSnapshot = await documentReference.get();
-
+    final darkmodeattr = await FirebaseFirestore.instance.collection('darkmode').doc(FirebaseAuth.instance.currentUser!.uid).get().then((snapshot) => snapshot.get('darkmode1'));
+if (mounted){
+  setState(() {
+    _isSwitched=darkmodeattr;
+  });
+}
     if (documentSnapshot.exists) {
       final data = documentSnapshot.data() as Map<String, dynamic>;
       Users user1 = Users.fromMap(data);
@@ -60,6 +65,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     // TODO: implement initState
     super.initState();
     loadData();
+
   }
 
   DateTime currentBackPressTime = DateTime.now();

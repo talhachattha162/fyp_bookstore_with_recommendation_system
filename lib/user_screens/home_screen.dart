@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 
 import '../models/book.dart';
 import '../providers/themenotifier.dart';
+import 'booksearchscreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -216,6 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
               IconButton(
                 onPressed: () {
                   // method to show the search bar
+                  // navigateWithNoBack(context, BookSearchScreen());
                   showSearch(
                       context: context,
                       // delegate to customize the search bar

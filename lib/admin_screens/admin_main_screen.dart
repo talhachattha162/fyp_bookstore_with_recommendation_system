@@ -12,6 +12,8 @@ import 'package:provider/provider.dart';
 import '../providers/themenotifier.dart';
 import '../utils/InternetChecker.dart';
 import '../utils/global_variables.dart';
+import 'dart:async';
+import 'dart:io';
 
 class MainScreenAdmin extends StatefulWidget {
   const MainScreenAdmin({super.key});
@@ -21,34 +23,18 @@ class MainScreenAdmin extends StatefulWidget {
 }
 
 class _MainScreenAdminState extends State<MainScreenAdmin> {
-  int _selectedIndex = 0;
-  static const List<Widget> _bottomNavigationItems = <Widget>[
-    AddRemoveUser(),
-    UploadBookScreen(),
-    AddRemoveCategories(),
-    Permissions()
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   Timer? timer;
   @override
   void initState() {
     super.initState();
+
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
-          Provider.of<InternetNotifier>(context, listen: false);
+      Provider.of<InternetNotifier>(context, listen: false);
       try {
         final result = await InternetAddress.lookup('google.com');
-        final result2 = await InternetAddress.lookup('facebook.com');
-        final result3 = await InternetAddress.lookup('microsoft.com');
-        if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty) ||
-            (result2.isNotEmpty && result2[0].rawAddress.isNotEmpty) ||
-            (result3.isNotEmpty && result3[0].rawAddress.isNotEmpty)) {
+        if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty)) {
           internetAvailabilityNotifier.setInternetAvailability(true);
         } else {}
       } on SocketException catch (_) {
@@ -61,6 +47,19 @@ class _MainScreenAdminState extends State<MainScreenAdmin> {
   void dispose() {
     timer?.cancel();
     super.dispose();
+  }
+  int _selectedIndex = 0;
+  static const List<Widget> _bottomNavigationItems = <Widget>[
+    AddRemoveUser(),
+    UploadBookScreen(),
+    AddRemoveCategories(),
+    Permissions()
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   DateTime currentBackPressTime = DateTime.now();

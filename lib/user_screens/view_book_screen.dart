@@ -306,11 +306,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
           Provider.of<InternetNotifier>(context, listen: false);
       try {
         final result = await InternetAddress.lookup('google.com');
-        final result2 = await InternetAddress.lookup('facebook.com');
-        final result3 = await InternetAddress.lookup('microsoft.com');
-        if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty) ||
-            (result2.isNotEmpty && result2[0].rawAddress.isNotEmpty) ||
-            (result3.isNotEmpty && result3[0].rawAddress.isNotEmpty)) {
+        if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty)
+            ) {
           internetAvailabilityNotifier.setInternetAvailability(true);
         } else {}
       } on SocketException catch (_) {
@@ -554,7 +551,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     final name = await getName(FirebaseAuth.instance.currentUser!.uid);
     var options = {
       'key': 'rzp_test_tlNELsTTfVj6JA',
-      'amount': widget.book.price.toInt() * 100, //* 82
+      'amount': widget.book.price*int.parse((_durationdaysController.text)) * 100, //* 82
       'currency': 'USD', //'INR'
       'name': name,
       'description': widget.book.title,
@@ -633,6 +630,9 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                 ),
                               ),
                               SizedBox(height: 10),
+                              Text(_durationdaysController.text!=''?'Price: \$${widget.book.price * int.parse(_durationdaysController.text)}':'Price: \$${widget.book.price} }:',
+                                  style: TextStyle(fontWeight: FontWeight.bold)),
+
                             ],
                           )
                         : Container(

@@ -68,11 +68,7 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
           Provider.of<InternetNotifier>(context, listen: false);
       try {
         final result = await InternetAddress.lookup('google.com');
-        final result2 = await InternetAddress.lookup('facebook.com');
-        final result3 = await InternetAddress.lookup('microsoft.com');
-        if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty) ||
-            (result2.isNotEmpty && result2[0].rawAddress.isNotEmpty) ||
-            (result3.isNotEmpty && result3[0].rawAddress.isNotEmpty)) {
+        if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty)) {
           internetAvailabilityNotifier.setInternetAvailability(true);
         } else {}
       } on SocketException catch (_) {
@@ -116,26 +112,27 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
       child: SafeArea(
           child: internetAvailabilityNotifier.getInternetAvailability() == true
               ? Scaffold(
-                  appBar: AppBar(
-                      title: const Text('Read Book'),
-                      leading: IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () {
-                          navigateWithNoBack(
-                              context,
-                              ViewBookScreen(
-                                book: widget.book,
-                              ));
-                        },
-                      )),
+                  // appBar: AppBar(
+                  //     title: const Text('Read Book'),
+                  //     leading: IconButton(
+                  //       icon: const Icon(Icons.arrow_back),
+                  //       onPressed: () {
+                  //         navigateWithNoBack(
+                  //             context,
+                  //             ViewBookScreen(
+                  //               book: widget.book,
+                  //             ));
+                  //       },
+                  //     )
+            //     ),
                   body: Center(
-                    child: Column(
+                    child: Stack(
                       children: [
                         Container(
                           width:orientation == Orientation.portrait?double.infinity:600,
-                          height: height * 0.72,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: width * 0.05, vertical: height * 0.015),
+                          height: double.infinity,
+                          // padding: EdgeInsets.symmetric(
+                          //     horizontal: width * 0.05, vertical: height * 0.015),
                           child: _pdfPath.isNotEmpty
                               ? SfPdfViewer.file(File(_pdfPath),)
                               : Center(
@@ -158,13 +155,23 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
                                   // Text('Loading...')
                                   ),
                         ),
-                        SizedBox(height:orientation == Orientation.portrait?5:0),
-                        orientation == Orientation.portrait?Text(
-                          '${widget.book.title}',
-                          style: TextStyle(
-                            fontSize: 18,
-                          ),
-                        ):Container(),
+                        // SizedBox(height:orientation == Orientation.portrait?5:0),
+                        // orientation == Orientation.portrait?Text(
+                        //   '${widget.book.title}',
+                        //   style: TextStyle(
+                        //     fontSize: 18,
+                        //   ),
+                        // ):Container(),
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () {
+                            navigateWithNoBack(
+                                context,
+                                ViewBookScreen(
+                                  book: widget.book,
+                                ));
+                          },
+                        ),
                       ],
                     ),
                   ),

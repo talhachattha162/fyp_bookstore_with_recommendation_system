@@ -444,7 +444,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.only(bottom: 10.0),
                                 child: TextInputField(
-                                  hintText: 'Enter Price',
+                                  hintText: freeRentPaid=='rent'?'Enter Price for 1 day':'Enter Price',
                                   suffixIcon: Text(''),
                                   isPassword: false,
                                   textEditingController: _priceController,

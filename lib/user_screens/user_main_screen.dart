@@ -72,11 +72,7 @@ class _MainScreenUserState extends State<MainScreenUser> {
           Provider.of<InternetNotifier>(context, listen: false);
       try {
         final result = await InternetAddress.lookup('google.com');
-        final result2 = await InternetAddress.lookup('facebook.com');
-        final result3 = await InternetAddress.lookup('microsoft.com');
-        if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty) ||
-            (result2.isNotEmpty && result2[0].rawAddress.isNotEmpty) ||
-            (result3.isNotEmpty && result3[0].rawAddress.isNotEmpty)) {
+        if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty) ) {
           internetAvailabilityNotifier.setInternetAvailability(true);
         } else {}
       } on SocketException catch (_) {
@@ -147,10 +143,11 @@ class _MainScreenUserState extends State<MainScreenUser> {
                   ? null
                   :
           BottomNavigationBar(
+                      showUnselectedLabels: true,
                       items: <BottomNavigationBarItem>[
                           BottomNavigationBarItem(
                             icon: Icon(
-                              CupertinoIcons.home,
+                              CupertinoIcons.home,// Set the default color for the unselected icon
                             ),
                             label: 'Home',
                             backgroundColor: themeNotifier.getTheme() ==
@@ -238,9 +235,20 @@ class _MainScreenUserState extends State<MainScreenUser> {
                         ],
                       type: BottomNavigationBarType.shifting,
                       currentIndex: _selectedIndex,
-                      selectedItemColor: Colors.white,
-                      iconSize: 24,
-                      selectedLabelStyle: const TextStyle(fontSize: 10),
+                      selectedItemColor: themeNotifier.getTheme() ==
+                          ThemeData.dark(useMaterial3: true).copyWith(
+                            colorScheme: ColorScheme.dark().copyWith(
+                              primary: darkprimarycolor,
+                              error: Colors.red,
+                              onPrimary: darkprimarycolor,
+                              outline: darkprimarycolor,
+                              primaryVariant: darkprimarycolor,
+                              onPrimaryContainer: darkprimarycolor,
+                            ),
+                          )
+                          ?Colors.white:Colors.black45,
+                      // iconSize: 24,
+                      // selectedLabelStyle: const TextStyle(fontSize: 10),
                       onTap: _onItemTapped,
                       elevation: 5),
     );
