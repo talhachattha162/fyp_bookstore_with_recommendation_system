@@ -28,10 +28,9 @@ class BookPdfScreen extends StatefulWidget {
 }
 
 class _BookPdfScreenState extends State<BookPdfScreen> {
+
   Timer? timer;
-
   String _pdfPath = '';
-
   Future<void> _decryptFile() async {
     // Read encrypted PDF file from storage
     String path = await widget.bookpath;

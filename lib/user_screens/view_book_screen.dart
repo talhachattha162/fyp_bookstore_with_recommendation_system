@@ -444,7 +444,12 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
             documentSnapshot.data() as Map<String, dynamic>;
 
         // Update the user's attribute
-        data['balance'] = data['balance'] + widget.book.price;
+        if(_durationdaysController.text!=''){
+          data['balance'] = data['balance'] + widget.book.price*int.parse((_durationdaysController.text));
+        }
+        else{
+          data['balance'] = data['balance'] + widget.book.price;
+        }
 
         // Update the user's data in Firestore
         userRef.update(data).then((value) {
@@ -550,8 +555,9 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
 // Name on Card: Any name
     final name = await getName(FirebaseAuth.instance.currentUser!.uid);
     var options = {
+      // widget.book.price.toInt() * 100
       'key': 'rzp_test_tlNELsTTfVj6JA',
-      'amount': widget.book.price*int.parse((_durationdaysController.text)) * 100, //* 82
+      'amount': _durationdaysController.text==''?widget.book.price.toInt()* 100:widget.book.price.toInt()*int.parse((_durationdaysController.text)) * 100, //* 82
       'currency': 'USD', //'INR'
       'name': name,
       'description': widget.book.title,
@@ -630,7 +636,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                 ),
                               ),
                               SizedBox(height: 10),
-                              Text(_durationdaysController.text!=''?'Price: \$${widget.book.price * int.parse(_durationdaysController.text)}':'Price: \$${widget.book.price} }:',
+                              Text(_durationdaysController.text!=''?'Price: \$${widget.book.price * int.parse(_durationdaysController.text)}':'Price: \$${widget.book.price}',
                                   style: TextStyle(fontWeight: FontWeight.bold)),
 
                             ],

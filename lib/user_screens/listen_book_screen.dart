@@ -1,3 +1,4 @@
+import 'package:read_pdf_text/read_pdf_text.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
@@ -8,8 +9,10 @@ import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart'
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../models/book.dart';
 import '../providers/internetavailabilitynotifier.dart';
 import '../providers/themenotifier.dart';
@@ -46,8 +49,10 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
   int endOffSet = 0;
   String dropdownValue = '1x';
   DateTime currentBackPressTime = DateTime.now();
-int count=0;
+  int count=0;
   String textabc = '';
+
+
 
   Future<bool> onWillPop() async {
     final now = DateTime.now();
@@ -64,11 +69,13 @@ int count=0;
   Future<void> speak(String text) async {
     await flutterTts.setLanguage('en-US');
     await flutterTts.setPitch(1);
-    await flutterTts.setSpeechRate(0.4);
+    await flutterTts.setSpeechRate(0.48);
     await flutterTts.speak(text);
   }
 
-   _speak(String text) async {
+
+
+  _speak(String text) async {
     int chunkSize = 3000;
     List<String> chunks = [];
     while (text.isNotEmpty) {
@@ -81,12 +88,16 @@ int count=0;
       }
     }
     flutterTts.setProgressHandler(
-        (String text, int startOffset, int endOffset, String word) {
-      print(
-          'text: $text, startOffset: $startOffset, endOffset: $endOffset, word: $word');
-      endOffSet = endOffset;
-      textabc = text;
-    });
+            (String text, int startOffset, int endOffset, String word) {
+
+          // print( 'text: $text, startOffset: $startOffset, endOffset: $endOffset, word: $word');
+setState(() {
+  textabc=word;
+});
+          endOffSet = endOffset;
+
+
+        });
     int i = 0;
     for (String chunk in chunks) {
       await flutterTts.speak(chunk);
@@ -131,55 +142,83 @@ int count=0;
   double parseDurationFromDouble(Duration hours) {
     return hours.inSeconds.toDouble();
   }
+Future<String> getPDFtext(String path) async {
+  String text = "";
+  try {
+    text = await ReadPdfText.getPDFtext(path) ;
+  } catch(e) {
+    final snackBar = SnackBar(
+      /// need to set following properties for best effect of awesome_snackbar_content
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
 
-  Future<Uint8List> _decryptFile() async {
-    // Read encrypted PDF file from storage
-    String path = await widget.bookpath;
-    final encryptedFile = File(path);
-    final encryptedPdfData = await encryptedFile.readAsBytes();
+      content: AwesomeSnackbarContent(
+        title: 'Error!',
+        message:
+        'Failed to get PDF text.$e',
 
-    // Decrypt PDF file
-    final key = encrypt.Key.fromLength(32);
-    final iv = encrypt.IV.fromLength(16);
-    final encrypter = encrypt.Encrypter(encrypt.AES(key));
-    final decryptedPdfData = encrypter.decryptBytes(
-      encrypt.Encrypted(encryptedPdfData),
-      iv: iv,
+        /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+        contentType: ContentType.failure,
+      ),
     );
 
-    // Return decrypted PDF data as Uint8List
-    return Uint8List.fromList(decryptedPdfData);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
+    // print();
   }
+  return text;
+}
 
-  extractTextFromPDF(Uint8List data) {
-    final PdfDocument document = PdfDocument(inputBytes: data);
-    // print(document.documentInformation.toString());
-    String extractedText = '';
-    final PdfTextExtractor extractor = PdfTextExtractor(document);
-    extractedText = extractor.extractText();
-    if (mounted) {
-      setState(() {
-        isLoading = false;
-      });
-    }
-    // document.dispose();
-    return extractedText;
-  }
+Future<void> _decryptFile1() async {
+  setState(() {
+    isLoading=true;
+  });
+  DateTime start=DateTime.now();
+  print(start);
+  // Read encrypted PDF file from storage
+  String path = await widget.bookpath;
+  final encryptedFile = File(path);
+  final encryptedPdfData = await encryptedFile.readAsBytes();
 
-  decryptAndConvertToText() async {
-    Uint8List decryptedData = await _decryptFile();
-    var texttoConvert = await extractTextFromPDF(decryptedData);
-    if (mounted) {
-      setState(() {
-        textToConvert = texttoConvert;
-      });
-    }
+  // Decrypt PDF file
+  final key = encrypt.Key.fromLength(32);
+  final iv = encrypt.IV.fromLength(16);
+  final encrypter = encrypt.Encrypter(encrypt.AES(key));
+  final decryptedPdfData = encrypter.decryptBytes(
+    encrypt.Encrypted(encryptedPdfData),
+    iv: iv,
+  );
+
+  // Store decrypted PDF file in cache directory
+  final tempDir = await getTemporaryDirectory();
+  final tempPdfFile = File('${tempDir.path}/decrypted.pdf');
+  await tempPdfFile.writeAsBytes(decryptedPdfData);
+
+  // print(tempPdfFile.path);
+  String texttoConvert=await getPDFtext(tempPdfFile.path);
+  // var texttoConvert = await extractTextFromPDF(decryptedData);
+  if (mounted) {
+    setState(() {
+      _pdfPath=tempPdfFile.path;
+      textToConvert = texttoConvert;
+    });
   }
+  DateTime end=DateTime.now();
+  print(end);
+
+  print(end.difference(start));
+  setState(() {
+    isLoading=false;
+  });
+}
+
 
   initTts() async {
     flutterTts = FlutterTts();
     await flutterTts.awaitSpeakCompletion(true);
-    await flutterTts.setSpeechRate(0.4);
+    await flutterTts.setSpeechRate(0.48);
 
     flutterTts.setStartHandler(() {
       if (mounted) {
@@ -244,9 +283,10 @@ int count=0;
   @override
   void initState() {
     super.initState();
+    _decryptFile1();
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
-          Provider.of<InternetNotifier>(context, listen: false);
+      Provider.of<InternetNotifier>(context, listen: false);
       try {
         final result = await InternetAddress.lookup('google.com');
         if ((result.isNotEmpty && result[0].rawAddress.isNotEmpty) ) {
@@ -260,7 +300,7 @@ int count=0;
       // Add a delay of 100 milliseconds before executing heavy operations
 
       // Future.delayed(Duration(milliseconds: 100), () {
-        initTts();
+      initTts();
       // });
     });
   }
@@ -272,12 +312,15 @@ int count=0;
     stop();
   }
 
+  String _pdfPath='';
+
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+
     return WillPopScope(
       onWillPop: () async {
         navigateWithNoBack(context, ViewBookScreen(book: widget.book));
@@ -287,116 +330,120 @@ int count=0;
         child: internetAvailabilityNotifier.getInternetAvailability() == false
             ? InternetChecker()
             :  Scaffold(
-                    appBar: AppBar(
-                        title: const Text('Listen Book'),
-                        leading: IconButton(
-                          icon: const Icon(Icons.arrow_back),
-                          onPressed: () {
-                            stop();
-                            navigateWithNoBack(
-                                context,
-                                ViewBookScreen(
-                                  book: widget.book,
-                                ));
-                          },
-                        )),
-                    body: SingleChildScrollView(
-                        child: Column(
-                      children: [
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        SizedBox(
-                          height: height * 0.56,
-                          width: width * 0.8,
-                          child: ClipRect(
-                            child: Align(
-                              alignment: Alignment.center,
-                              // widthFactor: 0.9,
-                              // heightFactor: 0.55,
-                              child: CachedNetworkImage(
-                                imageUrl: widget.book.coverPhotoFile,
-                                placeholder: (context, url) =>
-                                    CircularProgressIndicator(),
-                                errorWidget: (context, url, error) =>
-                                    Icon(Icons.error),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(widget.book.author),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          widget.book.title,
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            button(),
-                            DropdownButton<String>(
-                              value: dropdownValue,
-                              onChanged: _ttsState == TtsState.playing
-                                  ? null
-                                  : (String? newValue) async {
-                                      if (mounted) {
-                                        setState(() {
-                                          dropdownValue = newValue!;
-                                        });
-                                      }
-                                      if (newValue == '0.25x') {
-                                        await flutterTts.setSpeechRate(0.105);
-                                      } else if (newValue == '0.5x') {
-                                        await flutterTts.setSpeechRate(0.22);
-                                      } else if (newValue == '0.75x') {
-                                        await flutterTts.setSpeechRate(0.315);
-                                      } else if (newValue == '1x') {
-                                        await flutterTts.setSpeechRate(0.4);
-                                      } else if (newValue == '1.25x') {
-                                        await flutterTts.setSpeechRate(0.555);
-                                      } else if (newValue == '1.5x') {
-                                        await flutterTts.setSpeechRate(0.71);
-                                      } else if (newValue == '1.75x') {
-                                        await flutterTts.setSpeechRate(0.845);
-                                      } else if (newValue == '2x') {
-                                        await flutterTts.setSpeechRate(1.0);
-                                      }
-                                    },
-                              items: <String>[
-                                '0.25x',
-                                '0.5x',
-                                '0.75x',
-                                '1x',
-                                '1.25x',
-                                '1.5x',
-                                '1.75x',
-                                '2x'
-                              ].map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                            )
-                          ],
-                        ),
-                        isLoading==true?Text('It will take some time',style:TextStyle(fontSize: 10,color: Colors.grey)):Container()
-                        // Text(guidemsg)
-                      ],
-                    )),
+          appBar: AppBar(
+              title: const Text('Listen Book'),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  stop();
+                  navigateWithNoBack(
+                      context,
+                      ViewBookScreen(
+                        book: widget.book,
+                      ));
+                },
+              )),
+          body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 20,
                   ),
+                  SizedBox(
+                    height: height * 0.56,
+                    width: width * 0.8,
+                    child: ClipRect(
+                      child: Align(
+                        alignment: Alignment.center,
+                        // widthFactor: 0.9,
+                        // heightFactor: 0.55,
+                        child: CachedNetworkImage(
+                          imageUrl: widget.book.coverPhotoFile,
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+
+                  Text(
+                    widget.book.title,
+                    style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text('Author:'+widget.book.author),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(textabc),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      button(),
+                      DropdownButton<String>(
+                        value: dropdownValue,
+                        onChanged: _ttsState == TtsState.playing
+                            ? null
+                            : (String? newValue) async {
+                          if (mounted) {
+                            setState(() {
+                              dropdownValue = newValue!;
+                            });
+                          }
+                          if (newValue == '0.25x') {
+                            await flutterTts.setSpeechRate(0.105);
+                          } else if (newValue == '0.5x') {
+                            await flutterTts.setSpeechRate(0.22);
+                          } else if (newValue == '0.75x') {
+                            await flutterTts.setSpeechRate(0.315);
+                          } else if (newValue == '1x') {
+                            await flutterTts.setSpeechRate(0.48);
+                          } else if (newValue == '1.25x') {
+                            await flutterTts.setSpeechRate(0.555);
+                          } else if (newValue == '1.5x') {
+                            await flutterTts.setSpeechRate(0.71);
+                          } else if (newValue == '1.75x') {
+                            await flutterTts.setSpeechRate(0.845);
+                          } else if (newValue == '2x') {
+                            await flutterTts.setSpeechRate(1.0);
+                          }
+                        },
+                        items: <String>[
+                          '0.25x',
+                          '0.5x',
+                          '0.75x',
+                          '1x',
+                          '1.25x',
+                          '1.5x',
+                          '1.75x',
+                          '2x'
+                        ].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      )
+                    ],
+                  ),
+                  // Text(guidemsg)
+                ],
+              )),
+        ),
       ),
     );
   }
@@ -407,15 +454,7 @@ int count=0;
       return isLoading==true?Text('Loading...'):ElevatedButton(
         onPressed: () async {
 
-          if(count==0){
-            if (mounted) {
-              setState(() {
-                isLoading = true;
-              });
-            }
-           await decryptAndConvertToText();
-            count++;
-          }
+          
           await _speak(textToConvert);
         },
         style: OutlinedButton.styleFrom(
@@ -425,16 +464,16 @@ int count=0;
           side: BorderSide(
               width: 2,
               color: themeNotifier.getTheme() ==
-                      ThemeData.dark(useMaterial3: true).copyWith(
-                        colorScheme: ColorScheme.dark().copyWith(
-                          primary: darkprimarycolor,
-                          error: Colors.red,
-                          onPrimary: darkprimarycolor,
-                          outline: darkprimarycolor,
-                          primaryVariant: darkprimarycolor,
-                          onPrimaryContainer: darkprimarycolor,
-                        ),
-                      )
+                  ThemeData.dark(useMaterial3: true).copyWith(
+                    colorScheme: ColorScheme.dark().copyWith(
+                      primary: darkprimarycolor,
+                      error: Colors.red,
+                      onPrimary: darkprimarycolor,
+                      outline: darkprimarycolor,
+                      primaryVariant: darkprimarycolor,
+                      onPrimaryContainer: darkprimarycolor,
+                    ),
+                  )
                   ? darkprimarycolor
                   : primarycolor),
         ),
@@ -452,16 +491,16 @@ int count=0;
           side: BorderSide(
               width: 2,
               color: themeNotifier.getTheme() ==
-                      ThemeData.dark(useMaterial3: true).copyWith(
-                        colorScheme: ColorScheme.dark().copyWith(
-                          primary: darkprimarycolor,
-                          error: Colors.red,
-                          onPrimary: darkprimarycolor,
-                          outline: darkprimarycolor,
-                          primaryVariant: darkprimarycolor,
-                          onPrimaryContainer: darkprimarycolor,
-                        ),
-                      )
+                  ThemeData.dark(useMaterial3: true).copyWith(
+                    colorScheme: ColorScheme.dark().copyWith(
+                      primary: darkprimarycolor,
+                      error: Colors.red,
+                      onPrimary: darkprimarycolor,
+                      outline: darkprimarycolor,
+                      primaryVariant: darkprimarycolor,
+                      onPrimaryContainer: darkprimarycolor,
+                    ),
+                  )
                   ? darkprimarycolor
                   : primarycolor),
         ),
@@ -478,16 +517,16 @@ int count=0;
             side: BorderSide(
                 width: 2,
                 color: themeNotifier.getTheme() ==
-                        ThemeData.dark(useMaterial3: true).copyWith(
-                          colorScheme: ColorScheme.dark().copyWith(
-                            primary: darkprimarycolor,
-                            error: Colors.red,
-                            onPrimary: darkprimarycolor,
-                            outline: darkprimarycolor,
-                            primaryVariant: darkprimarycolor,
-                            onPrimaryContainer: darkprimarycolor,
-                          ),
-                        )
+                    ThemeData.dark(useMaterial3: true).copyWith(
+                      colorScheme: ColorScheme.dark().copyWith(
+                        primary: darkprimarycolor,
+                        error: Colors.red,
+                        onPrimary: darkprimarycolor,
+                        outline: darkprimarycolor,
+                        primaryVariant: darkprimarycolor,
+                        onPrimaryContainer: darkprimarycolor,
+                      ),
+                    )
                     ? darkprimarycolor
                     : primarycolor),
           ),
@@ -502,16 +541,16 @@ int count=0;
             side: BorderSide(
                 width: 2,
                 color: themeNotifier.getTheme() ==
-                        ThemeData.dark(useMaterial3: true).copyWith(
-                          colorScheme: ColorScheme.dark().copyWith(
-                            primary: darkprimarycolor,
-                            error: Colors.red,
-                            onPrimary: darkprimarycolor,
-                            outline: darkprimarycolor,
-                            primaryVariant: darkprimarycolor,
-                            onPrimaryContainer: darkprimarycolor,
-                          ),
-                        )
+                    ThemeData.dark(useMaterial3: true).copyWith(
+                      colorScheme: ColorScheme.dark().copyWith(
+                        primary: darkprimarycolor,
+                        error: Colors.red,
+                        onPrimary: darkprimarycolor,
+                        outline: darkprimarycolor,
+                        primaryVariant: darkprimarycolor,
+                        onPrimaryContainer: darkprimarycolor,
+                      ),
+                    )
                     ? darkprimarycolor
                     : primarycolor),
           ),

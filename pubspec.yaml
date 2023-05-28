@@ -77,6 +77,8 @@ dependencies:
   animated_text_kit: ^4.2.2
   google_fonts: ^4.0.4
   firebase_admin: ^0.2.0
+  read_pdf_text: ^0.2.1
+  highlight_text: ^1.6.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
