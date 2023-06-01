@@ -107,7 +107,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
       },
       child: SafeArea(
         child: internetAvailabilityNotifier.getInternetAvailability() == false
-            ? InternetChecker()
+            ? const InternetChecker()
             : Scaffold(
                 appBar: AppBar(
                     title: const Text('Write a review'),
@@ -166,8 +166,8 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                           height: 60,
                         ),
                         isLoading
-                            ? CircularProgressIndicator()
-                            : ElevatedButton(
+                            ? const CircularProgressIndicator()
+                            :  ElevatedButton(
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
                                     if (mounted) {
@@ -254,7 +254,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                                 child: const Padding(
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 75.0, vertical: 12.0),
-                                    child: Text('Submit')),
+                                    child:const Text('Submit')),
                               ),
                       ],
                     ),

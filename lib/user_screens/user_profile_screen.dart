@@ -73,10 +73,10 @@ if (mounted){
   Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+          .showSnackBar(const SnackBar(content:  Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -92,7 +92,7 @@ if (mounted){
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            title: Text('Balance: \$$balance'),
+            title:  Text('Balance: \$$balance'),
             automaticallyImplyLeading: false,
           ),
           body: SingleChildScrollView(
@@ -126,7 +126,7 @@ if (mounted){
                     ))),
                     const SizedBox(height: 10),
                     Text(name1,
-                        style: TextStyle(
+                        style:const TextStyle(
                             fontSize: subheadingSize,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(
@@ -173,7 +173,7 @@ if (mounted){
                                         ? ThemeData.dark(useMaterial3: true,)
                                             .copyWith(
                                             colorScheme:
-                                                ColorScheme.dark().copyWith(
+                                            const ColorScheme.dark().copyWith(
                                               primary: darkprimarycolor,
                                               error: Colors.red,
                                               onPrimary: darkprimarycolor,
@@ -257,7 +257,7 @@ if (mounted){
                                   if (user == null) {
                                     // print('hello');
                                     context.read<AuthState>().user = null;
-                                    navigateWithNoBack(context, MyApp());
+                                    navigateWithNoBack(context, const MyApp());
                                   }
                                 }),
                           ],

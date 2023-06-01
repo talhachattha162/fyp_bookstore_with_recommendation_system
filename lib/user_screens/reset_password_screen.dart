@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-import 'package:bookstore_recommendation_system_fyp/user_screens/signup_screen.dart';
+// import 'package:bookstore_recommendation_system_fyp/user_screens/signup_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import '../providers/internetavailabilitynotifier.dart';
 import '../utils/InternetChecker.dart';
 import '../utils/firebase_constants.dart';
-import '../utils/fluttertoast.dart';
+// import '../utils/fluttertoast.dart';
 import 'login_screen.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -62,7 +62,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(snackBar);
-      navigateWithNoBack(context, LoginScreen());
+      navigateWithNoBack(context, const LoginScreen());
     }).catchError((e) {
       if (mounted) {
         setState(() {
@@ -99,10 +99,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+          .showSnackBar(const SnackBar(content: Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -115,7 +115,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     // TODO: implement initState
     super.initState();
 
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
       try {
@@ -139,10 +139,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     return internetAvailabilityNotifier.getInternetAvailability() == false
-        ? InternetChecker()
+        ? const InternetChecker()
         : WillPopScope(
             onWillPop: () async {
-              navigateWithNoBack(context, LoginScreen());
+              navigateWithNoBack(context, const LoginScreen());
               return false;
             },
             child: SafeArea(
@@ -173,7 +173,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       ),
                     ),
                     isLoading == true
-                        ? CircularProgressIndicator()
+                        ? const CircularProgressIndicator()
                         : ElevatedButton(
                             onPressed: () {
                               resetPassword(

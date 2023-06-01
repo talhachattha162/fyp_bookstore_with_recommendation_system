@@ -33,16 +33,16 @@ import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:http/http.dart' as http;
-import '../models/razorpay_response.dart';
+// import '../models/razorpay_response.dart';
 import 'package:url_launcher/url_launcher.dart';
 // import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../utils/snackbar.dart';
+// import '../utils/snackbar.dart';
 import 'edit_screen.dart';
 
 class ViewBookScreen extends StatefulWidget {
-  Book book;
+  final Book book;
   ViewBookScreen({super.key, required this.book});
 
   @override
@@ -65,18 +65,6 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   bool isDownloading = false;
 
   String downloadString = '';
-
-  Future<bool> onWillPop() async {
-    final now = DateTime.now();
-    if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
-      currentBackPressTime = now;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
-      return Future.value(false);
-    }
-    return Future.value(true);
-  }
 
   Future<String> getName(String userId) async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -145,15 +133,15 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Download Successful', style: TextStyle(fontSize: 20)),
+            title: const Text('Download Successful', style:  TextStyle(fontSize: 20)),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
                   Column(
                     children: [
-                      Icon(Icons.check_circle_outline),
+                      const Icon(Icons.check_circle_outline),
                       Text('Downloaded at ${downloadsDirectory.path} folder',
-                          style: TextStyle(fontSize: 12))
+                          style: const TextStyle(fontSize: 12))
                     ],
                   ),
                 ],
@@ -164,7 +152,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text('Close'),
+                child: const Text('Close'),
               ),
             ],
           );
@@ -181,14 +169,14 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Download Failed', style: TextStyle(fontSize: 20)),
+            title: const Text('Download Failed', style:  TextStyle(fontSize: 20)),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
                   Column(
                     children: [
-                      Icon(Icons.error),
-                      Text('$e', style: TextStyle(fontSize: 12))
+                      const Icon(Icons.error),
+                      Text('$e', style:const  TextStyle(fontSize: 12))
                     ],
                   ),
                 ],
@@ -199,7 +187,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text('Close'),
+                child: const Text('Close'),
               ),
             ],
           );
@@ -301,7 +289,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
         }
       }
     });
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
       try {
@@ -346,14 +334,14 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     }).catchError((error) => print("Failed to delete book: $error"));
   }
 
-  Future<void> _checkIfBookIsFavorited() async {
-    final isFavorited = await isBookFavorited();
-    if (mounted) {
-      setState(() {
-        favourite = isFavorited;
-      });
-    }
-  }
+  // Future<void> _checkIfBookIsFavorited() async {
+  //   final isFavorited = await isBookFavorited();
+  //   if (mounted) {
+  //     setState(() {
+  //       favourite = isFavorited;
+  //     });
+  //   }
+  // }
 
   StreamSubscription<bool>? _paymentsStreamSubscription;
 
@@ -409,7 +397,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
         builder: (BuildContext context) {
           // set up the button
           Widget okButton = TextButton(
-            child: Text("OK"),
+            child: const Text("OK"),
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -417,8 +405,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
 
           // set up the AlertDialog
           AlertDialog alert = AlertDialog(
-            title: Text("Payment Successful"),
-            content: Text("Thank you for your payment!"),
+            title: const Text("Payment Successful"),
+            content: const Text("Thank you for your payment!"),
             actions: [
               okButton,
             ],
@@ -471,7 +459,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
       builder: (BuildContext context) {
         // set up the button
         Widget okButton = TextButton(
-          child: Text("OK"),
+          child:const  Text("OK"),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -479,8 +467,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
 
         // set up the AlertDialog
         AlertDialog alert = AlertDialog(
-          title: Text("Payment Failed"),
-          content: Text("Try next time"),
+          title:const  Text("Payment Failed"),
+          content:const  Text("Try next time"),
           actions: [
             okButton,
           ],
@@ -498,7 +486,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
       builder: (BuildContext context) {
         // set up the button
         Widget okButton = ElevatedButton(
-          child: Text("OK"),
+          child:const  Text("OK"),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -506,8 +494,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
 
         // set up the AlertDialog
         AlertDialog alert = AlertDialog(
-          title: Text("Payment Successful"),
-          content: Text("Thank you for your payment!"),
+          title:const  Text("Payment Successful"),
+          content:const  Text("Thank you for your payment!"),
           actions: [
             okButton,
           ],
@@ -611,16 +599,16 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                               //   style: TextStyle(
                               //       fontSize: 10, color: Colors.redAccent),
                               // ),
-                              Text('Enter Duration in days to rent',
+                              const Text('Enter Duration in days to rent',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               SizedBox(
                                 height: 40,
                                 width: 210,
                                 child: TextInputField(
                                   hintText: 'Enter Duration',
-                                  suffixIcon: Text(''),
+                                  suffixIcon: const Text(''),
                                   isPassword: false,
                                   textEditingController:
                                       _durationdaysController,
@@ -635,9 +623,9 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                   textInputType: TextInputType.number,
                                 ),
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Text(_durationdaysController.text!=''?'Price: \$${widget.book.price * int.parse(_durationdaysController.text)}':'Price: \$${widget.book.price}',
-                                  style: TextStyle(fontWeight: FontWeight.bold)),
+                                  style: const TextStyle(fontWeight: FontWeight.bold)),
 
                             ],
                           )
@@ -666,13 +654,13 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                         Navigator.pop(context);
                       },
                       child: Padding(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                             horizontal: 95.0, vertical: 9.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text('Pay'),
-                            Icon(Icons.arrow_forward),
+                            const  Text('Pay'),
+                            const Icon(Icons.arrow_forward),
                           ],
                         ),
                       ),
@@ -748,7 +736,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
       // print('hasData' + hasData.toString());
       yield hasData;
       await Future.delayed(
-          Duration(seconds: 1)); // Wait for 1 second before checking again
+          const Duration(seconds: 1)); // Wait for 1 second before checking again
     }
   }
 
@@ -862,7 +850,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     deleteReviewsForBookId(widget.book.bookid);
     deleteBook(widget.book.bookid);
     Navigator.of(context).pop();
-    navigateWithNoBack(context, MainScreenUser());
+    navigateWithNoBack(context, const MainScreenUser());
   }
 
   bool paymentsExist = false;
@@ -887,17 +875,17 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirmation'),
-          content: Text('Are you sure you want to delete this book?'),
+          title: const Text('Confirmation'),
+          content:const  Text('Are you sure you want to delete this book?'),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child:const  Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Delete'),
+              child:const  Text('Delete'),
               onPressed: () {
                 deleteBookAndNavigate(context);
               },
@@ -913,11 +901,11 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Cant delete'),
-          content: Text('Someone once purchased your book'),
+          title:const  Text('Cant delete'),
+          content:const  Text('Someone once purchased your book'),
           actions: <Widget>[
             TextButton(
-              child: Text('Ok'),
+              child:const  Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -958,12 +946,12 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
     // print(hasDataf);
     return WillPopScope(
       onWillPop: () async {
-        navigateWithNoBack(context, MainScreenUser());
+        navigateWithNoBack(context, const MainScreenUser());
         return false;
       },
       child: SafeArea(
         child: internetAvailabilityNotifier.getInternetAvailability() == false
-            ? InternetChecker()
+            ? const InternetChecker()
             : MultiProvider(
                 providers: [
                   ChangeNotifierProvider(
@@ -980,7 +968,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                         leading: IconButton(
                           icon: const Icon(Icons.arrow_back),
                           onPressed: () {
-                            navigateWithNoBack(context, MainScreenUser());
+                            navigateWithNoBack(context, const MainScreenUser());
                           },
                         ),
                         actions: [
@@ -990,11 +978,11 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                   onSelected: handleMenuItemSelected,
                                   itemBuilder: (BuildContext context) =>
                                       <PopupMenuEntry<String>>[
-                                    PopupMenuItem<String>(
+                                   const  PopupMenuItem<String>(
                                       value: 'Edit',
                                       child: Text('Edit'),
                                     ),
-                                    PopupMenuItem<String>(
+                                   const PopupMenuItem<String>(
                                       value: 'Delete',
                                       child: Text('Delete'),
                                     ),
@@ -1017,7 +1005,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                 alignment: Alignment.center,
                                 // widthFactor: 0.7,
                                 // heightFactor: 0.6,
-                                child: CachedNetworkImage(
+                                child: CachedNetworkImage(filterQuality:FilterQuality.low ,
                                   imageUrl: widget.book.coverPhotoFile,
                                   placeholder: (context, url) =>
                                       LoadingAnimationWidget.fourRotatingDots(
@@ -1025,7 +1013,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                             ThemeData.dark(useMaterial3: true)
                                                 .copyWith(
                                               colorScheme:
-                                                  ColorScheme.dark().copyWith(
+                                              const ColorScheme.dark().copyWith(
                                                 primary: darkprimarycolor,
                                                 error: Colors.red,
                                                 onPrimary: darkprimarycolor,
@@ -1041,7 +1029,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                     size: 50,
                                   ),
                                   errorWidget: (context, url, error) =>
-                                      Icon(Icons.error),
+                                     const Icon(Icons.error),
                                 ),
                               ),
                             ),
@@ -1060,14 +1048,14 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       ? _startDownload
                                       : null,
                                   icon: isDownloading
-                                      ? Center(
-                                          child: SizedBox(
+                                      ? const Center(
+                                          child:  SizedBox(
                                             height: 10,
                                             width: 10,
                                             child: CircularProgressIndicator(),
                                           ),
                                         )
-                                      : Icon(Icons.download)),
+                                      : const Icon(Icons.download)),
                               IconButton(
                                   onPressed: hasDataf == true ||
                                           widget.book.freeRentPaid == 'free' ||
@@ -1148,8 +1136,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                               builder: (context, provider, child) {
                             Book? book = provider.book;
                             if (book == null) {
-                              return Container(
-                                child: Text('Loading...'),
+                              return  Container(
+                                child:const  Text('Loading...'),
                               );
                             } else {
                               if (book.freeRentPaid == "paid" &&
@@ -1181,8 +1169,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                         context,
                                                         listen: false));
                                               },
-                                              icon: Icon(Icons.lock),
-                                              label: Text('Buy'),
+                                              icon:const Icon(Icons.lock),
+                                              label:const Text('Buy'),
                                             ),
                                           ],
                                         );
@@ -1202,8 +1190,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                   bookpath: bookpath,
                                                 ));
                                           },
-                                          icon: Icon(Icons.headphones),
-                                          label: Text('Listen'),
+                                          icon: const Icon(Icons.headphones),
+                                          label:const Text('Listen'),
                                         ),
                                         ElevatedButton.icon(
                                           onPressed: () async {
@@ -1214,8 +1202,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                   bookpath: bookpath,
                                                 ));
                                           },
-                                          icon: Icon(Icons.book),
-                                          label: Text('Read'),
+                                          icon:const Icon(Icons.book),
+                                          label:const Text('Read'),
                                         ),
                                       ],
                                     );
@@ -1265,7 +1253,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                         if (!timeLeft.isNegative) {
                                           pass = true;
                                         }
-                                        WidgetsBinding.instance!
+                                        WidgetsBinding.instance
                                             .addPostFrameCallback(
                                                 (_) => setState(() {
                                                       _timeLeft = timeLeft;
@@ -1291,8 +1279,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                           ));
                                                     },
                                                     icon:
-                                                        Icon(Icons.headphones),
-                                                    label: Text('Listen'),
+                                                    const Icon(Icons.headphones),
+                                                    label:const  Text('Listen'),
                                                   ),
                                                   ElevatedButton.icon(
                                                     onPressed: () async {
@@ -1303,8 +1291,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                             bookpath: bookpath,
                                                           ));
                                                     },
-                                                    icon: Icon(Icons.book),
-                                                    label: Text('Read'),
+                                                    icon:const Icon(Icons.book),
+                                                    label:const Text('Read'),
                                                   ),
                                                 ],
                                               ),
@@ -1333,8 +1321,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                     context,
                                                     listen: false));
                                           },
-                                          icon: Icon(Icons.lock),
-                                          label: Text('Rent'),
+                                          icon:const Icon(Icons.lock),
+                                          label:const Text('Rent'),
                                         ),
                                       ],
                                     );
@@ -1358,8 +1346,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                 bookpath: bookpath,
                                               ));
                                         },
-                                        icon: Icon(Icons.headphones),
-                                        label: Text('Listen')),
+                                        icon:const  Icon(Icons.headphones),
+                                        label: const Text('Listen')),
                                     ElevatedButton.icon(
                                         onPressed: () async {
                                           // _settingModalBottomSheet(context);
@@ -1371,8 +1359,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                 bookpath: bookpath,
                                               ));
                                         },
-                                        icon: Icon(Icons.book),
-                                        label: Text('Read')),
+                                        icon:const Icon(Icons.book),
+                                        label:const Text('Read')),
                                   ],
                                 );
                               }
@@ -1391,18 +1379,18 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
+                                    const Text(
                                       'Title',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18),
                                     ),
-                                    SizedBox(width: 5),
+                                   const SizedBox(width: 5),
                                     Flexible(
                                       child: Text(
                                         widget.book.title,
                                         // overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(fontSize: 16),
+                                        style:const TextStyle(fontSize: 16),
                                       ),
                                     )
                                   ],
@@ -1414,7 +1402,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
+                                   const Text(
                                       'Price',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
@@ -1422,7 +1410,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                     ),
                                     Text(
                                       "\$" + widget.book.price.toString(),
-                                      style: TextStyle(fontSize: 16),
+                                      style:const TextStyle(fontSize: 16),
                                     )
                                   ],
                                 ),
@@ -1438,7 +1426,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Tags',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
@@ -1452,7 +1440,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                         .substring(0, 6) +
                                                     '..' +
                                                     ' ,',
-                                            style: TextStyle(fontSize: 16),
+                                            style:const TextStyle(fontSize: 16),
                                           ),
                                           Text(
                                             widget.book.tag2.length < 6
@@ -1461,7 +1449,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                         .substring(0, 6) +
                                                     '..' +
                                                     ' ,',
-                                            style: TextStyle(fontSize: 16),
+                                            style:const TextStyle(fontSize: 16),
                                           ),
                                           Text(
                                             widget.book.tag3.length < 6
@@ -1470,7 +1458,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                         .substring(0, 6) +
                                                     '..' +
                                                     '',
-                                            style: TextStyle(fontSize: 16),
+                                            style:const TextStyle(fontSize: 16),
                                           ),
                                         ])
                                       ],
@@ -1484,7 +1472,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
+                                   const Text(
                                       'Author',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
@@ -1492,7 +1480,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                     ),
                                     Text(
                                       widget.book.author,
-                                      style: TextStyle(fontSize: 16),
+                                      style: const TextStyle(fontSize: 16),
                                     )
                                   ],
                                 ),
@@ -1503,7 +1491,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
+                                   const Text(
                                       'Published Year',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -1511,7 +1499,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                       ),
                                     ),
                                     Text(
-                                        style: TextStyle(
+                                        style:const TextStyle(
                                           fontSize: 16,
                                         ),
                                         widget.book.publishyear),
@@ -1524,7 +1512,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
+                                   const Text(
                                       'Reviews',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -1546,7 +1534,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                             useMaterial3: true)
                                                         .copyWith(
                                                       colorScheme:
-                                                          ColorScheme.dark()
+                                                      const ColorScheme.dark()
                                                               .copyWith(
                                                         primary:
                                                             darkprimarycolor,
@@ -1568,7 +1556,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                         ))
                                   ],
                                 ),
-                                SizedBox(
+                               const SizedBox(
                                   height: 10,
                                 ),
                                 Consumer<ReviewProvider>(
@@ -1585,7 +1573,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                                   true)
                                                           .copyWith(
                                                         colorScheme:
-                                                            ColorScheme.dark()
+                                                        const ColorScheme.dark()
                                                                 .copyWith(
                                                           primary:
                                                               darkprimarycolor,
@@ -1618,7 +1606,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                           width: 30,
                                                           child: ClipRRect(
                                                             borderRadius:
-                                                                BorderRadius
+                                                                 BorderRadius
                                                                     .circular(
                                                                         20),
                                                             child:
@@ -1629,7 +1617,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                                   (context,
                                                                       error,
                                                                       stackTrace) {
-                                                                return Icon(
+                                                                return const Icon(
                                                                     Icons.error,
                                                                     size: 20);
                                                               },
@@ -1650,7 +1638,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                               : provider
                                                                   .users[0]
                                                                   .name,
-                                                          style: TextStyle(
+                                                          style:const TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -1658,7 +1646,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                         ),
                                                         Row(
                                                           children: [
-                                                            Icon(
+                                                           const Icon(
                                                               Icons.star,
                                                               color:
                                                                   Colors.amber,
@@ -1672,7 +1660,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                         )
                                                       ],
                                                     ),
-                                                    SizedBox(
+                                                 const   SizedBox(
                                                       height: 10,
                                                     ),
                                                     Padding(
@@ -1681,7 +1669,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                           10.0, 0, 0, 0),
                                                       child: Wrap(children: [
                                                         Text(
-                                                            style: TextStyle(
+                                                            style:const TextStyle(
                                                               fontSize: 16,
                                                             ),
                                                             provider.reviews[0]
@@ -1705,7 +1693,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                                   true)
                                                           .copyWith(
                                                         colorScheme:
-                                                            ColorScheme.dark()
+                                                        const ColorScheme.dark()
                                                                 .copyWith(
                                                           primary:
                                                               darkprimarycolor,
@@ -1749,7 +1737,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                                   (context,
                                                                       error,
                                                                       stackTrace) {
-                                                                return Icon(
+                                                                return const Icon(
                                                                     Icons.error,
                                                                     size: 20);
                                                               },
@@ -1823,7 +1811,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                                   true)
                                                           .copyWith(
                                                         colorScheme:
-                                                            ColorScheme.dark()
+                                                        const ColorScheme.dark()
                                                                 .copyWith(
                                                           primary:
                                                               darkprimarycolor,
@@ -1867,7 +1855,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                                   (context,
                                                                       error,
                                                                       stackTrace) {
-                                                                return Icon(
+                                                                return const Icon(
                                                                     Icons.error,
                                                                     size: 20);
                                                               },
@@ -1935,16 +1923,16 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                               ],
                             ),
                           ),
-                          Text(
+                          const Text(
                             'Recommended Books',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           _recommendations.length == 0
                               ? nobooksmsg == ''
-                                  ? Text('Loading...')
-                                  : Text('No Similar Books Found')
+                                  ? const Text('Loading...')
+                                  : const Text('No Similar Books Found')
                               : Padding(
                                   padding: const EdgeInsets.all(12.0),
                                   child: SizedBox(
@@ -1991,7 +1979,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                                                     child: Text(
                                                       _recommendations[index]
                                                           [0],
-                                                      style: TextStyle(
+                                                      style: const TextStyle(
                                                           fontSize: 14.0),
                                                     ),
                                                   ),

@@ -91,7 +91,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 40,
+      imageQuality: 10,
     );
     if (pickedFile != null) {
       // var compressedFile = await FlutterImageCompress.compressWithFile(pickedFile.path,quality: 50, );

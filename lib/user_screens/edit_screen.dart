@@ -6,7 +6,7 @@ import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_scree
 import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/pick_file.dart';
-import 'package:bookstore_recommendation_system_fyp/utils/snackbar.dart';
+// import 'package:bookstore_recommendation_system_fyp/utils/snackbar.dart';
 import 'package:confetti/confetti.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -133,10 +133,10 @@ class _EditBookScreenState extends State<EditBookScreen> {
   Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+          .showSnackBar(const SnackBar(content: Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -157,7 +157,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
       child: SafeArea(
         child:  Scaffold(
           appBar: AppBar(
-            title:  Text('Edit Book Details', style: TextStyle(
+            title:  const Text('Edit Book Details', style:  TextStyle(
                 fontSize: 22, fontWeight: FontWeight.bold)),
             automaticallyImplyLeading: false,
           leading: IconButton(
@@ -184,7 +184,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                         children: [
                           TextInputField(
                             hintText: 'Enter title',
-                            suffixIcon: Text(''),
+                            suffixIcon: const Text(''),
                             isPassword: false,
                             textInputType: TextInputType.text,
                             textEditingController: _titleController,
@@ -213,7 +213,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                           ),
                           TextInputField(
                             hintText: 'Enter Published Year',
-                            suffixIcon: Text(''),
+                            suffixIcon: const Text(''),
                             isPassword: false,
                             textInputType: TextInputType.text,
                             textEditingController: _publishyearController,
@@ -235,7 +235,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                               isExpanded: true,
                               iconEnabledColor: themeNotifier.getTheme() ==
                                   ThemeData.dark(useMaterial3: true).copyWith(
-                                    colorScheme: ColorScheme.dark().copyWith(
+                                    colorScheme: const ColorScheme.dark().copyWith(
                                       primary: darkprimarycolor,
                                       error: Colors.red,
                                       onPrimary: darkprimarycolor,
@@ -275,7 +275,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                   width: width * 0.305,
                                   child: TextInputField(
                                     hintText: 'Tag1',
-                                    suffixIcon: Text(''),
+                                    suffixIcon: const Text(''),
                                     isPassword: false,
                                     textInputType: TextInputType.text,
                                     textEditingController: _tag1Controller,
@@ -294,7 +294,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                   width: width * 0.305,
                                   child: TextInputField(
                                     hintText: 'Tag2',
-                                    suffixIcon: Text(''),
+                                    suffixIcon: const Text(''),
                                     isPassword: false,
                                     textInputType: TextInputType.text,
                                     textEditingController: _tag2Controller,
@@ -313,7 +313,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                   width: width * 0.305,
                                   child: TextInputField(
                                     hintText: 'Tag3',
-                                    suffixIcon: Text(''),
+                                    suffixIcon: const Text(''),
                                     isPassword: false,
                                     textInputType: TextInputType.text,
                                     textEditingController: _tag3Controller,
@@ -338,7 +338,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                 width: width * 0.305,
                                 child: RadioListTile(
                                   contentPadding: const EdgeInsets.all(0.0),
-                                  title: Text(
+                                  title: const Text(
                                     "Free",
                                   ),
                                   activeColor: themeNotifier.getTheme() ==
@@ -382,7 +382,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                       ThemeData.dark(useMaterial3: true)
                                           .copyWith(
                                         colorScheme:
-                                        ColorScheme.dark().copyWith(
+                                        const ColorScheme.dark().copyWith(
                                           primary: darkprimarycolor,
                                           error: Colors.red,
                                           onPrimary: darkprimarycolor,
@@ -419,7 +419,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                       ThemeData.dark(useMaterial3: true)
                                           .copyWith(
                                         colorScheme:
-                                        ColorScheme.dark().copyWith(
+                                        const ColorScheme.dark().copyWith(
                                           primary: darkprimarycolor,
                                           error: Colors.red,
                                           onPrimary: darkprimarycolor,
@@ -453,7 +453,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                 padding: const EdgeInsets.only(bottom: 10.0),
                                 child: TextInputField(
                                   hintText: 'Enter Price',
-                                  suffixIcon: Text(''),
+                                  suffixIcon: const Text(''),
                                   isPassword: false,
                                   textEditingController: _priceController,
                                   validator: (value) {
@@ -744,7 +744,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                         isLoading = false;
                                       });
                                     }
-                                    navigateWithNoBack(context, MainScreenUser());
+                                    navigateWithNoBack(context, const MainScreenUser());
                                   }
                                 },
                                 child: const Padding(
@@ -764,7 +764,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                     color: Colors.black.withOpacity(0.5),
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                      child: Center(
+                      child: const  Center(
                         child: CircularProgressIndicator(),
                       ),
                     ),

@@ -49,7 +49,7 @@ pickFile(List<String> allowedextensions, FileType filetype, int size,
           content: AwesomeSnackbarContent(
             title: 'Error!',
             message:
-            'upload less than 1 mb file',
+            'upload less than 2 mb file',
 
             /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
             contentType: ContentType.failure,

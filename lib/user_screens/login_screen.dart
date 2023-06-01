@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 0), (Timer t) async {
+    timer = Timer.periodic(const Duration(seconds: 0), (Timer t) async {
 
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
@@ -212,10 +212,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+          .showSnackBar(const SnackBar(content: Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -261,7 +261,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   horizontal: 16.0, vertical: 4.0),
                               child: TextInputField(
                                 hintText: 'Enter Email',
-                                suffixIcon: Text(''),
+                                suffixIcon: const Text(''),
                                 textInputType: TextInputType.emailAddress,
                                 textEditingController: _emailController,
                                 isPassword: false,
@@ -323,7 +323,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: 20.0,
                             ),
                             isLoading == true
-                                ? CircularProgressIndicator()
+                                ? const CircularProgressIndicator()
                                 : ElevatedButton(
                                     onPressed: () async {
                                       if (_formKey.currentState!.validate()) {
@@ -359,7 +359,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               'password': _passwordController.text,
                                             });
                                             context.read<AuthState>().user = 1;
-                                            navigateWithNoBack(context, MyApp());
+                                            navigateWithNoBack(context, const MyApp());
                                             // here
                                           }
                                         }
@@ -378,7 +378,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         child: Text('Login')),
                                   ),
                             Padding(
-                              padding: EdgeInsets.fromLTRB(0, 0, 60, 0),
+                              padding: const EdgeInsets.fromLTRB(0, 0, 60, 0),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
@@ -387,7 +387,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         navigateWithNoBack(
                                             context, const ResetPasswordScreen());
                                       },
-                                      child: Text(
+                                      child: const Text(
                                         'Reset Password',
                                         style: TextStyle(fontSize: 12),
                                       )),
@@ -401,7 +401,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ThemeData.dark(useMaterial3: true)
                                               .copyWith(
                                             colorScheme:
-                                                ColorScheme.dark().copyWith(
+                                            const ColorScheme.dark().copyWith(
                                               primary: darkprimarycolor,
                                               error: Colors.red,
                                               onPrimary: darkprimarycolor,
@@ -418,7 +418,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: 10.0,
                             ),
                             isGoogleLoading == true
-                                ? CircularProgressIndicator()
+                                ? const CircularProgressIndicator()
                                 : SignInButton(
                                     Buttons.Google,
                                     text: "Sign in with Google",
@@ -441,7 +441,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       }
                                       if (user != null) {
                                         context.read<AuthState>().user = 1;
-                                        navigateWithNoBack(context, MyApp());
+                                        navigateWithNoBack(context, const MyApp());
                                       }
                                       if (mounted) {
                                         setState(() {
@@ -470,7 +470,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ])),
               ),
-            ):InternetChecker()
+            ):const InternetChecker()
       ),
     );
   }

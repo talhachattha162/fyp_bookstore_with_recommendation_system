@@ -1,17 +1,17 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-import 'package:bookstore_recommendation_system_fyp/user_screens/login_screen.dart';
-import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
+// import 'package:bookstore_recommendation_system_fyp/user_screens/login_screen.dart';
+// import 'package:bookstore_recommendation_system_fyp/utils/navigation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart';
 
 import '../models/user.dart';
-import '../providers/themenotifier.dart';
+// import '../providers/themenotifier.dart';
 import '../utils/firebase_constants.dart';
-import '../utils/global_variables.dart';
-import 'dart:io';
+// import '../utils/global_variables.dart';
+// import 'dart:io';
 
 class AddRemoveUser extends StatefulWidget {
   const AddRemoveUser({super.key});
@@ -21,7 +21,7 @@ class AddRemoveUser extends StatefulWidget {
 }
 
 class _AddRemoveUserState extends State<AddRemoveUser> {
-  List<Users> _users = [];
+  // List<Users> _users = [];
 bool isLoading=false;
   @override
   void initState() {
@@ -117,9 +117,9 @@ bool isLoading=false;
         await deleteBookData(bookId);
       }
 
-      print('All books and related data deleted successfully.');
+      // print('All books and related data deleted successfully.');
     } catch (e) {
-      print('Error deleting books and related data: $e');
+      // print('Error deleting books and related data: $e');
     }
   }
 
@@ -181,7 +181,7 @@ bool isLoading=false;
   Future<void> deleteCurrentUser(String email, String password) async {
     try {
       await login(email, password);
-      await Future.delayed(Duration(seconds: 2)); // Add a delay to ensure login is completed
+      await Future.delayed(const Duration(seconds: 2)); // Add a delay to ensure login is completed
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         await user.delete();
@@ -227,7 +227,7 @@ bool isLoading=false;
         .collection('books')
         .where('userid', isEqualTo: users.uid);
 
-    final bookCollectionSnapshot = await bookCollectionQuery.get();
+    // final bookCollectionSnapshot = await bookCollectionQuery.get();
 
       // If the user hasn't uploaded any book collections, delete their account
       if (users.authenticationmethod == 'email') {
@@ -320,17 +320,17 @@ bool isLoading=false;
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirmation'),
-          content: Text('Are you sure you want to delete this user?'),
+          title: const Text('Confirmation'),
+          content: const Text('Are you sure you want to delete this user?'),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
-            isLoading?CircularProgressIndicator():TextButton(
-              child: Text('Delete'),
+            isLoading?const CircularProgressIndicator():TextButton(
+              child: const Text('Delete'),
               onPressed: ()async {
                await _deleteUser(user);
                Navigator.of(context).pop();
@@ -354,7 +354,7 @@ bool isLoading=false;
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Create Account'),
+          title: const Text('Create Account'),
           content: Form(
             key: _formKey,
             child: Column(
@@ -362,7 +362,7 @@ bool isLoading=false;
               children: <Widget>[
                 TextFormField(
                   controller: _nameController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Name',
                   ),
                   validator: (value) {
@@ -375,7 +375,7 @@ bool isLoading=false;
                 ),
                 TextFormField(
                   controller: _emailController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Email',
                   ),
                   validator: (value) {
@@ -389,7 +389,7 @@ bool isLoading=false;
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Password',
                   ),
                   validator: (value) {
@@ -405,13 +405,13 @@ bool isLoading=false;
           ),
           actions: <Widget>[
             ElevatedButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             ElevatedButton(
-              child: Text('Create Account'),
+              child: const Text('Create Account'),
               onPressed: () async {
         if (_formKey.currentState!.validate()) {
           String email = _emailController.text.trim();
@@ -477,7 +477,7 @@ bool isLoading=false;
 
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    // final themeNotifier = Provider.of<ThemeNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     return SafeArea(
         child: Scaffold(
@@ -516,13 +516,13 @@ bool isLoading=false;
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Text(
+              const Text(
                 'Name',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
+              const Text(
                 'Gmail',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               // Text(
               //   'Delete',
@@ -538,7 +538,7 @@ bool isLoading=false;
                 builder: (BuildContext context,
                     AsyncSnapshot<List<Users>> snapshot) {
                   if (!snapshot.hasData) {
-                    return Center(child: const CircularProgressIndicator());
+                    return const Center(child: const CircularProgressIndicator());
                   }
                   final users = snapshot.data!;
                   return ListView.builder(
@@ -560,9 +560,9 @@ bool isLoading=false;
                                   ? user.name
                                   : user.name.substring(0, 8)),
                               Text(email),
-                              isLoading?Container(height:10,width:10,child:CircularProgressIndicator()):IconButton(
+                              isLoading?Container(height:10,width:10,child:const CircularProgressIndicator()):IconButton(
                                 onPressed: () => showConfirmationDialog(context,user),
-                                icon: Icon(Icons.delete),
+                                icon: const Icon(Icons.delete),
                               ),
                             ],
                           ),
@@ -577,7 +577,7 @@ bool isLoading=false;
                 },
               )),
           ElevatedButton.icon(
-              icon: Icon(CupertinoIcons.add),
+              icon: const Icon(CupertinoIcons.add),
               onPressed: () {
                 _showDialog(context);
               },

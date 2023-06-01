@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/themenotifier.dart';
 import '../utils/global_variables.dart';
-import 'rented_books.dart';
+// import 'rented_books.dart';
 import 'favourites_screen.dart';
 
 class LibraryScreen extends StatefulWidget {
@@ -27,7 +27,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
     )..repeat(reverse: true);
     Timer.periodic(Duration(seconds: 1), (Timer timer)
     {
@@ -48,11 +48,11 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
 
   Future<bool> onWillPop() async {
     final now = DateTime.now();
-    if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+    if (currentBackPressTime  == null ||
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+          .showSnackBar(const SnackBar(content:  Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -149,7 +149,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                       // ),
                       InkWell(
                         onTap: () {
-                          navigateWithNoBack(context, FavouritesScreen());
+                          navigateWithNoBack(context, const FavouritesScreen());
                         },
                         child: SizedBox(
                           width: width * 0.49,
@@ -157,7 +157,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                           child:Card (
                             child: AnimatedOpacity(
                               opacity: 1 ,
-                              duration: Duration(milliseconds: 500),
+                              duration: const Duration(milliseconds: 500),
                               curve: Curves.easeInOut,
                               child:Container(
                               decoration: BoxDecoration(
@@ -167,7 +167,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                                       ThemeData.dark(useMaterial3: true)
                                           .copyWith(
                                         colorScheme:
-                                        ColorScheme.dark().copyWith(
+                                        const ColorScheme.dark().copyWith(
                                           primary: darkprimarycolor,
                                           error: Colors.red,
                                           onPrimary: darkprimarycolor,
@@ -196,7 +196,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                                             ThemeData.dark(useMaterial3: true)
                                                 .copyWith(
                                               colorScheme:
-                                                  ColorScheme.dark().copyWith(
+                                              const ColorScheme.dark().copyWith(
                                                 primary: darkprimarycolor,
                                                 error: Colors.red,
                                                 onPrimary: darkprimarycolor,
@@ -216,7 +216,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                                                           useMaterial3: true)
                                                       .copyWith(
                                                     colorScheme:
-                                                        ColorScheme.dark()
+                                                    const ColorScheme.dark()
                                                             .copyWith(
                                                       primary: darkprimarycolor,
                                                       error: Colors.red,
@@ -243,7 +243,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                       ),
                       InkWell(
                         onTap: () {
-                          navigateWithNoBack(context, OrderHistory());
+                          navigateWithNoBack(context, const OrderHistory());
                         },
                         child: SizedBox(
                           width: width * 0.49,
@@ -256,7 +256,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                                     ThemeData.dark(useMaterial3: true)
                                         .copyWith(
                                       colorScheme:
-                                      ColorScheme.dark().copyWith(
+                                      const ColorScheme.dark().copyWith(
                                         primary: darkprimarycolor,
                                         error: Colors.red,
                                         onPrimary: darkprimarycolor,
@@ -284,7 +284,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                                             ThemeData.dark(useMaterial3: true)
                                                 .copyWith(
                                               colorScheme:
-                                                  ColorScheme.dark().copyWith(
+                                              const ColorScheme.dark().copyWith(
                                                 primary: darkprimarycolor,
                                                 error: Colors.red,
                                                 onPrimary: darkprimarycolor,
@@ -306,7 +306,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                                                               useMaterial3: true)
                                                           .copyWith(
                                                         colorScheme:
-                                                            ColorScheme.dark()
+                                                        const ColorScheme.dark()
                                                                 .copyWith(
                                                           primary: darkprimarycolor,
                                                           error: Colors.red,
@@ -329,7 +329,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                                                       useMaterial3: true)
                                                       .copyWith(
                                                     colorScheme:
-                                                    ColorScheme.dark()
+                                                    const ColorScheme.dark()
                                                         .copyWith(
                                                       primary: darkprimarycolor,
                                                       error: Colors.red,
@@ -362,7 +362,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                     children: [
                       InkWell(
                         onTap: () {
-                          navigateWithNoBack(context, BookRecommendationScreen());
+                          navigateWithNoBack(context, const BookRecommendationScreen());
                         },
                         child: SizedBox(
                           width: width * 0.5,
@@ -375,7 +375,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                                     ThemeData.dark(useMaterial3: true)
                                         .copyWith(
                                       colorScheme:
-                                      ColorScheme.dark().copyWith(
+                                      const ColorScheme.dark().copyWith(
                                         primary: darkprimarycolor,
                                         error: Colors.red,
                                         onPrimary: darkprimarycolor,
@@ -403,7 +403,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                                         ThemeData.dark(useMaterial3: true)
                                             .copyWith(
                                           colorScheme:
-                                          ColorScheme.dark().copyWith(
+                                          const ColorScheme.dark().copyWith(
                                             primary: darkprimarycolor,
                                             error: Colors.red,
                                             onPrimary: darkprimarycolor,
@@ -425,7 +425,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                                                       useMaterial3: true)
                                                       .copyWith(
                                                     colorScheme:
-                                                    ColorScheme.dark()
+                                                    const ColorScheme.dark()
                                                         .copyWith(
                                                       primary: darkprimarycolor,
                                                       error: Colors.red,
@@ -448,7 +448,7 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                                                       useMaterial3: true)
                                                       .copyWith(
                                                     colorScheme:
-                                                    ColorScheme.dark()
+                                                    const ColorScheme.dark()
                                                         .copyWith(
                                                       primary: darkprimarycolor,
                                                       error: Colors.red,

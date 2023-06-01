@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
+// import 'package:intl/intl.dart';
 import '../models/book.dart';
 import '../providers/internetavailabilitynotifier.dart';
 import '../providers/paymentprovider.dart';
@@ -82,10 +82,10 @@ class _OrderHistoryState extends State<OrderHistory> {
   Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+          .showSnackBar(const SnackBar(content: Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -97,10 +97,10 @@ class _OrderHistoryState extends State<OrderHistory> {
     double height = MediaQuery.of(context).size.height;
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     return internetAvailabilityNotifier.getInternetAvailability() == false
-        ? InternetChecker()
+        ? const InternetChecker()
         : WillPopScope(
             onWillPop: () async {
-              navigateWithNoBack(context, MainScreenUser());
+              navigateWithNoBack(context, const MainScreenUser());
               return false;
             },
             child: SafeArea(
@@ -122,7 +122,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                           // print(FirebaseAuth.instance.currentUser!.uid.toString()+'talhaxyz'+provider.payments.length.toString());
                           provider.fetchPayments(
                               FirebaseAuth.instance.currentUser!.uid);
-                          return Center(child: Text('No orders found'));
+                          return const Center(child: Text('No orders found'));
                         } else {
                           return ListView.builder(
                               itemCount: provider.payments.length,
@@ -141,18 +141,18 @@ class _OrderHistoryState extends State<OrderHistory> {
                                                 ? Text(
                                                     'On ${payment.formattedDate}, at ${payment.formattedTime}, a copy of the book ${book.title} was rented for \$${payment.pricePaid}.The book was rented for ${payment.durationDays} days',
                                                     style:
-                                                        TextStyle(fontSize: 16),
+                                                    const TextStyle(fontSize: 16),
                                                   )
                                                 : Text(
                                                     'On ${payment.formattedDate}, at ${payment.formattedTime}, a copy of the book ${book.title} was purchased for \$${payment.pricePaid}.',
                                                     style:
-                                                        TextStyle(fontSize: 16),
+                                                    const TextStyle(fontSize: 16),
                                                   ),
                                           ],
                                         ),
                                         if (index <
                                             provider.payments.length - 1)
-                                          Divider(),
+                                          const Divider(),
                                       ],
                                     ),
                                   );

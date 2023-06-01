@@ -1,4 +1,3 @@
-
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'dart:io';
@@ -19,8 +18,8 @@ import 'providers/paymentprovider.dart';
 import 'providers/authstatenotifier.dart';
 import 'providers/themenotifier.dart';
 // import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:flutter_svg/svg.dart';
-import '../utils/navigation.dart';
+// import 'package:flutter_svg/svg.dart';
+// import '../utils/navigation.dart';
 // import 'package:flutter_stripe/flutter_stripe.dart';
 
 Future<void> main() async {
@@ -68,7 +67,7 @@ Future<void> main() async {
       ),
 
       // Other providers here
-    ], child: beforeSplash()),
+    ], child: const beforeSplash()),
   );
 //   } else {
 //   // Permission is not granted
@@ -95,7 +94,7 @@ class _beforeSplashState extends State<beforeSplash> {
           fontFamily: GoogleFonts.acme().fontFamily),
       darkTheme: themeNotifier.getTheme(),
       debugShowCheckedModeBanner: false,
-      home: Splash(),
+      home: const Splash(),
     );
   }
 }
@@ -110,16 +109,16 @@ class _ErrorPageState extends State<ErrorPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Error'),
+        title: const Text('Error'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('An error occurred. Please Reload the screen.'),
-            SizedBox(height: 16),
+            const Text('An error occurred. Please Reload the screen.'),
+            const SizedBox(height: 16),
             ElevatedButton(
-              child: Text('Reload'),
+              child: const Text('Reload'),
               onPressed: () {
                 // Reload the current screen
                 Navigator.pop(context);
@@ -180,9 +179,9 @@ class _MyHomePageState extends State<MyHomePage> {
     //   }
     // });
     Timer(
-        Duration(seconds: 3),
+        const Duration(seconds: 3),
         () => Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => MyApp())));
+            context, MaterialPageRoute(builder: (context) => const MyApp())));
   }
 
   @override
@@ -231,7 +230,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 0), (Timer t) async {
+    timer = Timer.periodic(const Duration(seconds: 0), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
       try {
@@ -253,7 +252,7 @@ class _MyAppState extends State<MyApp> {
       if (auth.currentUser != null) {
         context.read<AuthState>().user = 1;
 
-        print('admin:::' + isAdminLoggedIn.toString());
+        // print('admin:::' + isAdminLoggedIn.toString());
         // print('chatthasohail');
       } else {
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -293,16 +292,16 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    // final themeNotifier = Provider.of<ThemeNotifier>(context);
 
     // print('main');
     return
         //  internetAvailabilityNotifier.getInternetAvailability() == true?
         _isFirstTime
-            ? IntroScreen()
+            ? const IntroScreen()
             : (_isLoggedIn
-                ? MainScreenUser()
-                : (isAdminLoggedIn ? MainScreenAdmin() : LoginScreen()));
+                ? const MainScreenUser()
+                : (isAdminLoggedIn ? const MainScreenAdmin() : const LoginScreen()));
   }
 }
 

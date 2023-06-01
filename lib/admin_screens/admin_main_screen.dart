@@ -6,14 +6,14 @@ import 'package:bookstore_recommendation_system_fyp/admin_screens/permissions_sc
 import 'package:bookstore_recommendation_system_fyp/admin_screens/add_remove_users_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/providers/internetavailabilitynotifier.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/upload_book_screen.dart';
-import 'package:flutter/cupertino.dart';
+// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/themenotifier.dart';
 import '../utils/InternetChecker.dart';
 import '../utils/global_variables.dart';
-import 'dart:async';
-import 'dart:io';
+// import 'dart:async';
+// import 'dart:io';
 
 class MainScreenAdmin extends StatefulWidget {
   const MainScreenAdmin({super.key});
@@ -29,7 +29,7 @@ class _MainScreenAdminState extends State<MainScreenAdmin> {
   void initState() {
     super.initState();
 
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
       Provider.of<InternetNotifier>(context, listen: false);
       try {
@@ -67,10 +67,10 @@ class _MainScreenAdminState extends State<MainScreenAdmin> {
   Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+          .showSnackBar(const SnackBar(content: Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -81,7 +81,7 @@ class _MainScreenAdminState extends State<MainScreenAdmin> {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     return internetAvailabilityNotifier.getInternetAvailability() == false
-        ? InternetChecker()
+        ? const InternetChecker()
         : WillPopScope(
             onWillPop: onWillPop,
             child: Scaffold(
@@ -92,13 +92,13 @@ class _MainScreenAdminState extends State<MainScreenAdmin> {
               bottomNavigationBar: BottomNavigationBar(
                   items: <BottomNavigationBarItem>[
                     BottomNavigationBarItem(
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.supervised_user_circle_outlined,
                         ),
                         label: 'Users',
                         backgroundColor: themeNotifier.getTheme() ==
                                 ThemeData.dark(useMaterial3: true).copyWith(
-                                  colorScheme: ColorScheme.dark().copyWith(
+                                  colorScheme: const ColorScheme.dark().copyWith(
                                     primary: darkprimarycolor,
                                     error: Colors.red,
                                     onPrimary: darkprimarycolor,
@@ -110,11 +110,11 @@ class _MainScreenAdminState extends State<MainScreenAdmin> {
                             ? darkprimarycolor
                             : primarycolor),
                     BottomNavigationBarItem(
-                        icon: Icon(Icons.upload),
+                        icon: const Icon(Icons.upload),
                         label: 'Upload',
                         backgroundColor: themeNotifier.getTheme() ==
                                 ThemeData.dark(useMaterial3: true).copyWith(
-                                  colorScheme: ColorScheme.dark().copyWith(
+                                  colorScheme: const ColorScheme.dark().copyWith(
                                     primary: darkprimarycolor,
                                     error: Colors.red,
                                     onPrimary: darkprimarycolor,
@@ -126,11 +126,11 @@ class _MainScreenAdminState extends State<MainScreenAdmin> {
                             ? darkprimarycolor
                             : primarycolor),
                     BottomNavigationBarItem(
-                        icon: Icon(Icons.category_outlined),
+                        icon: const Icon(Icons.category_outlined),
                         label: 'Categories',
                         backgroundColor: themeNotifier.getTheme() ==
                                 ThemeData.dark(useMaterial3: true).copyWith(
-                                  colorScheme: ColorScheme.dark().copyWith(
+                                  colorScheme: const ColorScheme.dark().copyWith(
                                     primary: darkprimarycolor,
                                     error: Colors.red,
                                     onPrimary: darkprimarycolor,
@@ -142,11 +142,11 @@ class _MainScreenAdminState extends State<MainScreenAdmin> {
                             ? darkprimarycolor
                             : primarycolor),
                     BottomNavigationBarItem(
-                        icon: Icon(Icons.add_moderator_outlined),
+                        icon: const Icon(Icons.add_moderator_outlined),
                         label: 'Permissions',
                         backgroundColor: themeNotifier.getTheme() ==
                                 ThemeData.dark(useMaterial3: true).copyWith(
-                                  colorScheme: ColorScheme.dark().copyWith(
+                                  colorScheme: const ColorScheme.dark().copyWith(
                                     primary: darkprimarycolor,
                                     error: Colors.red,
                                     onPrimary: darkprimarycolor,

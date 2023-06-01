@@ -144,10 +144,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+          .showSnackBar(const SnackBar(content:  Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -161,7 +161,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       onWillPop: onWillPop,
       child: SafeArea(
         child: internetAvailabilityNotifier.getInternetAvailability() == false
-            ? InternetChecker()
+            ? const InternetChecker()
             :  Scaffold(
                   resizeToAvoidBottomInset: false,
                   body: SingleChildScrollView(
@@ -183,7 +183,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 horizontal: 16.0, vertical: 4.0),
                             child: TextInputField(
                               hintText: 'Enter Name',
-                              suffixIcon: Text(''),
+                              suffixIcon: const Text(''),
                               textInputType: TextInputType.name,
                               textEditingController: _nameController,
                               isPassword: false,
@@ -203,7 +203,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 horizontal: 16.0, vertical: 4.0),
                             child: TextInputField(
                               hintText: 'Enter Email',
-                              suffixIcon: Text(''),
+                              suffixIcon: const Text(''),
                               textInputType: TextInputType.emailAddress,
                               textEditingController: _emailController,
                               isPassword: false,

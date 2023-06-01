@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../utils/fluttertoast.dart';
+// import '../utils/fluttertoast.dart';
 
 class AddRemoveCategories extends StatefulWidget {
   const AddRemoveCategories({super.key});
@@ -91,15 +91,15 @@ class _AddRemoveCategoriesState extends State<AddRemoveCategories> {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: Text('Error'),
+          title: const Text('Error'),
           content:
-              Text('Cannot delete category. Books with this category exist.'),
+          const Text('Cannot delete category. Books with this category exist.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // Close the dialog
               },
-              child: Text('Ok'),
+              child: const Text('Ok'),
             ),
           ],
         ),
@@ -114,7 +114,7 @@ class _AddRemoveCategoriesState extends State<AddRemoveCategories> {
         child: Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text('Categories'),
+        title: const Text('Categories'),
         
             automaticallyImplyLeading: false,
       ),
@@ -131,7 +131,7 @@ class _AddRemoveCategoriesState extends State<AddRemoveCategories> {
                     return Text('Error: ${snapshot.error}');
                   }
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: Text('Loading...'));
+                    return const Center(child: Text('Loading...'));
                   }
                   List<String> categories = [];
                   for (var doc in snapshot.data!.docs) {
@@ -145,7 +145,7 @@ class _AddRemoveCategoriesState extends State<AddRemoveCategories> {
                       return ListTile(
                         title: Text(categories[index]),
                         trailing: IconButton(
-                          icon: Icon(Icons.delete),
+                          icon: const Icon(Icons.delete),
                           onPressed: () {
                             // Call a function to delete the category from Firestore
                             deleteCategory(categories[index], categoryId);
@@ -157,19 +157,19 @@ class _AddRemoveCategoriesState extends State<AddRemoveCategories> {
                 },
               )),
           ElevatedButton.icon(
-              icon: Icon(CupertinoIcons.add),
+              icon: const Icon(CupertinoIcons.add),
               onPressed: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Text('Add Category'),
+                      title: const Text('Add Category'),
                       content: Form(
                         key: _formKey,
                         child: TextFormField(
                           controller: _categoryController,
                           decoration:
-                              InputDecoration(hintText: 'Enter category name'),
+                          const InputDecoration(hintText: 'Enter category name'),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Enter Category';
@@ -180,13 +180,13 @@ class _AddRemoveCategoriesState extends State<AddRemoveCategories> {
                       ),
                       actions: <Widget>[
                         TextButton(
-                          child: Text('Cancel'),
+                          child: const Text('Cancel'),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
                         ),
                         TextButton(
-                          child: Text('Add'),
+                          child: const Text('Add'),
                           onPressed: () {
     if (_formKey.currentState!.validate()) {
       String categoryName = _categoryController.text;

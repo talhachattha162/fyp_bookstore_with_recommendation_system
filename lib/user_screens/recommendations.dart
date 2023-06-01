@@ -1,12 +1,12 @@
-import 'dart:convert';
+// import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/user_main_screen.dart';
-import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
+// import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +24,7 @@ class BookRecommendationScreen extends StatefulWidget {
 class _BookRecommendationScreenState extends State<BookRecommendationScreen> {
 
   final openAI = OpenAI.instance.build(token: '',baseOption: HttpSetup(receiveTimeout:  25000),isLogger: true);
-  String _inputText = '';
+  // String _inputText = '';
   String _recommendation = '';
 bool isLoading=false;
   List<String> bookList=[];
@@ -44,7 +44,7 @@ bool isLoading=false;
   void initState() {
     super.initState();
 
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
       Provider.of<InternetNotifier>(context, listen: false);
       try {
@@ -124,7 +124,7 @@ bool isLoading=false;
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        navigateWithNoBack(context, MainScreenUser());
+        navigateWithNoBack(context, const MainScreenUser());
         return false;
       },
       child: Scaffold(
@@ -135,20 +135,20 @@ bool isLoading=false;
       onPressed: () {
       navigateWithNoBack(
       context,
-      MainScreenUser());
+          const MainScreenUser());
       },
       )),
         body: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Form(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
     
               children: [
-                Text('Note',style: TextStyle(fontSize: 14.0, color: Colors.green)),
-                Padding(
-                  padding: EdgeInsets.only(bottom: 8.0),
-                  child: Text(
+                const Text('Note',style: TextStyle(fontSize: 14.0, color: Colors.green)),
+                const Padding(
+                  padding:  EdgeInsets.only(bottom: 8.0),
+                  child:  Text(
                     'Add multiple titles,authors,languages,categories separated by comma',
                     style: TextStyle(fontSize: 14.0, color: Colors.grey),
                   ),
@@ -160,7 +160,7 @@ bool isLoading=false;
                     }
                     return null; // Return null if the input is valid
                   },
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Enter Book Titles you like *',
                   ),
                   onChanged: (value) {
@@ -172,7 +172,7 @@ bool isLoading=false;
                   },
                 ),
                 TextField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Enter authors name you like (optional)',
                   ),
                   onChanged: (value) {
@@ -184,7 +184,7 @@ bool isLoading=false;
                   },
                 ),
                 TextField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Enter categories you like (optional)',
                   ),
                   onChanged: (value) {
@@ -213,7 +213,7 @@ bool isLoading=false;
                   }).toList(),
                 ),
                 TextField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Languages you prefer (optional)',
                   ),
                   onChanged: (value) {
@@ -226,7 +226,7 @@ bool isLoading=false;
                 ),
     
                 TextFormField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Enter your age (optional)',
                   ),
                   onChanged: (value) {
@@ -257,17 +257,17 @@ bool isLoading=false;
                     );
                   }).toList(),
                 ),
-                SizedBox(height: 16.0),
-                isLoading==true?Center(child: CircularProgressIndicator()):ElevatedButton(
-                  child: Text('Generate'),
+                const SizedBox(height: 16.0),
+                isLoading==true?const Center(child: const CircularProgressIndicator()):ElevatedButton(
+                  child: const Text('Generate'),
                   onPressed: titles.isEmpty ? null : _generateRecommendation,
                 ),
-                SizedBox(height: 16.0),
-                Text(
+                const SizedBox(height: 16.0),
+                const Text(
                   'Recommendations:',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 8.0),
+                const SizedBox(height: 8.0),
                 Text(_recommendation),
               ],
             ),

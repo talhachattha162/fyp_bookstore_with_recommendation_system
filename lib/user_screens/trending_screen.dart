@@ -93,7 +93,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('Trendings'),
+            title:  const Text('Trendings'),
             automaticallyImplyLeading: false,
           ),
           resizeToAvoidBottomInset: false,
@@ -156,15 +156,16 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                     child: Column(
                                       children: [
                                         CachedNetworkImage(
+                                          filterQuality:FilterQuality.low ,
                                           height: 170,
                                           width: double.infinity,
                                           fit: BoxFit.fill,
                                           imageUrl: book.coverPhotoFile,
-                                          placeholder: (context, url) => Center(
+                                          placeholder: (context, url) => const Center(
                                               child:
                                                   CircularProgressIndicator()),
                                           errorWidget: (context, url, error) =>
-                                              Center(child: Icon(Icons.error)),
+                                              const Center(child: Icon(Icons.error)),
                                         ),
                                         SizedBox(
                                           child: Padding(
@@ -184,12 +185,12 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                                             '...'
                                                         : book.title,
                                                     style:
-                                                        TextStyle(fontSize: 12),
+                                                       const TextStyle(fontSize: 12),
                                                   ),
                                                 ),
                                                 Text(
                                                   "\$" + book.price.toString(),
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 )
@@ -205,7 +206,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                             },
                           );
                         }
-                        return Container();
+                        return  Container();
                       },
                     ),
         ),

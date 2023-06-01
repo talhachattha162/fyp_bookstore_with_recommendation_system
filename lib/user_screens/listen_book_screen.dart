@@ -1,9 +1,9 @@
 import 'package:read_pdf_text/read_pdf_text.dart';
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
+// import 'dart:typed_data';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+// import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -11,8 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+// import 'package:syncfusion_flutter_pdf/pdf.dart';
+// import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../models/book.dart';
 import '../providers/internetavailabilitynotifier.dart';
 import '../providers/themenotifier.dart';
@@ -40,7 +40,7 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
   int textInc = 0;
   var textToConvert;
   double currentduration = 0;
-  Duration? duration = Duration(hours: 0);
+  Duration? duration = const Duration(hours: 0);
   Timer? timer;
   bool isLoading = false;
   FlutterTts flutterTts = FlutterTts();
@@ -54,17 +54,7 @@ class _ListenBookScreenState extends State<ListenBookScreen> {
 
 
 
-  Future<bool> onWillPop() async {
-    final now = DateTime.now();
-    if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
-      currentBackPressTime = now;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
-      return Future.value(false);
-    }
-    return Future.value(true);
-  }
+
 
   Future<void> speak(String text) async {
     await flutterTts.setLanguage('en-US');
@@ -175,8 +165,8 @@ Future<void> _decryptFile1() async {
   setState(() {
     isLoading=true;
   });
-  DateTime start=DateTime.now();
-  print(start);
+  // DateTime start=DateTime.now();
+  // print(start);
   // Read encrypted PDF file from storage
   String path = await widget.bookpath;
   final encryptedFile = File(path);
@@ -205,10 +195,10 @@ Future<void> _decryptFile1() async {
       textToConvert = texttoConvert;
     });
   }
-  DateTime end=DateTime.now();
-  print(end);
+  // DateTime end=DateTime.now();
+  // print(end);
 
-  print(end.difference(start));
+  // print(end.difference(start));
   setState(() {
     isLoading=false;
   });
@@ -223,7 +213,7 @@ Future<void> _decryptFile1() async {
     flutterTts.setStartHandler(() {
       if (mounted) {
         setState(() {
-          print("Playing");
+          // print("Playing");
           guidemsg = "Playing...";
           _ttsState = TtsState.playing;
         });
@@ -233,7 +223,7 @@ Future<void> _decryptFile1() async {
     flutterTts.setCompletionHandler(() {
       if (mounted) {
         setState(() {
-          print("Complete");
+          // print("Complete");
           guidemsg = "Completed.";
           _ttsState = TtsState.stopped;
         });
@@ -243,7 +233,7 @@ Future<void> _decryptFile1() async {
     flutterTts.setCancelHandler(() {
       if (mounted) {
         setState(() {
-          print("Cancel");
+          // print("Cancel");
           guidemsg = "Stopped";
           _ttsState = TtsState.stopped;
         });
@@ -273,7 +263,7 @@ Future<void> _decryptFile1() async {
       if (mounted) {
         setState(() {
           guidemsg = "Error: $message";
-          print("Error: $message");
+          // print("Error: $message");
           _ttsState = TtsState.stopped;
         });
       }
@@ -284,7 +274,7 @@ Future<void> _decryptFile1() async {
   void initState() {
     super.initState();
     _decryptFile1();
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
       Provider.of<InternetNotifier>(context, listen: false);
       try {
@@ -316,7 +306,7 @@ Future<void> _decryptFile1() async {
 
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    // final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
@@ -328,7 +318,7 @@ Future<void> _decryptFile1() async {
       },
       child: SafeArea(
         child: internetAvailabilityNotifier.getInternetAvailability() == false
-            ? InternetChecker()
+            ? const InternetChecker()
             :  Scaffold(
           appBar: AppBar(
               title: const Text('Listen Book'),
@@ -360,9 +350,9 @@ Future<void> _decryptFile1() async {
                         child: CachedNetworkImage(
                           imageUrl: widget.book.coverPhotoFile,
                           placeholder: (context, url) =>
-                              CircularProgressIndicator(),
+                          const CircularProgressIndicator(),
                           errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
+                          const Icon(Icons.error),
                         ),
                       ),
                     ),
@@ -373,7 +363,7 @@ Future<void> _decryptFile1() async {
 
                   Text(
                     widget.book.title,
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(
@@ -451,7 +441,7 @@ Future<void> _decryptFile1() async {
   Widget button() {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     if (_ttsState == TtsState.stopped) {
-      return isLoading==true?Text('Loading...'):ElevatedButton(
+      return isLoading==true?const Text('Loading...'):ElevatedButton(
         onPressed: () async {
 
           
@@ -465,7 +455,7 @@ Future<void> _decryptFile1() async {
               width: 2,
               color: themeNotifier.getTheme() ==
                   ThemeData.dark(useMaterial3: true).copyWith(
-                    colorScheme: ColorScheme.dark().copyWith(
+                    colorScheme: const ColorScheme.dark().copyWith(
                       primary: darkprimarycolor,
                       error: Colors.red,
                       onPrimary: darkprimarycolor,
@@ -477,7 +467,7 @@ Future<void> _decryptFile1() async {
                   ? darkprimarycolor
                   : primarycolor),
         ),
-        child: Text('Play'),
+        child: const Text('Play'),
       );
     } else if (_ttsState == TtsState.paused) {
       return ElevatedButton(
@@ -492,7 +482,7 @@ Future<void> _decryptFile1() async {
               width: 2,
               color: themeNotifier.getTheme() ==
                   ThemeData.dark(useMaterial3: true).copyWith(
-                    colorScheme: ColorScheme.dark().copyWith(
+                    colorScheme: const ColorScheme.dark().copyWith(
                       primary: darkprimarycolor,
                       error: Colors.red,
                       onPrimary: darkprimarycolor,
@@ -504,7 +494,7 @@ Future<void> _decryptFile1() async {
                   ? darkprimarycolor
                   : primarycolor),
         ),
-        child: Text('Resume'),
+        child: const Text('Resume'),
       );
     } else {
       return Column(children: [
@@ -518,7 +508,7 @@ Future<void> _decryptFile1() async {
                 width: 2,
                 color: themeNotifier.getTheme() ==
                     ThemeData.dark(useMaterial3: true).copyWith(
-                      colorScheme: ColorScheme.dark().copyWith(
+                      colorScheme: const ColorScheme.dark().copyWith(
                         primary: darkprimarycolor,
                         error: Colors.red,
                         onPrimary: darkprimarycolor,
@@ -530,7 +520,7 @@ Future<void> _decryptFile1() async {
                     ? darkprimarycolor
                     : primarycolor),
           ),
-          child: Text('Pause'),
+          child: const Text('Pause'),
         ),
         ElevatedButton(
           onPressed: stop,
@@ -542,7 +532,7 @@ Future<void> _decryptFile1() async {
                 width: 2,
                 color: themeNotifier.getTheme() ==
                     ThemeData.dark(useMaterial3: true).copyWith(
-                      colorScheme: ColorScheme.dark().copyWith(
+                      colorScheme: const ColorScheme.dark().copyWith(
                         primary: darkprimarycolor,
                         error: Colors.red,
                         onPrimary: darkprimarycolor,
@@ -554,7 +544,7 @@ Future<void> _decryptFile1() async {
                     ? darkprimarycolor
                     : primarycolor),
           ),
-          child: Text('Stop'),
+          child: const Text('Stop'),
         )
       ]);
     }

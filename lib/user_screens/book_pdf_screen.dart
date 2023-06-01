@@ -62,7 +62,7 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
     super.initState();
     _decryptFile();
 
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
       try {
@@ -87,10 +87,10 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
   Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+          .showSnackBar(const SnackBar(content: Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -100,8 +100,8 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
+    // double height = MediaQuery.of(context).size.height;
+    // double width = MediaQuery.of(context).size.width;
     final orientation = MediaQuery.of(context).orientation;
     return WillPopScope(
       onWillPop:  () async {
@@ -138,7 +138,7 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
                                   child: LoadingAnimationWidget.fourRotatingDots(
                                   color: themeNotifier.getTheme() ==
                                       ThemeData.dark(useMaterial3: true).copyWith(
-                                        colorScheme: ColorScheme.dark().copyWith(
+                                        colorScheme: const ColorScheme.dark().copyWith(
                                           primary: darkprimarycolor,
                                           error: Colors.red,
                                           onPrimary: darkprimarycolor,
@@ -175,7 +175,7 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
                     ),
                   ),
                 )
-              : InternetChecker()),
+              : const InternetChecker()),
     );
   }
 }

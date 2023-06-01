@@ -27,7 +27,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
       try {
@@ -49,17 +49,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
 
   DateTime currentBackPressTime = DateTime.now();
 
-  Future<bool> onWillPop() async {
-    final now = DateTime.now();
-    if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
-      currentBackPressTime = now;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
-      return Future.value(false);
-    }
-    return Future.value(true);
-  }
+
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -70,12 +60,12 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
     final orientation = MediaQuery.of(context).orientation;
     return WillPopScope(
       onWillPop: () async {
-        navigateWithNoBack(context, MainScreenUser());
+        navigateWithNoBack(context, const MainScreenUser());
         return false;
       },
       child: SafeArea(
         child: internetAvailabilityNotifier.getInternetAvailability() == false
-            ? InternetChecker()
+            ? const InternetChecker()
             : Scaffold(
                 appBar: AppBar(
                     title: const Text('Favourites'),
@@ -100,7 +90,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                         return Text('Error: ${snapshot.error}');
                       }
                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                        return Center(
+                        return const Center(
                           child: Visibility(
                             visible: true,
                             child: Text('No favourites found'),
@@ -157,17 +147,18 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                                         child: Column(
                                           children: [
                                             CachedNetworkImage(
+                                              filterQuality: FilterQuality.low,
                                               height: 170,
                                               width: double.infinity,
                                               fit: BoxFit.fill,
                                               imageUrl:
                                                   bookData['coverPhotoFile'],
-                                              placeholder: (context, url) => Center(
+                                              placeholder: (context, url) => const Center(
                                                   child:
                                                       CircularProgressIndicator()),
                                               errorWidget:
                                                   (context, url, error) =>
-                                                      new Icon(Icons.error),
+                                                  const  Icon(Icons.error),
                                             ),
                                             SizedBox(
                                               child: Padding(
@@ -188,7 +179,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                                                                         0, 15) +
                                                                 '...'
                                                             : bookData['title'],
-                                                        style: TextStyle(
+                                                        style: const TextStyle(
                                                             fontSize: 12),
                                                       ),
                                                     ),
@@ -196,7 +187,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                                                       "\$" +
                                                           bookData['price']
                                                               .toString(),
-                                                      style: TextStyle(
+                                                      style: const TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold),
                                                     )
@@ -210,7 +201,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                                     ),
                                   );
                                 } else {
-                                  return Center(
+                                  return const Center(
                                     child: Visibility(
                                       visible: true,
                                       child: Text(''),
@@ -223,7 +214,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                         );
                       }
 
-                      return Center(
+                      return const Center(
                         child: Visibility(
                           visible: true,
                           child: Text('No favourites found'),

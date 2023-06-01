@@ -67,7 +67,7 @@ class _MainScreenUserState extends State<MainScreenUser> {
   void initState() {
     super.initState();
     // print('usermaininit');
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
       try {
@@ -84,7 +84,7 @@ class _MainScreenUserState extends State<MainScreenUser> {
       themeNotifier.setTheme(
           await checkDarkMode(FirebaseAuth.instance.currentUser!.uid) == true
               ? ThemeData.dark(useMaterial3: true).copyWith(
-                  colorScheme: ColorScheme.dark().copyWith(
+                  colorScheme: const ColorScheme.dark().copyWith(
                     primary: darkprimarycolor,
                     error: Colors.red,
                     onPrimary: darkprimarycolor,
@@ -112,10 +112,10 @@ class _MainScreenUserState extends State<MainScreenUser> {
   Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+          .showSnackBar(const SnackBar(content: const Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -130,9 +130,9 @@ class _MainScreenUserState extends State<MainScreenUser> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: internetAvailabilityNotifier.getInternetAvailability() == false
-          ? InternetChecker()
+          ? const InternetChecker()
           : Provider.of<AuthState>(context, listen: true).user == null
-              ? LoginScreen()
+              ? const LoginScreen()
               : Center(
                   child: _bottomNavigationItems.elementAt(_selectedIndex),
                 ),
@@ -146,13 +146,13 @@ class _MainScreenUserState extends State<MainScreenUser> {
                       showUnselectedLabels: true,
                       items: <BottomNavigationBarItem>[
                           BottomNavigationBarItem(
-                            icon: Icon(
+                            icon: const Icon(
                               CupertinoIcons.home,// Set the default color for the unselected icon
                             ),
                             label: 'Home',
                             backgroundColor: themeNotifier.getTheme() ==
                                     ThemeData.dark(useMaterial3: true).copyWith(
-                                      colorScheme: ColorScheme.dark().copyWith(
+                                      colorScheme: const ColorScheme.dark().copyWith(
                                         primary: darkprimarycolor,
                                         error: Colors.red,
                                         onPrimary: darkprimarycolor,
@@ -165,11 +165,11 @@ class _MainScreenUserState extends State<MainScreenUser> {
                                 : primarycolor,
                           ),
                           BottomNavigationBarItem(
-                            icon: Icon(Icons.recommend_outlined),
+                            icon: const Icon(Icons.recommend_outlined),
                             label: 'Trendings',
                             backgroundColor: themeNotifier.getTheme() ==
                                     ThemeData.dark(useMaterial3: true).copyWith(
-                                      colorScheme: ColorScheme.dark().copyWith(
+                                      colorScheme: const ColorScheme.dark().copyWith(
                                         primary: darkprimarycolor,
                                         error: Colors.red,
                                         onPrimary: darkprimarycolor,
@@ -182,11 +182,11 @@ class _MainScreenUserState extends State<MainScreenUser> {
                                 : primarycolor,
                           ),
                           BottomNavigationBarItem(
-                            icon: Icon(Icons.upload_outlined),
+                            icon: const Icon(Icons.upload_outlined),
                             label: 'Upload Book',
                             backgroundColor: themeNotifier.getTheme() ==
                                     ThemeData.dark(useMaterial3: true).copyWith(
-                                      colorScheme: ColorScheme.dark().copyWith(
+                                      colorScheme: const ColorScheme.dark().copyWith(
                                         primary: darkprimarycolor,
                                         error: Colors.red,
                                         onPrimary: darkprimarycolor,
@@ -199,11 +199,11 @@ class _MainScreenUserState extends State<MainScreenUser> {
                                 : primarycolor,
                           ),
                           BottomNavigationBarItem(
-                            icon: Icon(Icons.library_books_outlined),
+                            icon: const Icon(Icons.library_books_outlined),
                             label: 'Library',
                             backgroundColor: themeNotifier.getTheme() ==
                                     ThemeData.dark(useMaterial3: true).copyWith(
-                                      colorScheme: ColorScheme.dark().copyWith(
+                                      colorScheme: const ColorScheme.dark().copyWith(
                                         primary: darkprimarycolor,
                                         error: Colors.red,
                                         onPrimary: darkprimarycolor,
@@ -216,11 +216,11 @@ class _MainScreenUserState extends State<MainScreenUser> {
                                 : primarycolor,
                           ),
                           BottomNavigationBarItem(
-                            icon: Icon(Icons.person_outline_outlined),
+                            icon: const Icon(Icons.person_outline_outlined),
                             label: 'Profile',
                             backgroundColor: themeNotifier.getTheme() ==
                                     ThemeData.dark(useMaterial3: true).copyWith(
-                                      colorScheme: ColorScheme.dark().copyWith(
+                                      colorScheme: const ColorScheme.dark().copyWith(
                                         primary: darkprimarycolor,
                                         error: Colors.red,
                                         onPrimary: darkprimarycolor,
@@ -237,7 +237,7 @@ class _MainScreenUserState extends State<MainScreenUser> {
                       currentIndex: _selectedIndex,
                       selectedItemColor: themeNotifier.getTheme() ==
                           ThemeData.dark(useMaterial3: true).copyWith(
-                            colorScheme: ColorScheme.dark().copyWith(
+                            colorScheme: const ColorScheme.dark().copyWith(
                               primary: darkprimarycolor,
                               error: Colors.red,
                               onPrimary: darkprimarycolor,

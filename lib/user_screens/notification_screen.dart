@@ -108,10 +108,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+          .showSnackBar(const SnackBar(content: Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -121,15 +121,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     return internetAvailabilityNotifier.getInternetAvailability() == false
-        ? InternetChecker()
+        ? const InternetChecker()
         : WillPopScope(
             onWillPop: () async {
-              navigateWithNoBack(context, MainScreenUser());
+              navigateWithNoBack(context, const MainScreenUser());
               return false;
             },
             child: Scaffold(
               appBar: AppBar(
-                  title: Text('Notifications'),
+                  title: const Text('Notifications'),
                   leading: IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
@@ -137,7 +137,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     },
                   )),
               body: notifications.isEmpty
-                  ? Center(
+                  ? const Center(
                       child: Center(
                         child: Text('No Notifications'),
                       ),
@@ -158,7 +158,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   Text(notification.notificationMsg.toString()),
                               subtitle: Text(formattedDateTime),
                             ),
-                            Divider()
+                            const Divider()
                           ],
                         );
                       },

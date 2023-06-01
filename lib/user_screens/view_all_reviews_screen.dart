@@ -21,11 +21,11 @@ class ViewAllReviewsScreen extends StatefulWidget {
 }
 
 class _ViewAllReviewsScreenState extends State<ViewAllReviewsScreen> {
-  Timer? timer;
+   Timer? timer;
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
       try {
@@ -46,19 +46,8 @@ class _ViewAllReviewsScreenState extends State<ViewAllReviewsScreen> {
   }
 
 
-  DateTime currentBackPressTime = DateTime.now();
 
-  Future<bool> onWillPop() async {
-    final now = DateTime.now();
-    if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
-      currentBackPressTime = now;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
-      return Future.value(false);
-    }
-    return Future.value(true);
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +60,7 @@ class _ViewAllReviewsScreenState extends State<ViewAllReviewsScreen> {
       },
       child: SafeArea(
         child: internetAvailabilityNotifier.getInternetAvailability() == false
-            ? InternetChecker()
+            ? const InternetChecker()
             : MultiProvider(
                 providers: [
                   ChangeNotifierProvider(
@@ -132,7 +121,7 @@ class _ViewAllReviewsScreenState extends State<ViewAllReviewsScreen> {
                                                         user.photo,
                                                         errorBuilder: (context,
                                                             error, stackTrace) {
-                                                          return Icon(Icons.error,
+                                                          return const Icon(Icons.error,
                                                               size: 20);
                                                         },
                                                       ),
@@ -144,14 +133,14 @@ class _ViewAllReviewsScreenState extends State<ViewAllReviewsScreen> {
                                                                 0, 15) +
                                                             '...'
                                                         : user.name,
-                                                    style: TextStyle(
+                                                    style:const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         fontSize: 16),
                                                   ),
                                                   Row(
                                                     children: [
-                                                      Icon(
+                                                     const Icon(
                                                         Icons.star,
                                                         color: Colors.amber,
                                                       ),
@@ -162,7 +151,7 @@ class _ViewAllReviewsScreenState extends State<ViewAllReviewsScreen> {
                                                   )
                                                 ],
                                               ),
-                                              SizedBox(
+                                           const   SizedBox(
                                                 height: 10,
                                               ),
                                               Padding(
@@ -171,7 +160,7 @@ class _ViewAllReviewsScreenState extends State<ViewAllReviewsScreen> {
                                                         10.0, 0, 0, 0),
                                                 child: Wrap(children: [
                                                   Text(
-                                                      style: TextStyle(
+                                                      style: const TextStyle(
                                                         fontSize: 16,
                                                       ),
                                                       review.reviewtext)

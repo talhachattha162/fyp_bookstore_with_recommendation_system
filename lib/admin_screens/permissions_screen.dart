@@ -1,21 +1,21 @@
 import 'dart:io';
-import 'package:bookstore_recommendation_system_fyp/utils/fluttertoast.dart';
+// import 'package:bookstore_recommendation_system_fyp/utils/fluttertoast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+// import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../main.dart';
-import '../user_screens/login_screen.dart';
+// import '../user_screens/login_screen.dart';
 import '../utils/navigation.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 import '../models/notificationitem.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+// import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class Permissions extends StatefulWidget {
   const Permissions({super.key});
@@ -144,7 +144,7 @@ class _PermissionsState extends State<Permissions> {
         final Map<String, dynamic> notificationData = notificationItem.toMap();
         await notificationsReference.add(notificationData);
 
-        print('notification:' + notificationItem.toMap().toString());
+        // print('notification:' + notificationItem.toMap().toString());
       }
     }
   }
@@ -166,7 +166,7 @@ class _PermissionsState extends State<Permissions> {
     final CollectionReference collectionReference =
         firestore.collection('notifications');
     await collectionReference.add(item.toMap());
-    print('notification:' + item.toMap().toString());
+    // print('notification:' + item.toMap().toString());
   }
 
   Stream<QuerySnapshot> bookStream = FirebaseFirestore.instance
@@ -202,7 +202,7 @@ class _PermissionsState extends State<Permissions> {
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
-        title: Text('Permissions'),
+        title: const Text('Permissions'),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -210,7 +210,7 @@ class _PermissionsState extends State<Permissions> {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 bool isLoggedIn = false;
                 prefs.setBool('isLoggedIn', isLoggedIn);
-                navigateWithNoBack(context, MyApp());
+                navigateWithNoBack(context, const MyApp());
               },
               icon: const Icon(Icons.logout)),
         ],
@@ -225,7 +225,7 @@ class _PermissionsState extends State<Permissions> {
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (!snapshot.hasData) {
-                    return Center(
+                    return const Center(
                       child: CircularProgressIndicator(),
                     );
                   }
@@ -246,7 +246,7 @@ class _PermissionsState extends State<Permissions> {
                                   children: [
                                     Text(
                                       book['title'],
-                                      style: TextStyle(fontSize: 11),
+                                      style: const TextStyle(fontSize: 11),
                                     ),
                                   ],
                                 ),
@@ -263,7 +263,7 @@ class _PermissionsState extends State<Permissions> {
                                             return Container(
                                                 width: width * 1,
                                                 height: height * 0.5,
-                                                padding: EdgeInsets.all(4.0),
+                                                padding: const EdgeInsets.all(4.0),
                                                 child: Column(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
@@ -282,12 +282,12 @@ class _PermissionsState extends State<Permissions> {
                                                               'copyrightPhotoFile'],
                                                           placeholder: (context,
                                                                   url) =>
-                                                              Center(
+                                                          const Center(
                                                                   child:
-                                                                      new CircularProgressIndicator()),
+                                                                       CircularProgressIndicator()),
                                                           errorWidget: (context,
                                                                   url, error) =>
-                                                              new Icon(
+                                                          const Icon(
                                                                   Icons.error),
                                                         ),
                                                       ),
@@ -302,14 +302,14 @@ class _PermissionsState extends State<Permissions> {
                                               Navigator.pop(
                                                   context); // close the dialog
                                             },
-                                            child: Text('Close'),
+                                            child: const Text('Close'),
                                           ),
                                         ],
                                       );
                                     },
                                   );
                                 },
-                                child: Text(
+                                child: const Text(
                                   'Copyright',
                                   style: TextStyle(fontSize: 10),
                                 ),
@@ -323,20 +323,20 @@ class _PermissionsState extends State<Permissions> {
                                         title: Column(
                                           children: [
                                             Text(book['title'],
-                                                style: TextStyle(fontSize: 14)),
+                                                style: const TextStyle(fontSize: 14)),
                                             Text(
                                                 'Category:' +
                                                     book['selectedcategory'],
-                                                style: TextStyle(fontSize: 12)),
+                                                style: const TextStyle(fontSize: 12)),
                                             Text(
                                                 book['freeRentPaid'] +
                                                     ' \$' +
                                                     book['price'].toString(),
-                                                style: TextStyle(fontSize: 12)),
+                                                style: const TextStyle(fontSize: 12)),
                                             Text(
                                                 'Author:' +
                                                     book['author'].toString(),
-                                                style: TextStyle(fontSize: 12)),
+                                                style: const TextStyle(fontSize: 12)),
                                           ],
                                         ),
                                         content: FutureBuilder<Uint8List?>(
@@ -346,7 +346,7 @@ class _PermissionsState extends State<Permissions> {
                                                   snapshot) {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.waiting) {
-                                              return Center(
+                                              return const Center(
                                                 child:
                                                     CircularProgressIndicator(),
                                               );
@@ -359,13 +359,13 @@ class _PermissionsState extends State<Permissions> {
                                               return Container(
                                                 height: height * 0.73,
                                                 width: width * 0.95,
-                                                padding: EdgeInsets.all(8.0),
+                                                padding: const EdgeInsets.all(8.0),
                                                 child: SfPdfViewer.memory(
                                                   snapshot.data!,
                                                 ),
                                               );
                                             } else {
-                                              return Center(
+                                              return const Center(
                                                 child:
                                                     Text('No PDF bytes found'),
                                               );
@@ -378,20 +378,20 @@ class _PermissionsState extends State<Permissions> {
                                               Navigator.pop(
                                                   context); // close the dialog
                                             },
-                                            child: Text('Close'),
+                                            child: const Text('Close'),
                                           ),
                                         ],
                                       );
                                     },
                                   );
                                 },
-                                child: Text(
+                                child: const Text(
                                   'check book',
                                   style: TextStyle(fontSize: 10),
                                 ),
                               ),
                               book['isPermitted'] == true
-                                  ? IconButton(
+                                  ? const IconButton(
                                       onPressed: null, icon: Icon(Icons.check))
                                   : IconButton(
                                       onPressed: () async {
@@ -401,7 +401,7 @@ class _PermissionsState extends State<Permissions> {
                                         subscriptionNotification(
                                             book['title'], book['userid']);
                                       },
-                                      icon: Icon(Icons.check)),
+                                      icon: const Icon(Icons.check)),
                               Padding(
                                 padding: const EdgeInsets.all(0.0),
                                 child: IconButton(
@@ -413,7 +413,7 @@ class _PermissionsState extends State<Permissions> {
                                       deletePaymentsForBookId(book['bookid']);
                                       deleteReviewsForBookId(book['bookid']);
                                     },
-                                    icon: Icon(Icons.clear)),
+                                    icon: const Icon(Icons.clear)),
                               )
                             ],
                           ),

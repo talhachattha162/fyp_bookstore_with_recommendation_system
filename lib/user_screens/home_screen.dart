@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 
 import '../models/book.dart';
 import '../providers/themenotifier.dart';
-import 'booksearchscreen.dart';
+// import 'booksearchscreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -66,7 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     getCategories();
     getBooks();
-
     _fetchNotifications();
     // print('homeinit');
   }
@@ -105,10 +104,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+          .showSnackBar(const SnackBar(content: Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -149,16 +148,16 @@ class _HomeScreenState extends State<HomeScreen> {
       onWillPop: onWillPop,
       child: SafeArea(
         child: Scaffold(
-          appBar: AppBar(
+          appBar:  AppBar(
               // title: Text(''),
             title: Align(
                 alignment: Alignment.topLeft,
-              child: TextLiquidFill(loadDuration: Duration(seconds: 2),
+              child: TextLiquidFill(loadDuration: const Duration(seconds: 2),
                 boxBackgroundColor: themeNotifier.getTheme() ==
                     ThemeData.dark(useMaterial3: true)
                         .copyWith(
                       colorScheme:
-                      ColorScheme.dark().copyWith(
+                      const ColorScheme.dark().copyWith(
                         primary: darkprimarycolor,
                         error: Colors.red,
                         onPrimary: darkprimarycolor,
@@ -170,9 +169,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                     ? Colors.black
                     : Colors.green.shade300,
-                text: 'Book Store',
+                text:  'Book Store',
                 waveColor: Colors.white,
-                textStyle: TextStyle(
+                textStyle: const TextStyle(
                   fontSize: 24.0,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -189,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   IconButton(
                     onPressed: () {
-                      navigateWithNoBack(context, NotificationScreen());
+                      navigateWithNoBack(context, const NotificationScreen());
                     },
                     icon: const Icon(Icons.notifications),
                   ),
@@ -197,14 +196,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     top: 22.0,
                     right: 5.0,
                     child: Container(
-                      padding: EdgeInsets.all(3),
-                      decoration: BoxDecoration(
+                      padding: const EdgeInsets.all(3),
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.red,
                       ),
                       child: Text(
                         notificationLength.toString(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 10.0,
                           fontWeight: FontWeight.bold,
@@ -283,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: LoadingAnimationWidget.fourRotatingDots(
                               color: themeNotifier.getTheme() ==
                                       ThemeData.dark(useMaterial3: true).copyWith(
-                                        colorScheme: ColorScheme.dark().copyWith(
+                                        colorScheme: const ColorScheme.dark().copyWith(
                                           primary: darkprimarycolor,
                                           error: Colors.red,
                                           onPrimary: darkprimarycolor,
@@ -298,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ));
                           }
                           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                            return Center(
+                            return const Center(
                               child: Visibility(
                                 visible: true,
                                 child: Text('No books found'),
@@ -329,17 +328,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                         padding: const EdgeInsets.all(4.0),
                                         child: Column(
                                           children: [
-                                            CachedNetworkImage(
+                                            CachedNetworkImage(filterQuality:FilterQuality.low ,
                                               height: 170,
                                               width: double.infinity,
                                               fit: BoxFit.fill,
                                               imageUrl: book.coverPhotoFile,
-                                              placeholder: (context, url) => Center(
+                                              placeholder: (context, url) => const Center(
                                                   child:
                                                       CircularProgressIndicator()),
                                               errorWidget:
                                                   (context, url, error) =>
-                                                      new Icon(Icons.error),
+                                                  const  Icon(Icons.error),
                                             ),
                                             SizedBox(
                                               child: Padding(
@@ -361,7 +360,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                             15) +
                                                                     '...'
                                                                 : book.title,
-                                                            style: TextStyle(
+                                                            style: const TextStyle(
                                                                 fontSize: 12),
                                                           ),
                                                         ],
@@ -376,7 +375,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           : '\$' +
                                                               book.price
                                                                   .toString(),
-                                                      style: TextStyle(
+                                                      style: const TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           fontSize: 14),
@@ -425,7 +424,7 @@ class CustomSearchDelegate extends SearchDelegate {
         onPressed: () {
           query = '';
         },
-        icon: Icon(CupertinoIcons.clear),
+        icon:const Icon(CupertinoIcons.clear),
       ),
     ];
   }
@@ -437,7 +436,7 @@ class CustomSearchDelegate extends SearchDelegate {
       onPressed: () {
         close(context, null);
       },
-      icon: Icon(Icons.arrow_back),
+      icon:const Icon(Icons.arrow_back),
     );
   }
 
@@ -451,7 +450,7 @@ class CustomSearchDelegate extends SearchDelegate {
       }
     }
     if (query.toLowerCase() == '') {
-      return Container();
+      return  Container();
     } else {
       return ListView.builder(
         itemCount: matchQuery.length,
@@ -472,7 +471,7 @@ class CustomSearchDelegate extends SearchDelegate {
               ),
             );
           } else {
-            return Center(
+            return const  Center(
               child: Text('No book found'),
             );
           }
@@ -512,7 +511,7 @@ class CustomSearchDelegate extends SearchDelegate {
               ),
             );
           } else {
-            return Center(
+            return const Center(
               child: Text('No Book found'),
             );
           }

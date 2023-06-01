@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+// import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:motion_toast/motion_toast.dart';
 import 'package:provider/provider.dart';
 import '../providers/internetavailabilitynotifier.dart';
@@ -11,7 +11,7 @@ import '../utils/InternetChecker.dart';
 import '../utils/firebase_constants.dart';
 import '../utils/fluttertoast.dart';
 import '../utils/navigation.dart';
-import '../utils/snackbar.dart';
+// import '../utils/snackbar.dart';
 import 'login_screen.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
@@ -46,8 +46,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         MotionToast.success(
-          title:  Text("Success Motion Toast"),
-          description:  Text("No user found for that email."),
+          title:  const Text("Success Motion Toast"),
+          description:  const Text("No user found for that email."),
         ).show(context);
       } else if (e.code == 'wrong-password') {
         flutterToast('Wrong password provided.');
@@ -67,7 +67,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     timer =
         Timer.periodic(const Duration(seconds: 3), (_) => checkEmailVerified());
 
-    timer1 = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    timer1 = Timer.periodic(const Duration(seconds: 1), (Timer t) async {
        if (!mounted) {
     return; // exit if the widget is no longer mounted
   }
@@ -116,7 +116,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         ..showSnackBar(snackBar);
       // showSnackBar(context, 'Email Successfully Verified');
       auth.signOut();
-      navigateWithNoBack(context, LoginScreen());
+      navigateWithNoBack(context, const LoginScreen());
       timer?.cancel();
     }
   }
@@ -133,10 +133,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Future<bool> onWillPop() async {
     final now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Press back again to exit')));
+          .showSnackBar(const SnackBar(content: Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -146,7 +146,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Widget build(BuildContext context) {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     return internetAvailabilityNotifier.getInternetAvailability() == false
-        ? InternetChecker()
+        ? const InternetChecker()
         : WillPopScope(
             onWillPop: onWillPop,
             child: SafeArea(
@@ -190,7 +190,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Center(child: CircularProgressIndicator()),
+                      const Center(child: CircularProgressIndicator()),
                       const SizedBox(height: 8),
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 32.0),
