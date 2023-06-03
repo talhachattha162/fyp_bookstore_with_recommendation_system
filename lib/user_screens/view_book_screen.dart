@@ -211,7 +211,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
       encrypt.Encrypted encryptedPdf = encrypter.encryptBytes(pdfData, iv: iv);
 
       // Store encrypted PDF file in folder
-      Directory appDocDir = await getApplicationDocumentsDirectory();
+      Directory appDocDir = await getTemporaryDirectory();
       String encryptedPath = '${appDocDir.path}/encrypted';
       Directory(encryptedPath).createSync(recursive: true);
       File encryptedFile =

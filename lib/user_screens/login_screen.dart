@@ -158,6 +158,30 @@ class _LoginScreenState extends State<LoginScreen> {
         password: password,
       );
       user = userCredential.user;
+      if (user != null && !user.emailVerified) {
+        final snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+
+          content: AwesomeSnackbarContent(
+            title: 'Error!',
+            message: 'Email is not verified. Please verify your email.',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+          ),
+        );
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+
+        // Sign out the user as their email is not verified
+        await auth.signOut();
+        user = null;
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         final snackBar = SnackBar(

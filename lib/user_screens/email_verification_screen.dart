@@ -4,7 +4,7 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 // import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:motion_toast/motion_toast.dart';
+// import 'package:motion_toast/motion_toast.dart';
 import 'package:provider/provider.dart';
 import '../providers/internetavailabilitynotifier.dart';
 import '../utils/InternetChecker.dart';
@@ -45,10 +45,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       user = userCredential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        MotionToast.success(
-          title:  const Text("Success Motion Toast"),
-          description:  const Text("No user found for that email."),
-        ).show(context);
+        flutterToast("No user found for that email.");
       } else if (e.code == 'wrong-password') {
         flutterToast('Wrong password provided.');
       }

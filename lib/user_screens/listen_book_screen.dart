@@ -132,10 +132,13 @@ setState(() {
   double parseDurationFromDouble(Duration hours) {
     return hours.inSeconds.toDouble();
   }
+
+
 Future<String> getPDFtext(String path) async {
   String text = "";
   try {
     text = await ReadPdfText.getPDFtext(path) ;
+
   } catch(e) {
     final snackBar = SnackBar(
       /// need to set following properties for best effect of awesome_snackbar_content

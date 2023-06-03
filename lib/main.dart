@@ -49,7 +49,8 @@ Future<void> main() async {
   // };
   // Stripe.publishableKey =
   //     "pk_test_51MWx8OAVMyklfe3CsjEzA1CiiY0XBTlHYbZ8jQlGtVFIwQi4aNeGv8J1HUw4rgSavMTLzTwgn0XRlwoTVRFXyu2h00mRUeWmAf";
-
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
   runApp(
     MultiProvider(providers: [
       ChangeNotifierProvider<ThemeNotifier>(

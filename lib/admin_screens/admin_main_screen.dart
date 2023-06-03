@@ -81,7 +81,7 @@ class _MainScreenAdminState extends State<MainScreenAdmin> {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     return internetAvailabilityNotifier.getInternetAvailability() == false
-        ? const InternetChecker()
+        ?  InternetChecker()
         : WillPopScope(
             onWillPop: onWillPop,
             child: Scaffold(

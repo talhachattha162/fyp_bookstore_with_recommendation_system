@@ -25,7 +25,8 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   RegExp pass_valid = RegExp(r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)");
-  RegExp email_valid = RegExp(r'\S+@\S+\.\S+');
+  RegExp email_valid = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+  // RegExp email_valid = RegExp(r'\S+@\S+\.\S+');
   RegExp name_valid = RegExp(r"^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$");
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();

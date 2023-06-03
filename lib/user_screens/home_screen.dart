@@ -1,4 +1,4 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
+// import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/notification_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
 import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart';
@@ -149,37 +149,37 @@ class _HomeScreenState extends State<HomeScreen> {
       child: SafeArea(
         child: Scaffold(
           appBar:  AppBar(
-              // title: Text(''),
-            title: Align(
-                alignment: Alignment.topLeft,
-              child: TextLiquidFill(loadDuration: const Duration(seconds: 2),
-                boxBackgroundColor: themeNotifier.getTheme() ==
-                    ThemeData.dark(useMaterial3: true)
-                        .copyWith(
-                      colorScheme:
-                      const ColorScheme.dark().copyWith(
-                        primary: darkprimarycolor,
-                        error: Colors.red,
-                        onPrimary: darkprimarycolor,
-                        outline: darkprimarycolor,
-                        primaryVariant: darkprimarycolor,
-                        onPrimaryContainer:
-                        darkprimarycolor,
-                      ),
-                    )
-                    ? Colors.black
-                    : Colors.green.shade300,
-                text:  'Book Store',
-                waveColor: Colors.white,
-                textStyle: const TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-                // boxHeight: 50.0,
-              ),
-            ),
+              title: Text('BookStore'),
+            // title: Align(
+            //     alignment: Alignment.topLeft,
+            //   child: TextLiquidFill(loadDuration: const Duration(seconds: 2),
+            //     boxBackgroundColor: themeNotifier.getTheme() ==
+            //         ThemeData.dark(useMaterial3: true)
+            //             .copyWith(
+            //           colorScheme:
+            //           const ColorScheme.dark().copyWith(
+            //             primary: darkprimarycolor,
+            //             error: Colors.red,
+            //             onPrimary: darkprimarycolor,
+            //             outline: darkprimarycolor,
+            //             primaryVariant: darkprimarycolor,
+            //             onPrimaryContainer:
+            //             darkprimarycolor,
+            //           ),
+            //         )
+            //         ? Colors.black
+            //         : Colors.green.shade300,
+            //     text:  'Book Store',
+            //     waveColor: Colors.white,
+            //     textStyle: const TextStyle(
+            //       fontSize: 24.0,
+            //       fontWeight: FontWeight.bold,
+            //       color: Colors.white,
+            //     ),
+            //     textAlign: TextAlign.center,
+            //     // boxHeight: 50.0,
+            //   ),
+            // ),
     
     
             automaticallyImplyLeading: false,
@@ -239,6 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Padding(
                         padding: const EdgeInsets.all(3.0),
                         child: ChipsChoice<int>.single(
+                          key: ValueKey(tag),
                           value: tag,
                           onChanged: (val) {
                             if (mounted) {
@@ -306,6 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                           return
                               GridView.builder(
+
                                 gridDelegate:
                                     SliverGridDelegateWithFixedCrossAxisCount(
                                         crossAxisCount: orientation == Orientation.portrait?2:4,
@@ -317,6 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Book book = Book.fromSnapshot(
                                       snapshot.data!.docs[index]);
                                   return InkWell(
+                                      key: ValueKey(book.bookid),
                                     onTap: () {
                                       navigateWithNoBack(
                                           context, ViewBookScreen(book: book));

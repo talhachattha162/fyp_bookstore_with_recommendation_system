@@ -9,6 +9,7 @@ import 'package:confetti/confetti.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 // import 'package:text_to_speech/text_to_speech.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -40,7 +41,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
   RegExp price_valid = RegExp(r"^\d+$");
   RegExp name_valid = RegExp(r"^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$");
   RegExp tags_valid = RegExp(r"^(\d|\w)+$");
-  RegExp endspace =RegExp(r"\s+$");
+  RegExp endspace = RegExp(r"\s+$");
 
   bool isLoading = false;
   bool errortextexist = false;
@@ -100,20 +101,88 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
     return downloadUrl;
   }
 
+  // Future<String> uploadFileToFirebaseStorage(
+  //     Uint8List uint8list, String foldername) async {
+  //   FirebaseStorage storage = FirebaseStorage.instance;
+  //   String filePath = '$foldername/${DateTime.now()}';
+  //   Reference ref = storage.ref(filePath);
+  //   try {
+  //     String downloadURL;
+  //     UploadTask uploadTask = ref.putData(uint8list);
+  //     await uploadTask;
+  //     downloadURL = await ref.getDownloadURL();
+  //     return downloadURL;
+  //   } on FirebaseException catch (e) {
+  //     print(e);
+  //   }
+  //   return '';
+  // }
+
   Future<String> uploadFileToFirebaseStorage(
-      Uint8List uint8list, String foldername) async {
-    FirebaseStorage storage = FirebaseStorage.instance;
-    String filePath = '$foldername/${DateTime.now()}';
-    Reference ref = storage.ref(filePath);
-    try {
-      String downloadURL;
-      UploadTask uploadTask = ref.putData(uint8list);
-      await uploadTask;
-      downloadURL = await ref.getDownloadURL();
-      return downloadURL;
-    } on FirebaseException catch (e) {
-      print(e);
+    Uint8List uint8list,
+    String foldername,
+      int image
+  ) async {
+    // Compress the image using the flutter_image_compress package
+    if(image==1){
+      List<int> compressedData = await FlutterImageCompress.compressWithList(
+        uint8list,
+        quality: 10, // Set the desired quality percentage (0-100)
+        format: CompressFormat.webp, // Set the desired format (jpeg, png)
+      );
+
+      FirebaseStorage storage = FirebaseStorage.instance;
+      String filePath = '$foldername/${DateTime.now()}';
+      Reference ref = storage.ref(filePath);
+      try {
+        String downloadURL;
+        UploadTask uploadTask = ref.putData(Uint8List.fromList(compressedData));
+        await uploadTask;
+        downloadURL = await ref.getDownloadURL();
+        return downloadURL;
+      } on FirebaseException catch (e) {
+        print(e);
+      }
     }
+
+      if(image==2){
+        List<int> compressedData = await FlutterImageCompress.compressWithList(
+          uint8list,
+          quality: 20, // Set the desired quality percentage (0-100)
+          format: CompressFormat.webp, // Set the desired format (jpeg, png)
+        );
+
+        FirebaseStorage storage = FirebaseStorage.instance;
+        String filePath = '$foldername/${DateTime.now()}';
+        Reference ref = storage.ref(filePath);
+        try {
+          String downloadURL;
+          UploadTask uploadTask = ref.putData(Uint8List.fromList(compressedData));
+          await uploadTask;
+          downloadURL = await ref.getDownloadURL();
+          return downloadURL;
+        } on FirebaseException catch (e) {
+          print(e);
+        }
+      }
+
+    else{
+      FirebaseStorage storage = FirebaseStorage.instance;
+      String filePath = '$foldername/${DateTime.now()}';
+      Reference ref = storage.ref(filePath);
+      try {
+        String downloadURL;
+        UploadTask uploadTask = ref.putData(uint8list);
+        await uploadTask;
+        downloadURL = await ref.getDownloadURL();
+        return downloadURL;
+      } on FirebaseException catch (e) {
+        print(e);
+      }
+    }
+
+
+
     return '';
   }
 
@@ -124,8 +193,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
     if (currentBackPressTime == null ||
         now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Press back again to exit')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Press back again to exit')));
       return Future.value(false);
     }
     return Future.value(true);
@@ -141,18 +210,17 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
     return WillPopScope(
       onWillPop: onWillPop,
       child: SafeArea(
-        child:  Scaffold(
-                appBar: AppBar(
-                  title: const Text('Upload Book'),
-                  automaticallyImplyLeading: false,
-                ),
-                resizeToAvoidBottomInset: false,
-                body:AbsorbPointer(
-                  absorbing: isLoading,
-                  child: Stack(
-                  children: [
-    
-                    SingleChildScrollView(
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Upload Book'),
+            automaticallyImplyLeading: false,
+          ),
+          resizeToAvoidBottomInset: false,
+          body: AbsorbPointer(
+            absorbing: isLoading,
+            child: Stack(
+              children: [
+                SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -163,7 +231,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                         children: [
                           TextInputField(
                             hintText: 'Enter title',
-                            suffixIcon:const  Text(''),
+                            suffixIcon: const Text(''),
                             isPassword: false,
                             textInputType: TextInputType.text,
                             textEditingController: _titleController,
@@ -193,10 +261,10 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                               return null;
                             },
                           ),
-                      TextInputField(
-                        textInputType: TextInputType.number,
-                        hintText: 'Enter Published Year',
-                        suffixIcon: const Text(''),
+                          TextInputField(
+                            textInputType: TextInputType.number,
+                            hintText: 'Enter Published Year',
+                            suffixIcon: const Text(''),
                             isPassword: false,
                             textEditingController: _publishyearController,
                             validator: (value) {
@@ -209,7 +277,6 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                               return null;
                             },
                           ),
-    
                           ButtonTheme(
                             alignedDropdown: true,
                             height: 20,
@@ -217,18 +284,20 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                               elevation: 50,
                               isExpanded: true,
                               iconEnabledColor: themeNotifier.getTheme() ==
-                                ThemeData.dark(useMaterial3: true).copyWith(
-                                  colorScheme: const ColorScheme.dark().copyWith(
-                                    primary: darkprimarycolor,
-                                    error: Colors.red,
-                                    onPrimary: darkprimarycolor,
-                                    outline: darkprimarycolor,
-                                    primaryVariant: darkprimarycolor,
-                                    onPrimaryContainer: darkprimarycolor,
-                                  ),
-                                )
-                            ? darkprimarycolor
-                            : primarycolor,
+                                      ThemeData.dark(useMaterial3: true)
+                                          .copyWith(
+                                        colorScheme:
+                                            const ColorScheme.dark().copyWith(
+                                          primary: darkprimarycolor,
+                                          error: Colors.red,
+                                          onPrimary: darkprimarycolor,
+                                          outline: darkprimarycolor,
+                                          primaryVariant: darkprimarycolor,
+                                          onPrimaryContainer: darkprimarycolor,
+                                        ),
+                                      )
+                                  ? darkprimarycolor
+                                  : primarycolor,
                               value: selectedCategory == ''
                                   ? 'Select Category'
                                   : selectedCategory,
@@ -337,7 +406,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                           ThemeData.dark(useMaterial3: true)
                                               .copyWith(
                                             colorScheme:
-                                            const ColorScheme.dark().copyWith(
+                                                const ColorScheme.dark()
+                                                    .copyWith(
                                               primary: darkprimarycolor,
                                               error: Colors.red,
                                               onPrimary: darkprimarycolor,
@@ -374,7 +444,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                           ThemeData.dark(useMaterial3: true)
                                               .copyWith(
                                             colorScheme:
-                                            const ColorScheme.dark().copyWith(
+                                                const ColorScheme.dark()
+                                                    .copyWith(
                                               primary: darkprimarycolor,
                                               error: Colors.red,
                                               onPrimary: darkprimarycolor,
@@ -411,7 +482,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                           ThemeData.dark(useMaterial3: true)
                                               .copyWith(
                                             colorScheme:
-                                            const ColorScheme.dark().copyWith(
+                                                const ColorScheme.dark()
+                                                    .copyWith(
                                               primary: darkprimarycolor,
                                               error: Colors.red,
                                               onPrimary: darkprimarycolor,
@@ -444,7 +516,9 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.only(bottom: 10.0),
                                 child: TextInputField(
-                                  hintText: freeRentPaid=='rent'?'Enter Price for 1 day':'Enter Price',
+                                  hintText: freeRentPaid == 'rent'
+                                      ? 'Enter Price for 1 day'
+                                      : 'Enter Price',
                                   suffixIcon: const Text(''),
                                   isPassword: false,
                                   textEditingController: _priceController,
@@ -459,7 +533,6 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                     }
                                   },
                                   textInputType: TextInputType.number,
-    
                                 ),
                               )),
                           const Text(
@@ -488,17 +561,17 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                       elevation: 0,
                                       behavior: SnackBarBehavior.floating,
                                       backgroundColor: Colors.transparent,
-    
+
                                       content: AwesomeSnackbarContent(
                                         title: 'File Error!',
                                         message:
-                                        '<2 mb image allowed Reselect file.',
-    
+                                            '<2 mb image allowed Reselect file.',
+
                                         /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
                                         contentType: ContentType.failure,
                                       ),
                                     );
-    
+
                                     ScaffoldMessenger.of(context)
                                       ..hideCurrentSnackBar()
                                       ..showSnackBar(snackBar);
@@ -544,17 +617,17 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                       elevation: 0,
                                       behavior: SnackBarBehavior.floating,
                                       backgroundColor: Colors.transparent,
-    
+
                                       content: AwesomeSnackbarContent(
                                         title: 'File Error!',
                                         message:
-                                        '<2 mb image allowed Reselect file',
-    
+                                            '<2 mb image allowed Reselect file',
+
                                         /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
                                         contentType: ContentType.failure,
                                       ),
                                     );
-    
+
                                     ScaffoldMessenger.of(context)
                                       ..hideCurrentSnackBar()
                                       ..showSnackBar(snackBar);
@@ -598,17 +671,17 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                       elevation: 0,
                                       behavior: SnackBarBehavior.floating,
                                       backgroundColor: Colors.transparent,
-    
+
                                       content: AwesomeSnackbarContent(
                                         title: 'File Error!',
                                         message:
-                                        '<2 mb image allowed Reselect file',
-    
+                                            '<2 mb image allowed Reselect file',
+
                                         /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
                                         contentType: ContentType.failure,
                                       ),
                                     );
-    
+
                                     ScaffoldMessenger.of(context)
                                       ..hideCurrentSnackBar()
                                       ..showSnackBar(snackBar);
@@ -630,14 +703,14 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               isLoading
-                                  ?  Container(
-                                      child:const  CircularProgressIndicator())
+                                  ? Container(
+                                      child: const CircularProgressIndicator())
                                   : ElevatedButton(
                                       onPressed: () async {
                                         if (_formKey.currentState!.validate() &&
                                             selectedCategory.isNotEmpty) {
                                           if (_filename1 ==
-                                              "<2 mb image allowed" ||
+                                                  "<2 mb image allowed" ||
                                               _filename2 ==
                                                   "<2 mb pdf allowed" ||
                                               _filename3 ==
@@ -645,26 +718,28 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                             final snackBar = SnackBar(
                                               /// need to set following properties for best effect of awesome_snackbar_content
                                               elevation: 0,
-                                              behavior: SnackBarBehavior.floating,
-                                              backgroundColor: Colors.transparent,
-    
+                                              behavior:
+                                                  SnackBarBehavior.floating,
+                                              backgroundColor:
+                                                  Colors.transparent,
+
                                               content: AwesomeSnackbarContent(
                                                 title: 'Error!',
-                                                message:
-                                                'Please upload file.',
-    
+                                                message: 'Please upload file.',
+
                                                 /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-                                                contentType: ContentType.failure,
+                                                contentType:
+                                                    ContentType.failure,
                                               ),
                                             );
-    
+
                                             ScaffoldMessenger.of(context)
                                               ..hideCurrentSnackBar()
                                               ..showSnackBar(snackBar);
                                           } else {
                                             // _convertTextToSpeech();
                                             // createAudioScript(); if (mounted) {
-    
+
                                             setState(() {
                                               isLoading = true;
                                             });
@@ -673,30 +748,28 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                   BottomNavigationBarState>();
                                               state.setEnabled(false);
                                               String coverpic =
-                                              await uploadFileToFirebaseStorage(
-                                                  _file1!, 'coverpic');
+                                                  await uploadFileToFirebaseStorage(
+                                                      _file1!, 'coverpic',1);
                                               String book =
-                                              await uploadFileToFirebaseStorage(
-                                                  _file2!, 'book');
+                                                  await uploadFileToFirebaseStorage(
+                                                      _file2!, 'book',0);
                                               String copyrightpic =
-                                              await uploadFileToFirebaseStorage(
-                                                  _file3!, 'copyrightpic');
+                                                  await uploadFileToFirebaseStorage(
+                                                      _file3!, 'copyrightpic',2);
                                               // textToSpeech();
                                               // createAudioScript();
                                               // _showResult(text);
                                               // await createAudioScript(text);
-    
+
                                               CollectionReference
-                                              bookCollection =
-                                              firestoreInstance
-                                                  .collection("books");
+                                                  bookCollection =
+                                                  firestoreInstance
+                                                      .collection("books");
                                               String bookid =
-                                                  bookCollection
-                                                      .doc()
-                                                      .id;
+                                                  bookCollection.doc().id;
                                               Book books;
                                               if (FirebaseAuth
-                                                  .instance.currentUser ==
+                                                      .instance.currentUser ==
                                                   null) {
                                                 // DateTime now = DateTime.now();
                                                 // int timestamp = now
@@ -712,8 +785,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                     _priceController.text == ''
                                                         ? 0
                                                         : int.parse(
-                                                        _priceController
-                                                            .text),
+                                                            _priceController
+                                                                .text),
                                                     coverpic,
                                                     book,
                                                     copyrightpic,
@@ -739,8 +812,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                     _priceController.text == ''
                                                         ? 0
                                                         : int.parse(
-                                                        _priceController
-                                                            .text),
+                                                            _priceController
+                                                                .text),
                                                     coverpic,
                                                     book,
                                                     copyrightpic,
@@ -759,16 +832,17 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                     .set(books.toMap())
                                                     .then((value) async {})
                                                     .onError((error,
-                                                    stackTrace) async {
+                                                        stackTrace) async {
                                                   flutterToast('Error:' +
                                                       error.toString());
                                                 }).then((_) {
                                                   _controller.play();
-                                                  Timer(const Duration(seconds: 2),
-                                                          () {
-                                                        _controller.stop();
-                                                      });
-    
+                                                  Timer(
+                                                      const Duration(
+                                                          seconds: 2), () {
+                                                    _controller.stop();
+                                                  });
+
                                                   // flutterToast('Book Added');
                                                 });
                                               } catch (e) {
@@ -813,29 +887,29 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                       ),
                     ),
                   ),
-                    ),
-                    if(isLoading)
-                      Container(
-                        color: Colors.black.withOpacity(0.5),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                          child: const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        ),
-                      ),
-                    ConfettiWidget(
-                      confettiController: _controller,
-                      blastDirection: 0.7 / 2,
-                      maxBlastForce: 10,
-                      minBlastForce: 1,
-                      emissionFrequency: 0.08,
-                      numberOfParticles: 20,
-                      gravity: 0.2,
-                    ),
-                  ],
-                  ),
                 ),
+                if (isLoading)
+                  Container(
+                    color: Colors.black.withOpacity(0.5),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ),
+                ConfettiWidget(
+                  confettiController: _controller,
+                  blastDirection: 0.7 / 2,
+                  maxBlastForce: 10,
+                  minBlastForce: 1,
+                  emissionFrequency: 0.08,
+                  numberOfParticles: 30,
+                  gravity: 0.2,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
