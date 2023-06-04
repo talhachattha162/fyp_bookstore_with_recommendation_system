@@ -27,7 +27,7 @@ class MainScreenUser extends StatefulWidget {
 }
 
 class _MainScreenUserState extends State<MainScreenUser> {
-  int _selectedIndex = 0;
+  // int _selectedIndex = 0;
   static const List<Widget> _bottomNavigationItems = <Widget>[
     HomeScreen(),
     TrendingScreen(),
@@ -38,14 +38,11 @@ class _MainScreenUserState extends State<MainScreenUser> {
 
   void _onItemTapped(int index) {
     final state = Provider.of<BottomNavigationBarState>(context, listen: false);
-    if(state.isEnabled) {
-      if (mounted) {
-        setState(() {
-          _selectedIndex = index;
-        });
-      }
+    if (state.isEnabled()) {
+      state.setSelectedIndex(index);
     }
   }
+
 
   Timer? timer;
 
@@ -127,22 +124,25 @@ class _MainScreenUserState extends State<MainScreenUser> {
     // print('usermain');
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
+    final state = Provider.of<BottomNavigationBarState>(context, listen: false);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: internetAvailabilityNotifier.getInternetAvailability() == false
           ? const InternetChecker()
-          : Provider.of<AuthState>(context, listen: true).user == null
+          : Provider.of<AuthState>(context, listen: false).user == null
               ? const LoginScreen()
               : Center(
-                  child: _bottomNavigationItems.elementAt(_selectedIndex),
+                  child: _bottomNavigationItems.elementAt(state.getSelectedIndex()),
                 ),
       bottomNavigationBar:
           internetAvailabilityNotifier.getInternetAvailability() == false
               ? null
-              : Provider.of<AuthState>(context, listen: true).user == null
+              : Provider.of<AuthState>(context, listen: false).user == null
                   ? null
                   :
-          BottomNavigationBar(
+          Consumer<BottomNavigationBarState>(
+        builder: (context, state, _) {
+      return BottomNavigationBar(
                       showUnselectedLabels: true,
                       items: <BottomNavigationBarItem>[
                           BottomNavigationBarItem(
@@ -234,7 +234,7 @@ class _MainScreenUserState extends State<MainScreenUser> {
                           ),
                         ],
                       type: BottomNavigationBarType.shifting,
-                      currentIndex: _selectedIndex,
+          currentIndex: state.getSelectedIndex(),
                       selectedItemColor: themeNotifier.getTheme() ==
                           ThemeData.dark(useMaterial3: true).copyWith(
                             colorScheme: const ColorScheme.dark().copyWith(
@@ -250,7 +250,7 @@ class _MainScreenUserState extends State<MainScreenUser> {
                       // iconSize: 24,
                       // selectedLabelStyle: const TextStyle(fontSize: 10),
                       onTap: _onItemTapped,
-                      elevation: 5),
+                      elevation: 5);})
     );
   }
 }

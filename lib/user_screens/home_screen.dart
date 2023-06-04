@@ -13,6 +13,10 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../models/book.dart';
+import '../providers/bookListProvider.dart';
+import '../providers/categoriesProvider.dart';
+import '../providers/notificationLengthProvider.dart';
+import '../providers/tagProvider.dart';
 import '../providers/themenotifier.dart';
 // import 'booksearchscreen.dart';
 
@@ -24,19 +28,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int tag = 0;
-  List<String> categories = [];
+  // int tag = 0;
+  // List<String> categories = [];
   List<String> options = ['loading'];
 
-  List<Book> books = [];
+  // List<Book> books = [];
 
   List<String> titles = [];
   List<String> searchData = [];
 
-  int notificationLength = 0;
+  // int notificationLength = 0;
 
   intialize() {
-    titles = books.map((book) {
+    final bookListProvider = Provider.of<BookListProvider>(context,listen: false);
+
+
+    titles = bookListProvider.books.map((book) {
       return book.title;
     }).toList();
     searchData.addAll(titles);
@@ -52,21 +59,27 @@ class _HomeScreenState extends State<HomeScreen> {
         Map<String, dynamic> data = doc.data();
         return Book.fromMap(data);
       }).toList();
-      if (mounted) {
-        setState(() {
-          books.addAll(bookList);
+      final bookListProvider = Provider.of<BookListProvider>(context,listen: false);
+        bookListProvider.addBooks(bookList);
+        // books.addAll(bookListProvider.books);
           intialize();
-        });
-      }
     });
   }
 
   @override
   void initState() {
     super.initState();
-    getCategories();
-    getBooks();
-    _fetchNotifications();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Add a delay of 100 milliseconds before executing heavy operations
+// print(FirebaseAuth.instance.currentUser);
+      // Future.delayed(Duration(milliseconds: 100), () {
+      getCategories();
+      getBooks();
+      _fetchNotifications();
+
+      // });
+    // });
+
     // print('homeinit');
   }
 
@@ -89,15 +102,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void getCategories() {
+    final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+
     FirebaseFirestore.instance.collection('categories').get().then((snapshot) {
-      if (mounted) {
-        setState(() {
-          categories = List.castFrom<dynamic, String>(
-              snapshot.docs.map((doc) => doc.get('name')).toList());
-        });
-      }
+      final newCategories = List<String>.from(
+          snapshot.docs.map((doc) => doc.get('name')).toList());
+
+      categoryProvider.clearCategories(); // Clear existing categories
+      categoryProvider.addCategories(newCategories);
     });
   }
+
 
   DateTime currentBackPressTime = DateTime.now();
 
@@ -127,12 +142,12 @@ class _HomeScreenState extends State<HomeScreen> {
           .get()
           .then((doc) {
         final notificationAttribute = doc['notifications'] ?? 0;
-        if (mounted) {
-          setState(() {
-            notificationLength =
-                (snapshots.docs.length - notificationAttribute).toInt();
-          });
-        }
+
+            final notificationProvider = Provider.of<NotificationLengthProvider>(context,listen: false);
+
+            notificationProvider.setNotificationLength((snapshots.docs.length - notificationAttribute).toInt());
+
+
       });
     });
   }
@@ -143,6 +158,11 @@ class _HomeScreenState extends State<HomeScreen> {
     double height = MediaQuery.of(context).size.height;
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final orientation = MediaQuery.of(context).orientation;
+    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final notificationProvider = Provider.of<NotificationLengthProvider>(context);
+    final tagProvider = Provider.of<TagProvider>(context);
+// print(categoryProvider.categories);
+
     // _fetchNotifications(context);
     return WillPopScope(
       onWillPop: onWillPop,
@@ -202,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.red,
                       ),
                       child: Text(
-                        notificationLength.toString(),
+                        notificationProvider.notificationLength.toString(),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 10.0,
@@ -217,11 +237,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {
                   // method to show the search bar
                   // navigateWithNoBack(context, BookSearchScreen());
+                  final bookListProvider = Provider.of<BookListProvider>(context,listen:false);
+
                   showSearch(
                       context: context,
                       // delegate to customize the search bar
                       delegate: CustomSearchDelegate(
-                          searchData: searchData, books: books));
+                          searchData: searchData, books: bookListProvider.books));
                 },
                 icon: const Icon(CupertinoIcons.search),
               ),
@@ -239,23 +261,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       Padding(
                         padding: const EdgeInsets.all(3.0),
                         child: ChipsChoice<int>.single(
-                          key: ValueKey(tag),
-                          value: tag,
+                          key: ValueKey(tagProvider.tag),
+                          value: tagProvider.tag,
                           onChanged: (val) {
-                            if (mounted) {
-                              setState(() {
-                                tag = val;
-                              });
-                            }
+                                tagProvider.setTag(val) ;
+
                           },
-                          choiceItems: categories.isEmpty
+                          choiceItems: categoryProvider.categories.isEmpty
                               ? C2Choice.listFrom<int, String>(
                                   source: options,
                                   value: (i, v) => i,
                                   label: (i, v) => v,
                                 )
                               : C2Choice.listFrom<int, String>(
-                                  source: categories,
+                                  source: categoryProvider.categories,
                                   value: (i, v) => i,
                                   label: (i, v) => v,
                                 ),
@@ -270,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: height * 0.73,
                       child: StreamBuilder<QuerySnapshot>(
                         stream: _queryBooksByCategory(
-                            categories.isEmpty ? ' ' : categories[tag]),
+                            categoryProvider.categories.isEmpty ? ' ' : categoryProvider.categories[tagProvider.tag]),
                         builder: (BuildContext context,
                             AsyncSnapshot<QuerySnapshot> snapshot) {
                           if (snapshot.hasError) {
@@ -331,7 +350,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         padding: const EdgeInsets.all(4.0),
                                         child: Column(
                                           children: [
-                                            CachedNetworkImage(filterQuality:FilterQuality.low ,
+                                            CachedNetworkImage(
                                               height: 170,
                                               width: double.infinity,
                                               fit: BoxFit.fill,

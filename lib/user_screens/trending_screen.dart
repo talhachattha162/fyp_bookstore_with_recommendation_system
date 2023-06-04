@@ -7,7 +7,9 @@ import 'package:provider/provider.dart';
 import '../models/book.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../providers/loadingProvider.dart';
 import '../providers/themenotifier.dart';
+import '../providers/trendingProvider.dart';
 import '../utils/global_variables.dart';
 import '../utils/navigation.dart';
 
@@ -20,6 +22,8 @@ class TrendingScreen extends StatefulWidget {
 
 class _TrendingScreenState extends State<TrendingScreen> {
   DateTime currentBackPressTime = DateTime.now();
+
+  bool isLoading=false;
 
   Future<bool> onWillPop() async {
     final now = DateTime.now();
@@ -42,51 +46,52 @@ class _TrendingScreenState extends State<TrendingScreen> {
   }
 
   Stream<List<Book>?> _bookStream() {
+    final trendingProvider = Provider.of<TrendingProvider>(context,listen:false);
     final collection = FirebaseFirestore.instance.collection('books');
 
     return collection
-        .where(FieldPath.documentId, whereIn: _trendingBookIds)
+        .where(FieldPath.documentId, whereIn: trendingProvider.trendingBookIds)
         .snapshots()
         .map((snapshot) => snapshot.docs.isEmpty
             ? null
             : snapshot.docs.map((doc) => Book.fromSnapshot(doc)).toList());
   }
 
-  List<String> _trendingBookIds = [];
+  // List<String> _trendingBookIds = [];
   Future<void> _fetchTrendingBookIds() async {
-    if (mounted) {
-      setState(() {
-        isLoading = true;
-      });
-    }
+    // final loadingProvider = Provider.of<LoadingProvider>(context,listen: false);
+    // loadingProvider.setLoading(true);
+    setState(() {
+      isLoading=true;
+    });
     try {
       final response = await http
           .get(Uri.parse('http://tayyab162.pythonanywhere.com/trending-books'));
       if (response.statusCode == 200) {
         final List<dynamic> bookIds = json.decode(response.body);
-        if (mounted) {
-          setState(() {
-            _trendingBookIds = bookIds.cast<String>();
-          });
-        }
+
+            final trendingProvider = Provider.of<TrendingProvider>(context,listen: false);
+        trendingProvider.setTrendingBookIds(bookIds.cast<String>());
+
       } else {
         throw Exception('Failed to retrieve trending book ids');
       }
     } catch (e) {
       print('Failed to retrieve trending book ids: $e');
     }
-    if (mounted) {
-      setState(() {
-        isLoading = false;
-      });
-    }
+setState(() {
+  isLoading=false;
+});
   }
 
-  bool isLoading = false;
+  // bool isLoading = false;
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
+    // final loadingProvider = Provider.of<LoadingProvider>(context);
+    // double height = MediaQuery.of(context).size.height;
     final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final trendingProvider = Provider.of<TrendingProvider>(context);
+
     final orientation = MediaQuery.of(context).orientation;
     return WillPopScope(
       onWillPop: onWillPop,
@@ -118,7 +123,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                   ),
                   visible: true,
                 ))
-              : _trendingBookIds.isEmpty
+              : trendingProvider.trendingBookIds.isEmpty
                   ? Center(child: Text('No trendings found'))
                   : StreamBuilder<List<Book>?>(
                       stream: _bookStream(),

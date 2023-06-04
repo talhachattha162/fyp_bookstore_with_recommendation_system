@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../models/book.dart';
 import '../providers/internetavailabilitynotifier.dart';
+import '../providers/pdfProvider.dart';
 import '../providers/themenotifier.dart';
 import '../utils/InternetChecker.dart';
 import '../utils/navigation.dart';
@@ -30,7 +31,7 @@ class BookPdfScreen extends StatefulWidget {
 class _BookPdfScreenState extends State<BookPdfScreen> {
 
   Timer? timer;
-  String _pdfPath = '';
+  // String _pdfPath = '';
   Future<void> _decryptFile() async {
     // Read encrypted PDF file from storage
     String path = await widget.bookpath;
@@ -50,11 +51,11 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
     final tempDir = await getTemporaryDirectory();
     final tempPdfFile = File('${tempDir.path}/decrypted.pdf');
     await tempPdfFile.writeAsBytes(decryptedPdfData);
-    if (mounted) {
-      setState(() {
-        _pdfPath = tempPdfFile.path;
-      });
-    }
+    final pdfProvider = Provider.of<PdfProvider>(context);
+    // final pdfPath = pdfProvider.pdfPath;
+    pdfProvider.updatePdfPath(tempPdfFile.path);
+
+
   }
 
   @override
@@ -100,6 +101,7 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
+    final pdfProvider = Provider.of<PdfProvider>(context);
     // double height = MediaQuery.of(context).size.height;
     // double width = MediaQuery.of(context).size.width;
     final orientation = MediaQuery.of(context).orientation;
@@ -132,8 +134,8 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
                           height: double.infinity,
                           // padding: EdgeInsets.symmetric(
                           //     horizontal: width * 0.05, vertical: height * 0.015),
-                          child: _pdfPath.isNotEmpty
-                              ? SfPdfViewer.file(File(_pdfPath),)
+                          child: pdfProvider.pdfPath.isNotEmpty
+                              ? SfPdfViewer.file(File(pdfProvider.pdfPath),)
                               : Center(
                                   child: LoadingAnimationWidget.fourRotatingDots(
                                   color: themeNotifier.getTheme() ==

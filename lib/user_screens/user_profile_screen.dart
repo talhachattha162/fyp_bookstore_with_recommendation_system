@@ -13,7 +13,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:widget_circular_animator/widget_circular_animator.dart';
 import '../models/user.dart';
 import '../providers/authstatenotifier.dart';
+import '../providers/switchProvider.dart';
 import '../providers/themenotifier.dart';
+import '../providers/userProfileProvider.dart';
 import '../utils/firebase_constants.dart';
 import 'faqs_screen.dart';
 import 'update_profile_screen.dart';
@@ -26,39 +28,42 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  bool _isSwitched = false;
+  // bool _isSwitched = false;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final DocumentReference documentReference = FirebaseFirestore.instance
       .collection('users')
       .doc(FirebaseAuth.instance.currentUser!.uid);
-  String photoUrl = '';
-  String name1 = '';
-  String balance = '';
+  // String photoUrl = '';
+  // String name1 = '';
+  // String balance = '';
 
   Future<void> loadData() async {
     final DocumentSnapshot documentSnapshot = await documentReference.get();
     final darkmodeattr = await FirebaseFirestore.instance.collection('darkmode').doc(FirebaseAuth.instance.currentUser!.uid).get().then((snapshot) => snapshot.get('darkmode1'));
-if (mounted){
-  setState(() {
-    _isSwitched=darkmodeattr;
-  });
-}
+
+    final switchProvider = Provider.of<SwitchProvider>(context,listen: false);
+
+    switchProvider.setSwitched(darkmodeattr);
+
+
     if (documentSnapshot.exists) {
       final data = documentSnapshot.data() as Map<String, dynamic>;
       Users user1 = Users.fromMap(data);
       String name = user1.getName();
       final photo = user1.getPhoto();
       String balance1 = user1.getBalance.toString();
-      if (mounted) {
-        setState(() {
-          name1 = name;
-          photoUrl = photo;
-          balance = balance1;
-        });
+
+          final userProfileProvider = Provider.of<UserProfileProvider>(context,listen: false);
+          // final name = userProfileProvider.name;
+          // final photoUrl = userProfileProvider.photoUrl;
+          // final balance = userProfileProvider.balance;
+          userProfileProvider.updateUserProfile(name, photo, balance1);
+
       }
     }
-  }
+
+
 
   @override
   void initState() {
@@ -84,15 +89,17 @@ if (mounted){
 
   @override
   Widget build(BuildContext context) {
+    final userProfileProvider = Provider.of<UserProfileProvider>(context);
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+    final switchProvider = Provider.of<SwitchProvider>(context);
     return WillPopScope(
       onWillPop: onWillPop,
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            title:  Text('Balance: \$$balance'),
+            title:  Text('Balance: \$${userProfileProvider.balance}'),
             automaticallyImplyLeading: false,
           ),
           body: SingleChildScrollView(
@@ -122,10 +129,10 @@ if (mounted){
                 child: CircleAvatar(
                       maxRadius: 40,
                       backgroundImage:
-                          photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+                      userProfileProvider.photoUrl.isNotEmpty ? NetworkImage(userProfileProvider.photoUrl) : null,
                     ))),
                     const SizedBox(height: 10),
-                    Text(name1,
+                    Text(userProfileProvider.name,
                         style:const TextStyle(
                             fontSize: subheadingSize,
                             fontWeight: FontWeight.bold)),
@@ -160,7 +167,7 @@ if (mounted){
                               leading: const Icon(Icons.mode_night_outlined),
                               title: const Text('Change Mode'),
                               trailing: Switch(
-                                  value: _isSwitched,
+                                  value: switchProvider.isSwitched,
                                   onChanged: (value) {
                                     themeNotifier.setTheme(themeNotifier
                                                 .getTheme() ==
@@ -189,11 +196,8 @@ if (mounted){
                                             primarySwatch: primarycolor,
     
                                         fontFamily: GoogleFonts.acme().fontFamily));
-                                    if (mounted) {
-                                      setState(() {
-                                        _isSwitched = value;
-                                      });
-                                    }
+                                    final switchProvider = Provider.of<SwitchProvider>(context,listen: false);
+                                    switchProvider.setSwitched(value);
                                     if(themeNotifier
                                                 .getTheme() ==
                                             ThemeData(

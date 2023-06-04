@@ -21,6 +21,8 @@ import 'dart:io';
 
 import '../models/book.dart';
 import '../providers/bottomnavbarnotifier.dart';
+import '../providers/categoriesProvider.dart';
+import '../providers/selectedCategoryProvider.dart';
 import '../providers/themenotifier.dart';
 import '../utils/firebase_constants.dart';
 import '../utils/fluttertoast.dart';
@@ -64,30 +66,33 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
 
   FlutterTts flutterTts = FlutterTts();
 
-  List<String> categories = [];
+  // List<String> categories = [];
 
-  String selectedCategory = '';
+  // String selectedCategory = '';
   @override
   void initState() {
     super.initState();
-    getCategories();
+    Provider.of<SelectedCategoryProvider>(context,listen: false).setSelectedCategory(Provider.of<CategoryProvider>(context,listen: false).categories[0]);
+
+    // getCategories();
+
   }
 
-  void getCategories() {
-    FirebaseFirestore.instance.collection('categories').get().then((snapshot) {
-      if (snapshot.docs.isNotEmpty) {
-        if (mounted) {
-          setState(() {
-            categories = List.castFrom<dynamic, String>(
-                snapshot.docs.map((doc) => doc.get('name')).toList());
-            if (categories.isNotEmpty) {
-              selectedCategory = categories[0];
-            }
-          });
-        }
-      }
-    });
-  }
+  // void getCategories() {
+  //   FirebaseFirestore.instance.collection('categories').get().then((snapshot) {
+  //     if (snapshot.docs.isNotEmpty) {
+  //       if (mounted) {
+  //         setState(() {
+  //           categories = List.castFrom<dynamic, String>(
+  //               snapshot.docs.map((doc) => doc.get('name')).toList());
+  //           if (categories.isNotEmpty) {
+  //             selectedCategory = categories[0];
+  //           }
+  //         });
+  //       }
+  //     }
+  //   });
+  // }
 
   /// saving converted audio file to firebase
   Future<String> saveToFirebase(String path, String name,
@@ -127,7 +132,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
     if(image==1){
       List<int> compressedData = await FlutterImageCompress.compressWithList(
         uint8list,
-        quality: 10, // Set the desired quality percentage (0-100)
+        quality: 4, // Set the desired quality percentage (0-100)
         format: CompressFormat.webp, // Set the desired format (jpeg, png)
       );
 
@@ -148,7 +153,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
       if(image==2){
         List<int> compressedData = await FlutterImageCompress.compressWithList(
           uint8list,
-          quality: 20, // Set the desired quality percentage (0-100)
+          quality: 10, // Set the desired quality percentage (0-100)
           format: CompressFormat.webp, // Set the desired format (jpeg, png)
         );
 
@@ -204,6 +209,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     // Size screenSize = MediaQuery.of(context).size;
+    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final selectedCategoryProvider=Provider.of<SelectedCategoryProvider>(context);
 
     // double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
@@ -281,6 +288,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                             alignedDropdown: true,
                             height: 20,
                             child: DropdownButton(
+
                               elevation: 50,
                               isExpanded: true,
                               iconEnabledColor: themeNotifier.getTheme() ==
@@ -298,23 +306,23 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                       )
                                   ? darkprimarycolor
                                   : primarycolor,
-                              value: selectedCategory == ''
+                              value: selectedCategoryProvider.selectedCategory == ''
                                   ? 'Select Category'
-                                  : selectedCategory,
-                              items: categories.isEmpty
+                                  : selectedCategoryProvider.selectedCategory,
+                              items: categoryProvider.categories.isEmpty
                                   ? null
-                                  : categories.map((category) {
+                                  : categoryProvider.categories.map((category) {
                                       return DropdownMenuItem(
                                         value: category,
                                         child: Text(category),
+
                                       );
                                     }).toList(),
                               onChanged: (value) {
-                                if (mounted) {
-                                  setState(() {
-                                    selectedCategory = value.toString();
-                                  });
-                                }
+                                final selectedCategoryProvider=Provider.of<SelectedCategoryProvider>(context,listen: false);
+
+                                    selectedCategoryProvider.setSelectedCategory(value.toString()) ;
+
                               },
                             ),
                           ),
@@ -707,8 +715,10 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                       child: const CircularProgressIndicator())
                                   : ElevatedButton(
                                       onPressed: () async {
+                                        final selectedCategoryProvider=Provider.of<SelectedCategoryProvider>(context,listen: false);
+
                                         if (_formKey.currentState!.validate() &&
-                                            selectedCategory.isNotEmpty) {
+                                            selectedCategoryProvider.selectedCategory.isNotEmpty) {
                                           if (_filename1 ==
                                                   "<2 mb image allowed" ||
                                               _filename2 ==
@@ -743,7 +753,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                             setState(() {
                                               isLoading = true;
                                             });
-                                            if (categories.isNotEmpty) {
+                                            if (categoryProvider.categories.isNotEmpty) {
                                               final state = context.read<
                                                   BottomNavigationBarState>();
                                               state.setEnabled(false);
@@ -790,7 +800,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                     coverpic,
                                                     book,
                                                     copyrightpic,
-                                                    selectedCategory,
+                                                    selectedCategoryProvider.selectedCategory,
                                                     'audiobook',
                                                     freeRentPaid,
                                                     [],
@@ -817,7 +827,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                     coverpic,
                                                     book,
                                                     copyrightpic,
-                                                    selectedCategory,
+                                                    selectedCategoryProvider.selectedCategory,
                                                     'audiobook',
                                                     freeRentPaid,
                                                     [],

@@ -89,6 +89,9 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                       if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
                       }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return const Center(
                           child: Visibility(
@@ -97,7 +100,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                           ),
                         );
                       }
-                      if (snapshot.hasData) {
+                     if (snapshot.hasData) {
                         List<String> bookIds = [];
                         for (QueryDocumentSnapshot favourite
                             in snapshot.data!.docs) {

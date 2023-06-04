@@ -1,3 +1,13 @@
+import 'package:bookstore_recommendation_system_fyp/providers/bookListProvider.dart';
+import 'package:bookstore_recommendation_system_fyp/providers/categoriesProvider.dart';
+import 'package:bookstore_recommendation_system_fyp/providers/loadingProvider.dart';
+import 'package:bookstore_recommendation_system_fyp/providers/notificationLengthProvider.dart';
+import 'package:bookstore_recommendation_system_fyp/providers/pdfProvider.dart';
+import 'package:bookstore_recommendation_system_fyp/providers/selectedCategoryProvider.dart';
+import 'package:bookstore_recommendation_system_fyp/providers/switchProvider.dart';
+import 'package:bookstore_recommendation_system_fyp/providers/tagProvider.dart';
+import 'package:bookstore_recommendation_system_fyp/providers/trendingProvider.dart';
+import 'package:bookstore_recommendation_system_fyp/providers/userProfileProvider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'dart:io';
@@ -49,8 +59,6 @@ Future<void> main() async {
   // };
   // Stripe.publishableKey =
   //     "pk_test_51MWx8OAVMyklfe3CsjEzA1CiiY0XBTlHYbZ8jQlGtVFIwQi4aNeGv8J1HUw4rgSavMTLzTwgn0XRlwoTVRFXyu2h00mRUeWmAf";
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.clear();
   runApp(
     MultiProvider(providers: [
       ChangeNotifierProvider<ThemeNotifier>(
@@ -66,6 +74,35 @@ Future<void> main() async {
       ChangeNotifierProvider(
         create: (_) => BottomNavigationBarState(),
       ),
+  ChangeNotifierProvider(
+  create: (context) => BookListProvider(),),
+      ChangeNotifierProvider(
+        create: (context) => CategoryProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => NotificationLengthProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => TagProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => LoadingProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => TrendingProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => SwitchProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => UserProfileProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => PdfProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => SelectedCategoryProvider(),
+      )
 
       // Other providers here
     ], child: const beforeSplash()),
@@ -220,11 +257,10 @@ class _MyAppState extends State<MyApp> {
   bool _isFirstTime = false;
   bool _isLoggedIn = false;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _checkAuthStatus();
-  }
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  // }
 
   bool isAdminLoggedIn = false;
 
@@ -249,6 +285,8 @@ class _MyAppState extends State<MyApp> {
     });
 
     Future.microtask(() async {
+
+      _checkAuthStatus();
       await _checkFirstTime();
       if (auth.currentUser != null) {
         context.read<AuthState>().user = 1;
@@ -281,7 +319,7 @@ class _MyAppState extends State<MyApp> {
 
   void _checkAuthStatus() {
     setState(() {
-      _isLoggedIn = Provider.of<AuthState>(context, listen: true).user != null;
+      _isLoggedIn = Provider.of<AuthState>(context, listen: false).user != null;
     });
   }
 
