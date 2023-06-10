@@ -1,4 +1,5 @@
 import 'package:bookstore_recommendation_system_fyp/user_screens/view_book_screen.dart';
+import 'package:bookstore_recommendation_system_fyp/utils/fluttertoast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -74,10 +75,10 @@ class _TrendingScreenState extends State<TrendingScreen> {
         trendingProvider.setTrendingBookIds(bookIds.cast<String>());
 
       } else {
-        throw Exception('Failed to retrieve trending book ids');
+        flutterToast('Failed to retrieve trending book Retry');
       }
     } catch (e) {
-      print('Failed to retrieve trending book ids: $e');
+      flutterToast('Failed to retrieve trending book Retry');
     }
 setState(() {
   isLoading=false;

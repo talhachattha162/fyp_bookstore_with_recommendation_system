@@ -459,9 +459,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                         user = await _signInWithGoogle();
                                       } on PlatformException catch (e) {
                                         flutterToast(
-                                            'Error signing in with Google: ${e.message}');
+                                            'Error signing in with Google');
                                       } catch (e) {
-                                        flutterToast(e);
+                                        flutterToast('Error retry');
                                       }
                                       if (user != null) {
                                         context.read<AuthState>().user = 1;

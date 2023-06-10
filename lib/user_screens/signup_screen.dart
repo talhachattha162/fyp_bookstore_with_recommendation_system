@@ -59,15 +59,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
+  final TextEditingController _ageController = TextEditingController();
+  RegExp age_valid = RegExp(r'^\d+$');
+
+
   static signUp(
       {required String name,
       required String userEmail,
       required String password,
+        required String age,
       required BuildContext context}) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: userEmail, password: password);
-      Users users = Users(auth.currentUser!.uid, name, '', userEmail, password,
+      Users users = Users(auth.currentUser!.uid, name, age, userEmail, password,
           '', 0, 'email', 0);
       var firebaseUser = auth.currentUser;
       firestoreInstance
@@ -183,6 +188,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16.0, vertical: 4.0),
                             child: TextInputField(
+                              hintText: 'Enter Age',
+                              suffixIcon: Text(''),
+                              textInputType: TextInputType.number,
+                              textEditingController: _ageController,
+                              isPassword: false,
+                              validator: (value) {
+                                if (!age_valid.hasMatch(value)) {
+                                  return 'Enter valid age';
+                                }
+                                if (value.length >= 3) {
+                                  return 'Enter valid age';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 4.0),
+                            child: TextInputField(
                               hintText: 'Enter Name',
                               suffixIcon: const Text(''),
                               textInputType: TextInputType.name,
@@ -279,9 +304,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           name: _nameController.text,
                                           userEmail: _emailController.text,
                                           password: _passwordController.text,
+                                          age: _ageController.text,
                                           context: context);
                                       if (u != 'exist') {
-
                                         Navigator.pushReplacement(
                                             context,
                                             MaterialPageRoute(

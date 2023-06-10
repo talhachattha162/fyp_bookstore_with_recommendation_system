@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:bookstore_recommendation_system_fyp/utils/global_variables.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -51,18 +52,28 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
     final tempDir = await getTemporaryDirectory();
     final tempPdfFile = File('${tempDir.path}/decrypted.pdf');
     await tempPdfFile.writeAsBytes(decryptedPdfData);
-    final pdfProvider = Provider.of<PdfProvider>(context);
+    final pdfProvider = Provider.of<PdfProvider>(context,listen: false);
     // final pdfPath = pdfProvider.pdfPath;
     pdfProvider.updatePdfPath(tempPdfFile.path);
 
 
   }
 
+  Future<void> setSecureFlag() async {
+    await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+  }
+  Future<void> removeSecureFlag() async {
+    await FlutterWindowManager.clearFlags(
+        FlutterWindowManager.FLAG_SECURE);
+  }
+
   @override
   void initState() {
     super.initState();
     _decryptFile();
-
+    if(widget.book.freeRentPaid=='rent'){
+      setSecureFlag();
+    }
     timer = Timer.periodic(const Duration(seconds: 1), (Timer t) async {
       final internetAvailabilityNotifier =
           Provider.of<InternetNotifier>(context, listen: false);
@@ -79,8 +90,9 @@ class _BookPdfScreenState extends State<BookPdfScreen> {
 
   @override
   void dispose() {
-    timer?.cancel();
     super.dispose();
+    timer?.cancel();
+    removeSecureFlag();
   }
 
   DateTime currentBackPressTime = DateTime.now();

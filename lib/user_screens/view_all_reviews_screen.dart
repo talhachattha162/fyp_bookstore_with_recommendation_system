@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../models/book.dart';
 import '../providers/internetavailabilitynotifier.dart';
 import '../providers/reviewnotifier.dart';
+import '../providers/themenotifier.dart';
 import '../utils/InternetChecker.dart';
 
 class ViewAllReviewsScreen extends StatefulWidget {
@@ -53,6 +54,7 @@ class _ViewAllReviewsScreenState extends State<ViewAllReviewsScreen> {
   Widget build(BuildContext context) {
     final internetAvailabilityNotifier = Provider.of<InternetNotifier>(context);
     double height = MediaQuery.of(context).size.height;
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     return WillPopScope(
       onWillPop:  () async {
         navigateWithNoBack(context, ViewBookScreen(book: widget.book));
@@ -100,7 +102,30 @@ class _ViewAllReviewsScreenState extends State<ViewAllReviewsScreen> {
                                     return Padding(
                                       padding: const EdgeInsets.all(15.0),
                                       child: Card(
-                                        shadowColor: primarycolor[300],
+                                        shadowColor: themeNotifier
+                                            .getTheme() ==
+                                            ThemeData.dark(
+                                                useMaterial3:
+                                                true)
+                                                .copyWith(
+                                              colorScheme:
+                                              const ColorScheme.dark()
+                                                  .copyWith(
+                                                primary:
+                                                darkprimarycolor,
+                                                error: Colors.red,
+                                                onPrimary:
+                                                darkprimarycolor,
+                                                outline:
+                                                darkprimarycolor,
+                                                primaryVariant:
+                                                darkprimarycolor,
+                                                onPrimaryContainer:
+                                                darkprimarycolor,
+                                              ),
+                                            )
+                                            ? darkprimarycolor
+                                            : primarycolor,
                                         elevation: 6,
                                         child: Padding(
                                           padding: const EdgeInsets.all(12.0),

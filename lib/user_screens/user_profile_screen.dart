@@ -17,6 +17,7 @@ import '../providers/switchProvider.dart';
 import '../providers/themenotifier.dart';
 import '../providers/userProfileProvider.dart';
 import '../utils/firebase_constants.dart';
+import 'change_recommendation_criteria.dart';
 import 'faqs_screen.dart';
 import 'update_profile_screen.dart';
 
@@ -221,6 +222,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                                 }
     
                                   }),
+                            ),
+                            const Divider(),
+                            ListTile(
+                              leading: const Icon(Icons.recommend),
+                              title: const Text('Change Recommendation Criteria'),
+                              onTap: () {
+                               navigateWithNoBack(context, ChangeRecommendationCriteria());
+                              },
                             ),
                             const Divider(),
                             ListTile(

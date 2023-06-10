@@ -21,6 +21,10 @@ import 'dart:async';
 import 'dart:io';
 
 import '../models/book.dart';
+import '../providers/categoriesProvider.dart';
+import '../providers/fileNamesProvider.dart';
+import '../providers/freeRentPaidProvider.dart';
+import '../providers/selectedCategoryProvider.dart';
 import '../providers/themenotifier.dart';
 import '../utils/firebase_constants.dart';
 import '../utils/fluttertoast.dart';
@@ -47,9 +51,9 @@ class _EditBookScreenState extends State<EditBookScreen> {
   bool errortextexist = false;
   String errortext = '';
   final _formKey = GlobalKey<FormState>();
-  String _filename1 = "<5 mb image allowed";
-  String freeRentPaid = "free";
-  bool _isvisible = false;
+  // String _filename1 = "<5 mb image allowed";
+  // String freeRentPaid = "free";
+  // bool _isvisible = false;
   Uint8List? _file1;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _tag1Controller = TextEditingController();
@@ -62,13 +66,15 @@ class _EditBookScreenState extends State<EditBookScreen> {
 
   FlutterTts flutterTts = FlutterTts();
 
-  List<String> categories = [];
+  // List<String> categories = [];
 
-  String selectedCategory = '';
+  // String selectedCategory = '';
   @override
   void initState() {
     super.initState();
-    getCategories();
+    // getCategories();
+    // Provider.of<SelectedCategoryProvider>(context,listen: false).setSelectedCategory(Provider.of<CategoryProvider>(context,listen: false).categories[0]);
+
     _titleController.text=widget.book.title;
     _tag1Controller.text=widget.book.tag1;
         _tag2Controller.text=widget.book.tag2;
@@ -76,28 +82,29 @@ class _EditBookScreenState extends State<EditBookScreen> {
         _publishyearController.text=widget.book.publishyear;
     _priceController.text = widget.book.price.toString();
     _authorController.text=widget.book.author;
-    selectedCategory=widget.book.selectedcategory;
-    freeRentPaid=widget.book.freeRentPaid;
-    if(freeRentPaid!="free"){
-      _isvisible=true;
+    Provider.of<SelectedCategoryProvider>(context,listen: false).setSelectedCategory(widget.book.selectedcategory);
+    Provider.of<FreeRentPaidProvider>(context,listen:false).updateFreeRentPaid(widget.book.freeRentPaid, false);
+    if(Provider.of<FreeRentPaidProvider>(context,listen:false).freeRentPaid!="free"){
+      Provider.of<FreeRentPaidProvider>(context,listen:false).updateFreeRentPaid(widget.book.freeRentPaid, true);
+
     }
   }
 
-  void getCategories() {
-    FirebaseFirestore.instance.collection('categories').get().then((snapshot) {
-      if (snapshot.docs.isNotEmpty) {
-        if (mounted) {
-          setState(() {
-            categories = List.castFrom<dynamic, String>(
-                snapshot.docs.map((doc) => doc.get('name')).toList());
-            // if (categories.isNotEmpty) {
-            //   selectedCategory = categories[0];
-            // }
-          });
-        }
-      }
-    });
-  }
+  // void getCategories() {
+  //   FirebaseFirestore.instance.collection('categories').get().then((snapshot) {
+  //     if (snapshot.docs.isNotEmpty) {
+  //       if (mounted) {
+  //         setState(() {
+  //           categories = List.castFrom<dynamic, String>(
+  //               snapshot.docs.map((doc) => doc.get('name')).toList());
+  //           // if (categories.isNotEmpty) {
+  //           //   selectedCategory = categories[0];
+  //           // }
+  //         });
+  //       }
+  //     }
+  //   });
+  // }
 
   /// saving converted audio file to firebase
   Future<String> saveToFirebase(String path, String name,
@@ -144,10 +151,14 @@ class _EditBookScreenState extends State<EditBookScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final rentProvider = Provider.of<FreeRentPaidProvider>(context);
+  final fileNamesProvider = Provider.of<FileNamesProvider>(context);
     final themeNotifier = Provider.of<ThemeNotifier>(context);
-    Size screenSize = MediaQuery.of(context).size;
-
-    double height = MediaQuery.of(context).size.height;
+    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final selectedCategoryProvider=Provider.of<SelectedCategoryProvider>(context);
+    // Size screenSize = MediaQuery.of(context).size;
+    //
+    // double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return WillPopScope(
         onWillPop:  () async {
@@ -246,23 +257,21 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                   )
                                   ? darkprimarycolor
                                   : primarycolor,
-                              value: selectedCategory == ''
+                              value: selectedCategoryProvider.selectedCategory == ''
                                   ? 'Select Category'
-                                  : selectedCategory,
-                              items: categories.isEmpty
+                                  : selectedCategoryProvider.selectedCategory,
+                              items: categoryProvider.categories.isEmpty
                                   ? null
-                                  : categories.map((category) {
+                                  : categoryProvider.categories.map((category) {
                                 return DropdownMenuItem(
                                   value: category,
                                   child: Text(category),
                                 );
                               }).toList(),
                               onChanged: (value) {
-                                if (mounted) {
-                                  setState(() {
-                                    selectedCategory = value.toString();
-                                  });
-                                }
+                                final selectedCategoryProvider1=Provider.of<SelectedCategoryProvider>(context,listen:false);
+                                    selectedCategoryProvider1.setSelectedCategory( value.toString());
+
                               },
                             ),
                           ),
@@ -358,18 +367,18 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                       ? darkprimarycolor
                                       : primarycolor,
                                   selected:
-                                  freeRentPaid == 'free' ? true : false,
+                                  rentProvider.freeRentPaid == 'free' ? true : false,
                                   value: "free",
-                                  groupValue: freeRentPaid,
+                                  groupValue: rentProvider.freeRentPaid,
                                   onChanged: (value) {
-                                    if (mounted) {
-                                      setState(() {
-                                        freeRentPaid = value.toString();
-                                        _isvisible = false;
-                                      });
-                                    }
-                                  },
-                                ),
+                                    final rentProvider1 = Provider.of<
+                                        FreeRentPaidProvider>(
+                                        context, listen: false);
+
+                                    rentProvider1.updateFreeRentPaid(
+                                        value.toString(), false);
+                                  }
+                              ),
                               ),
                               SizedBox(
                                 width: width * 0.305,
@@ -395,16 +404,13 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                       ? darkprimarycolor
                                       : primarycolor,
                                   selected:
-                                  freeRentPaid == 'rent' ? true : false,
+                                  rentProvider.freeRentPaid == 'rent' ? true : false,
                                   value: "rent",
-                                  groupValue: freeRentPaid,
+                                  groupValue: rentProvider.freeRentPaid,
                                   onChanged: (value) {
-                                    if (mounted) {
-                                      setState(() {
-                                        freeRentPaid = value.toString();
-                                        _isvisible = true;
-                                      });
-                                    }
+                                    final rentProvider1 = Provider.of<FreeRentPaidProvider>(context);
+                                    rentProvider1.updateFreeRentPaid(value.toString(), true);
+
                                   },
                                 ),
                               ),
@@ -432,23 +438,20 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                       ? darkprimarycolor
                                       : primarycolor,
                                   selected:
-                                  freeRentPaid == 'paid' ? true : false,
+                                  rentProvider.freeRentPaid == 'paid' ? true : false,
                                   value: "paid",
-                                  groupValue: freeRentPaid,
+                                  groupValue: rentProvider.freeRentPaid,
                                   onChanged: (value) {
-                                    if (mounted) {
-                                      setState(() {
-                                        freeRentPaid = value.toString();
-                                        _isvisible = true;
-                                      });
-                                    }
+                                    final rentProvider1 = Provider.of<FreeRentPaidProvider>(context);
+                                    rentProvider1.updateFreeRentPaid(value.toString(), true);
+
                                   },
                                 ),
                               )
                             ],
                           ),
                           Visibility(
-                              visible: _isvisible,
+                              visible: rentProvider.isvisible,
                               child: Padding(
                                 padding: const EdgeInsets.only(bottom: 10.0),
                                 child: TextInputField(
@@ -457,13 +460,12 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                   isPassword: false,
                                   textEditingController: _priceController,
                                   validator: (value) {
-                                    if (_isvisible == true) {
                                       if (value.isEmpty) {
                                         return 'Enter valid price';
                                       }
                                       if (!price_valid.hasMatch(value)) {
                                         return 'only digits allowed';
-                                      }
+
                                     }
                                   },
                                   textInputType: TextInputType.number,
@@ -479,17 +481,16 @@ class _EditBookScreenState extends State<EditBookScreen> {
                             margin: const EdgeInsets.symmetric(vertical: 10),
                             child: ElevatedButton.icon(
                               onPressed: () async {
+                                final rentProvider = Provider.of<FreeRentPaidProvider>(context);
+                                final fileNamesProvider = Provider.of<FileNamesProvider>(context);
                                 try {
                                   PlatformFile file = await pickFile(
                                       [], FileType.image, 5000000, context);
-                                  if (mounted) {
-                                    setState(() {
-                                      _filename1 = file.name;
-                                    });
-                                  }
+                                  fileNamesProvider.filename1=file.name;
+
                                   _file1 = file.bytes!;
                                 } catch (err) {
-                                  if (_filename1 == "<5 mb image allowed") {
+                                  if (fileNamesProvider.filename1 == "<2 mb image allowed") {
                                     final snackBar = SnackBar(
                                       /// need to set following properties for best effect of awesome_snackbar_content
                                       elevation: 0,
@@ -519,7 +520,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                               icon: const Icon(Icons.upload_file),
                             ),
                           ),
-                          Text(_filename1),
+                          Text(fileNamesProvider.filename1),
                           const SizedBox(
                             height: 20,
                           ),
@@ -532,15 +533,20 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                   child: CircularProgressIndicator())
                                   : ElevatedButton(
                                 onPressed: () async {
+                                  final categoryProvider1 = Provider.of<CategoryProvider>(context);
+
+                                  final selectedCategoryProvider1=Provider.of<SelectedCategoryProvider>(context,listen:false);
+                                  final rentProvider1 = Provider.of<FreeRentPaidProvider>(context,listen:false);
+                                  final fileNamesProvider1 = Provider.of<FileNamesProvider>(context,listen:false);
                                   if (_formKey.currentState!.validate() &&
-                                      selectedCategory.isNotEmpty) {
+                                      selectedCategoryProvider1.selectedCategory.isNotEmpty) {
                                     setState(() {
                                       isLoading = true;
                                     });
-                                    if (_filename1 ==
-                                        "<5 mb image allowed") {
+                                    if (fileNamesProvider1.filename1 ==
+                                        "<2 mb image allowed") {
 
-                                      if (categories.isNotEmpty) {
+                                      if (categoryProvider1.categories.isNotEmpty) {
                                         CollectionReference
                                         bookCollection =
                                         firestoreInstance
@@ -565,9 +571,9 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                             widget.book.coverPhotoFile,
                                             widget.book.bookFile,
                                             widget.book.copyrightPhotoFile,
-                                            selectedCategory,
+                                            selectedCategoryProvider1.selectedCategory,
                                             'audiobook',
-                                            freeRentPaid,
+                                            rentProvider1.freeRentPaid,
                                             [],
                                             FirebaseAuth.instance
                                                 .currentUser!.uid,
@@ -645,7 +651,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                       }
                                     } else {
 
-                                      if (categories.isNotEmpty) {
+                                      if (categoryProvider1.categories.isNotEmpty) {
                                         String coverpic =
                                         await EditFileToFirebaseStorage(
                                             _file1!, 'coverpic');
@@ -676,9 +682,9 @@ class _EditBookScreenState extends State<EditBookScreen> {
                                             coverpic,
                                             widget.book.bookFile,
                                             widget.book.copyrightPhotoFile,
-                                            selectedCategory,
+                                            selectedCategoryProvider1.selectedCategory,
                                             'audiobook',
-                                            freeRentPaid,
+                                            rentProvider1.freeRentPaid,
                                             [],
                                             FirebaseAuth.instance
                                                 .currentUser!.uid,
@@ -733,12 +739,16 @@ class _EditBookScreenState extends State<EditBookScreen> {
     ..showSnackBar(snackBar);
                                           });
                                         } catch (e) {
-                                          flutterToast(e.toString());
+                                          flutterToast('Error Retry');
                                         }
                                       } else {
                                         flutterToast('No categories');
                                       }
                                     }
+                                    fileNamesProvider.filename1 = "<2 mb image allowed";
+                                    fileNamesProvider.filename2 = "<2 mb pdf allowed";
+                                    fileNamesProvider.filename3 = "<2 mb image allowed";
+                                    rentProvider.updateFreeRentPaid('free', false);
                                     if (mounted) {
                                       setState(() {
                                         isLoading = false;

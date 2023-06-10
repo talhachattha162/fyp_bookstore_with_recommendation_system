@@ -358,124 +358,124 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
                     ],
                   ),
     
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          navigateWithNoBack(context, const BookRecommendationScreen());
-                        },
-                        child: SizedBox(
-                          width: width * 0.5,
-                          height: orientation == Orientation.portrait?height * 0.3:height * 0.5,
-                          child: Card(
-                            child: Container( decoration: BoxDecoration(
-                              // borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: themeNotifier.getTheme() ==
-                                    ThemeData.dark(useMaterial3: true)
-                                        .copyWith(
-                                      colorScheme:
-                                      const ColorScheme.dark().copyWith(
-                                        primary: darkprimarycolor,
-                                        error: Colors.red,
-                                        onPrimary: darkprimarycolor,
-                                        outline: darkprimarycolor,
-                                        primaryVariant: darkprimarycolor,
-                                        onPrimaryContainer:
-                                        darkprimarycolor,
-                                      ),
-                                    )
-                                    ? darkprimarycolor
-                                    : primarycolor,
-                                width: isCardVisible?0.1:1.0,
-                              ),
-                            ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 26.0,
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                  Icons.thumb_up_alt_outlined,
-                                    size: 20,
-                                    color: themeNotifier.getTheme() ==
-                                        ThemeData.dark(useMaterial3: true)
-                                            .copyWith(
-                                          colorScheme:
-                                          const ColorScheme.dark().copyWith(
-                                            primary: darkprimarycolor,
-                                            error: Colors.red,
-                                            onPrimary: darkprimarycolor,
-                                            outline: darkprimarycolor,
-                                            primaryVariant: darkprimarycolor,
-                                            onPrimaryContainer:
-                                            darkprimarycolor,
-                                          ),
-                                        )
-                                        ? darkprimarycolor
-                                        : primarycolor,
-                                  ),
-                                  Column(
-                                    children: [
-                                      Text('Recommend',
-                                          style: TextStyle(
-                                              color: themeNotifier.getTheme() ==
-                                                  ThemeData.dark(
-                                                      useMaterial3: true)
-                                                      .copyWith(
-                                                    colorScheme:
-                                                    const ColorScheme.dark()
-                                                        .copyWith(
-                                                      primary: darkprimarycolor,
-                                                      error: Colors.red,
-                                                      onPrimary: darkprimarycolor,
-                                                      outline: darkprimarycolor,
-                                                      primaryVariant:
-                                                      darkprimarycolor,
-                                                      onPrimaryContainer:
-                                                      darkprimarycolor,
-                                                    ),
-                                                  )
-                                                  ? darkprimarycolor
-                                                  : primarycolor,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20)),
-                                      Text('Books',
-                                          style: TextStyle(
-                                              color: themeNotifier.getTheme() ==
-                                                  ThemeData.dark(
-                                                      useMaterial3: true)
-                                                      .copyWith(
-                                                    colorScheme:
-                                                    const ColorScheme.dark()
-                                                        .copyWith(
-                                                      primary: darkprimarycolor,
-                                                      error: Colors.red,
-                                                      onPrimary: darkprimarycolor,
-                                                      outline: darkprimarycolor,
-                                                      primaryVariant:
-                                                      darkprimarycolor,
-                                                      onPrimaryContainer:
-                                                      darkprimarycolor,
-                                                    ),
-                                                  )
-                                                  ? darkprimarycolor
-                                                  : primarycolor,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            elevation: 50,
-                          ),
-                        ),
-                      ),
-    
-                    ],
-                  ),
+                  // Row(
+                  //   children: [
+                  //     InkWell(
+                  //       onTap: () {
+                  //         navigateWithNoBack(context, const BookRecommendationScreen());
+                  //       },
+                  //       child: SizedBox(
+                  //         width: width * 0.5,
+                  //         height: orientation == Orientation.portrait?height * 0.3:height * 0.5,
+                  //         child: Card(
+                  //           child: Container( decoration: BoxDecoration(
+                  //             // borderRadius: BorderRadius.circular(12),
+                  //             border: Border.all(
+                  //               color: themeNotifier.getTheme() ==
+                  //                   ThemeData.dark(useMaterial3: true)
+                  //                       .copyWith(
+                  //                     colorScheme:
+                  //                     const ColorScheme.dark().copyWith(
+                  //                       primary: darkprimarycolor,
+                  //                       error: Colors.red,
+                  //                       onPrimary: darkprimarycolor,
+                  //                       outline: darkprimarycolor,
+                  //                       primaryVariant: darkprimarycolor,
+                  //                       onPrimaryContainer:
+                  //                       darkprimarycolor,
+                  //                     ),
+                  //                   )
+                  //                   ? darkprimarycolor
+                  //                   : primarycolor,
+                  //               width: isCardVisible?0.1:1.0,
+                  //             ),
+                  //           ),
+                  //             padding: const EdgeInsets.symmetric(
+                  //               horizontal: 26.0,
+                  //             ),
+                  //             child: Column(
+                  //               mainAxisAlignment: MainAxisAlignment.center,
+                  //               children: [
+                  //                 Icon(
+                  //                 Icons.thumb_up_alt_outlined,
+                  //                   size: 20,
+                  //                   color: themeNotifier.getTheme() ==
+                  //                       ThemeData.dark(useMaterial3: true)
+                  //                           .copyWith(
+                  //                         colorScheme:
+                  //                         const ColorScheme.dark().copyWith(
+                  //                           primary: darkprimarycolor,
+                  //                           error: Colors.red,
+                  //                           onPrimary: darkprimarycolor,
+                  //                           outline: darkprimarycolor,
+                  //                           primaryVariant: darkprimarycolor,
+                  //                           onPrimaryContainer:
+                  //                           darkprimarycolor,
+                  //                         ),
+                  //                       )
+                  //                       ? darkprimarycolor
+                  //                       : primarycolor,
+                  //                 ),
+                  //                 Column(
+                  //                   children: [
+                  //                     Text('Recommend',
+                  //                         style: TextStyle(
+                  //                             color: themeNotifier.getTheme() ==
+                  //                                 ThemeData.dark(
+                  //                                     useMaterial3: true)
+                  //                                     .copyWith(
+                  //                                   colorScheme:
+                  //                                   const ColorScheme.dark()
+                  //                                       .copyWith(
+                  //                                     primary: darkprimarycolor,
+                  //                                     error: Colors.red,
+                  //                                     onPrimary: darkprimarycolor,
+                  //                                     outline: darkprimarycolor,
+                  //                                     primaryVariant:
+                  //                                     darkprimarycolor,
+                  //                                     onPrimaryContainer:
+                  //                                     darkprimarycolor,
+                  //                                   ),
+                  //                                 )
+                  //                                 ? darkprimarycolor
+                  //                                 : primarycolor,
+                  //                             fontWeight: FontWeight.bold,
+                  //                             fontSize: 20)),
+                  //                     Text('Books',
+                  //                         style: TextStyle(
+                  //                             color: themeNotifier.getTheme() ==
+                  //                                 ThemeData.dark(
+                  //                                     useMaterial3: true)
+                  //                                     .copyWith(
+                  //                                   colorScheme:
+                  //                                   const ColorScheme.dark()
+                  //                                       .copyWith(
+                  //                                     primary: darkprimarycolor,
+                  //                                     error: Colors.red,
+                  //                                     onPrimary: darkprimarycolor,
+                  //                                     outline: darkprimarycolor,
+                  //                                     primaryVariant:
+                  //                                     darkprimarycolor,
+                  //                                     onPrimaryContainer:
+                  //                                     darkprimarycolor,
+                  //                                   ),
+                  //                                 )
+                  //                                 ? darkprimarycolor
+                  //                                 : primarycolor,
+                  //                             fontWeight: FontWeight.bold,
+                  //                             fontSize: 20)),
+                  //                   ],
+                  //                 ),
+                  //               ],
+                  //             ),
+                  //           ),
+                  //           elevation: 50,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //
+                  //   ],
+                  // ),
                 ],
               ),
             )),

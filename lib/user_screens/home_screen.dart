@@ -47,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return book.title;
     }).toList();
     searchData.addAll(titles);
+    searchData=searchData.toSet().toList();
   }
 
   void getBooks() {

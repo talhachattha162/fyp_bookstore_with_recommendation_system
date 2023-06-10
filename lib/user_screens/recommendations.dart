@@ -23,7 +23,7 @@ class BookRecommendationScreen extends StatefulWidget {
 
 class _BookRecommendationScreenState extends State<BookRecommendationScreen> {
 
-  final openAI = OpenAI.instance.build(token: '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',baseOption: HttpSetup(receiveTimeout:  25000),isLogger: true);
+  final openAI = OpenAI.instance.build(token: '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',baseOption: HttpSetup(receiveTimeout:  25000),isLogger: true);
   // String _inputText = '';
   String _recommendation = '';
 bool isLoading=false;
@@ -75,9 +75,9 @@ bool isLoading=false;
       String age1=age.isEmpty?'':',I am $age years olds';
       String language1=language.isEmpty?'':',Language I prefer $language';
       final request = CompleteText(
-          prompt: 'As a reader, I have specific preferences and conditions for the books I would like to read. Here are my requirements:The books I like are $titles$author$category$age1$language1,books  should be $_selectedItem,books should be $_selectedItem1.Considering the above conditions Recommend me 10 books. Only provide the title and author name for each book.',
+          prompt: 'As a reader, I have specific preferences and conditions for the books I would like to read. Here are my requirements:The books I like are $titles$author$category$age1$language1,books  should be $_selectedItem,books should be $_selectedItem1.Considering the above conditions Recommend me 7 books. Only provide the title and author name for each book.',
           model: kTranslateModelV3,
-          maxTokens: 180);
+          maxTokens: 200);
       final response = await openAI.onCompleteText(request: request);
      if(mounted){
       setState(() {

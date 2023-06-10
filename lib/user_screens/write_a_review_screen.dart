@@ -208,7 +208,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                                           .set(review.toMap())
                                           .then((value) async {})
                                           .onError((error, stackTrace) async {
-                                        flutterToast('Error:' + error.toString());
+                                        flutterToast('Error: Plz Reload' );
                                       }).then((_) {
 
                                         final snackBar = SnackBar(
@@ -242,7 +242,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                                         }
                                       });
                                     } catch (e) {
-                                      flutterToast('Error:' + e.toString());
+                                      flutterToast('Error:Retry');
                                     }
                                     if (mounted) {
                                       setState(() {

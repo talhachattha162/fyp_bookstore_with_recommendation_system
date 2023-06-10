@@ -23,6 +23,7 @@ import '../models/notificationitem.dart';
 import '../models/payment.dart';
 import '../providers/bookprovider.dart';
 import '../providers/internetavailabilitynotifier.dart';
+import '../providers/linkprovider.dart';
 import '../providers/reviewnotifier.dart';
 import '../providers/themenotifier.dart';
 import '../utils/InternetChecker.dart';
@@ -271,6 +272,8 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   bool hasDataf = false;
   @override
   void initState() {
+    // LinkProvider linkProvider = Provider.of<LinkProvider>(context, listen: false);
+    // print(linkProvider.link);
     checkPaymentsExistForBookId(widget.book.bookid);
     _getRecommendations(widget.book.title);
     getUserData();
@@ -348,8 +351,10 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
   List<dynamic> _recommendations = [];
 
   Future<void> _getRecommendations(String bookname) async {
+    LinkProvider linkProvider = Provider.of<LinkProvider>(context, listen: false);
+    String link=linkProvider.link;
     final response = await http.get(Uri.parse(
-        'http://talha1623.pythonanywhere.com/recommend?book_name=$bookname'));
+        '$link $bookname'));
     if (response.statusCode == 200) {
       if (response.body is List) {
       } else if (response.body is String) {
@@ -390,7 +395,7 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
         .set(payment.toMap())
         .then((value) async {})
         .onError((error, stackTrace) async {
-      Fluttertoast.showToast(msg: 'Error:' + error.toString());
+      Fluttertoast.showToast(msg: 'Error: Reload' );
     }).then((value) {
       showDialog(
         context: context,
@@ -1931,8 +1936,13 @@ class _ViewBookScreenState extends State<ViewBookScreen> {
                           const SizedBox(height: 10),
                           _recommendations.length == 0
                               ? nobooksmsg == ''
-                                  ? const Text('Loading...')
-                                  : const Text('No Similar Books Found')
+                                  ? Column(
+                                    children: [
+                                      const Text('Loading...'),
+                                      const Text('Wait fo 2-3 minutes',style: TextStyle(fontSize: 10,color: Colors.grey),),
+                                    ],
+                                  )
+                                  : const Text('No Books Found')
                               : Padding(
                                   padding: const EdgeInsets.all(12.0),
                                   child: SizedBox(

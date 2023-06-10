@@ -444,7 +444,12 @@ Future<void> _decryptFile1() async {
   Widget button() {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     if (_ttsState == TtsState.stopped) {
-      return isLoading==true?const Text('Loading...'):ElevatedButton(
+      return isLoading==true?Column(
+        children: [
+          const Text('Loading...'),
+          const Text('Wait fo 2-3 minutes',style: TextStyle(fontSize: 10,color: Colors.grey),),
+        ],
+      ):ElevatedButton(
         onPressed: () async {
 
           

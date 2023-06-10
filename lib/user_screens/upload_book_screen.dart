@@ -22,6 +22,8 @@ import 'dart:io';
 import '../models/book.dart';
 import '../providers/bottomnavbarnotifier.dart';
 import '../providers/categoriesProvider.dart';
+import '../providers/fileNamesProvider.dart';
+import '../providers/freeRentPaidProvider.dart';
 import '../providers/selectedCategoryProvider.dart';
 import '../providers/themenotifier.dart';
 import '../utils/firebase_constants.dart';
@@ -49,11 +51,9 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
   bool errortextexist = false;
   String errortext = '';
   final _formKey = GlobalKey<FormState>();
-  String _filename1 = "<2 mb image allowed";
-  String _filename2 = "<2 mb pdf allowed";
-  String _filename3 = "<2 mb image allowed";
-  String freeRentPaid = "free";
-  bool _isvisible = false;
+
+  // String freeRentPaid = "free";
+  // bool _isvisible = false;
   Uint8List? _file1, _file2, _file3;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _tag1Controller = TextEditingController();
@@ -207,6 +207,8 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final rentProvider = Provider.of<FreeRentPaidProvider>(context);
+    final fileNamesProvider = Provider.of<FileNamesProvider>(context);
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     // Size screenSize = MediaQuery.of(context).size;
     final categoryProvider = Provider.of<CategoryProvider>(context);
@@ -428,16 +430,12 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                       ? darkprimarycolor
                                       : primarycolor,
                                   selected:
-                                      freeRentPaid == 'free' ? true : false,
+                                  rentProvider.freeRentPaid == 'free' ? true : false,
                                   value: "free",
-                                  groupValue: freeRentPaid,
+                                  groupValue: rentProvider.freeRentPaid,
                                   onChanged: (value) {
-                                    if (mounted) {
-                                      setState(() {
-                                        freeRentPaid = value.toString();
-                                        _isvisible = false;
-                                      });
-                                    }
+                                    final rentProvider = Provider.of<FreeRentPaidProvider>(context,listen: false);
+                                        rentProvider.updateFreeRentPaid(value.toString(),false);
                                   },
                                 ),
                               ),
@@ -466,16 +464,14 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                       ? darkprimarycolor
                                       : primarycolor,
                                   selected:
-                                      freeRentPaid == 'rent' ? true : false,
+                                  rentProvider.freeRentPaid == 'rent' ? true : false,
                                   value: "rent",
-                                  groupValue: freeRentPaid,
+                                  groupValue: rentProvider.freeRentPaid,
                                   onChanged: (value) {
-                                    if (mounted) {
-                                      setState(() {
-                                        freeRentPaid = value.toString();
-                                        _isvisible = true;
-                                      });
-                                    }
+                                        final rentProvider = Provider.of<FreeRentPaidProvider>(context,listen: false);
+                                        rentProvider.updateFreeRentPaid(value.toString(), true);
+
+
                                   },
                                 ),
                               ),
@@ -504,34 +500,31 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                       ? darkprimarycolor
                                       : primarycolor,
                                   selected:
-                                      freeRentPaid == 'paid' ? true : false,
+                                  rentProvider.freeRentPaid == 'paid' ? true : false,
                                   value: "paid",
-                                  groupValue: freeRentPaid,
+                                  groupValue: rentProvider.freeRentPaid,
                                   onChanged: (value) {
-                                    if (mounted) {
-                                      setState(() {
-                                        freeRentPaid = value.toString();
-                                        _isvisible = true;
-                                      });
-                                    }
+                                    final rentProvider = Provider.of<FreeRentPaidProvider>(context,listen: false);
+                                    rentProvider.updateFreeRentPaid(value.toString(), true);
+
                                   },
                                 ),
                               )
                             ],
                           ),
                           Visibility(
-                              visible: _isvisible,
+                              visible: rentProvider.isvisible,
                               child: Padding(
                                 padding: const EdgeInsets.only(bottom: 10.0),
                                 child: TextInputField(
-                                  hintText: freeRentPaid == 'rent'
+                                  hintText: rentProvider.freeRentPaid == 'rent'
                                       ? 'Enter Price for 1 day'
                                       : 'Enter Price',
                                   suffixIcon: const Text(''),
                                   isPassword: false,
                                   textEditingController: _priceController,
                                   validator: (value) {
-                                    if (_isvisible == true) {
+                                    if (rentProvider.isvisible == true) {
                                       if (value.isEmpty) {
                                         return 'Enter valid price';
                                       }
@@ -553,17 +546,19 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                             margin: const EdgeInsets.symmetric(vertical: 10),
                             child: ElevatedButton.icon(
                               onPressed: () async {
-                                try {
+                                final fileNamesProvider = Provider.of<FileNamesProvider>(context,listen: false);
+
+                              try {
                                   PlatformFile file = await pickFile(
                                       [], FileType.image, 2000000, context);
-                                  if (mounted) {
-                                    setState(() {
-                                      _filename1 = file.name;
-                                    });
-                                  }
+
+
+                                      fileNamesProvider.
+                                      filename1 = file.name;
+
                                   _file1 = file.bytes!;
                                 } catch (err) {
-                                  if (_filename1 == "<2 mb image allowed") {
+                                  if (fileNamesProvider.filename1 == "<2 mb image allowed") {
                                     final snackBar = SnackBar(
                                       /// need to set following properties for best effect of awesome_snackbar_content
                                       elevation: 0,
@@ -595,7 +590,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                               icon: const Icon(Icons.upload_file),
                             ),
                           ),
-                          Text(_filename1),
+                          Text(fileNamesProvider.filename1),
                           const SizedBox(
                             height: 10,
                           ),
@@ -609,17 +604,15 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                             margin: const EdgeInsets.symmetric(vertical: 10),
                             child: ElevatedButton.icon(
                               onPressed: () async {
+                                final fileNamesProvider = Provider.of<FileNamesProvider>(context,listen: false);
                                 try {
                                   PlatformFile file = await pickFile(['pdf'],
                                       FileType.custom, 2000000, context);
-                                  if (mounted) {
-                                    setState(() {
-                                      _filename2 = file.name;
-                                    });
-                                  }
+
+                                      fileNamesProvider.filename2 = file.name;
                                   _file2 = file.bytes!;
                                 } catch (err) {
-                                  if (_filename2 == "<2 mb pdf allowed") {
+                                  if (fileNamesProvider.filename2 == "<2 mb pdf allowed") {
                                     final snackBar = SnackBar(
                                       /// need to set following properties for best effect of awesome_snackbar_content
                                       elevation: 0,
@@ -649,7 +642,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                               icon: const Icon(Icons.upload_file),
                             ),
                           ),
-                          Text(_filename2),
+                          Text(fileNamesProvider.filename2),
                           const SizedBox(
                             height: 10,
                           ),
@@ -663,17 +656,15 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                             margin: const EdgeInsets.symmetric(vertical: 10),
                             child: ElevatedButton.icon(
                               onPressed: () async {
+                                final fileNamesProvider = Provider.of<FileNamesProvider>(context,listen: false);
                                 try {
                                   PlatformFile file = await pickFile(
                                       [], FileType.image, 2000000, context);
-                                  if (mounted) {
-                                    setState(() {
-                                      _filename3 = file.name;
-                                    });
-                                  }
+                                      fileNamesProvider.filename3 = file.name;
+
                                   _file3 = file.bytes!;
                                 } catch (err) {
-                                  if (_filename3 == "<2 mb image allowed") {
+                                  if (fileNamesProvider.filename3 == "<2 mb image allowed") {
                                     final snackBar = SnackBar(
                                       /// need to set following properties for best effect of awesome_snackbar_content
                                       elevation: 0,
@@ -703,7 +694,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                               icon: const Icon(Icons.upload_file),
                             ),
                           ),
-                          Text(_filename3),
+                          Text(fileNamesProvider.filename3),
                           const SizedBox(
                             height: 20,
                           ),
@@ -716,14 +707,15 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                   : ElevatedButton(
                                       onPressed: () async {
                                         final selectedCategoryProvider=Provider.of<SelectedCategoryProvider>(context,listen: false);
+                                        final fileNamesProvider = Provider.of<FileNamesProvider>(context,listen: false);
 
                                         if (_formKey.currentState!.validate() &&
                                             selectedCategoryProvider.selectedCategory.isNotEmpty) {
-                                          if (_filename1 ==
+                                          if (fileNamesProvider.filename1 ==
                                                   "<2 mb image allowed" ||
-                                              _filename2 ==
+                                              fileNamesProvider.filename2 ==
                                                   "<2 mb pdf allowed" ||
-                                              _filename3 ==
+                                              fileNamesProvider.filename3 ==
                                                   "<2 mb image allowed") {
                                             final snackBar = SnackBar(
                                               /// need to set following properties for best effect of awesome_snackbar_content
@@ -756,6 +748,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                             if (categoryProvider.categories.isNotEmpty) {
                                               final state = context.read<
                                                   BottomNavigationBarState>();
+                                              final rentProvider = Provider.of<FreeRentPaidProvider>(context,listen: false);
                                               state.setEnabled(false);
                                               String coverpic =
                                                   await uploadFileToFirebaseStorage(
@@ -802,7 +795,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                     copyrightpic,
                                                     selectedCategoryProvider.selectedCategory,
                                                     'audiobook',
-                                                    freeRentPaid,
+                                                    rentProvider.freeRentPaid,
                                                     [],
                                                     'admin',
                                                     false,
@@ -829,7 +822,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                     copyrightpic,
                                                     selectedCategoryProvider.selectedCategory,
                                                     'audiobook',
-                                                    freeRentPaid,
+                                                    rentProvider.freeRentPaid,
                                                     [],
                                                     FirebaseAuth.instance
                                                         .currentUser!.uid,
@@ -843,8 +836,7 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                                     .then((value) async {})
                                                     .onError((error,
                                                         stackTrace) async {
-                                                  flutterToast('Error:' +
-                                                      error.toString());
+                                                  flutterToast('Error: Retry');
                                                 }).then((_) {
                                                   _controller.play();
                                                   Timer(
@@ -861,6 +853,9 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                             } else {
                                               flutterToast('No categories');
                                             }
+                                            // fileNamesProvider.filename1 == "<2 mb image allowed";
+                                            // fileNamesProvider.filename2 == "<2 mb image allowed";
+                                            // fileNamesProvider.filename3 == "<2 mb image allowed";
                                             _titleController.clear();
                                             _tag1Controller.clear();
                                             _tag2Controller.clear();
@@ -869,9 +864,10 @@ class _UploadBookScreenState extends State<UploadBookScreen> {
                                             _priceController.clear();
                                             _authorController.clear();
                                             _categoryController.clear();
-                                            _filename1 = "<2 mb image allowed";
-                                            _filename2 = "<2 mb pdf allowed";
-                                            _filename3 = "<2 mb image allowed";
+                                            fileNamesProvider.filename1 = "<2 mb image allowed";
+                                            fileNamesProvider.filename2 = "<2 mb pdf allowed";
+                                            fileNamesProvider.filename3 = "<2 mb image allowed";
+                                            rentProvider.updateFreeRentPaid('free', false);
                                             _file1 = null;
                                             _file2 = null;
                                             _file3 = null;

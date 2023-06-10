@@ -1,5 +1,8 @@
 import 'package:bookstore_recommendation_system_fyp/providers/bookListProvider.dart';
 import 'package:bookstore_recommendation_system_fyp/providers/categoriesProvider.dart';
+import 'package:bookstore_recommendation_system_fyp/providers/fileNamesProvider.dart';
+import 'package:bookstore_recommendation_system_fyp/providers/freeRentPaidProvider.dart';
+import 'package:bookstore_recommendation_system_fyp/providers/linkprovider.dart';
 import 'package:bookstore_recommendation_system_fyp/providers/loadingProvider.dart';
 import 'package:bookstore_recommendation_system_fyp/providers/notificationLengthProvider.dart';
 import 'package:bookstore_recommendation_system_fyp/providers/pdfProvider.dart';
@@ -102,8 +105,16 @@ Future<void> main() async {
       ),
       ChangeNotifierProvider(
         create: (context) => SelectedCategoryProvider(),
-      )
-
+      ),
+  ChangeNotifierProvider(
+  create: (context) => FreeRentPaidProvider(),
+  ),
+      ChangeNotifierProvider(
+        create: (context) => FileNamesProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => LinkProvider(),
+      ),
       // Other providers here
     ], child: const beforeSplash()),
   );
@@ -284,9 +295,8 @@ class _MyAppState extends State<MyApp> {
       }
     });
 
-    Future.microtask(() async {
 
-      _checkAuthStatus();
+    Future.microtask(() async {
       await _checkFirstTime();
       if (auth.currentUser != null) {
         context.read<AuthState>().user = 1;
@@ -309,19 +319,18 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _checkFirstTime() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _isFirstTime = prefs.getBool('isFirstTime') ?? true;
-      if (_isFirstTime) {
-        prefs.setBool('isFirstTime', false);
-      }
-    });
+    if(mounted) {
+      setState(() {
+        _isFirstTime = prefs.getBool('isFirstTime') ?? true;
+        if (_isFirstTime) {
+          prefs.setBool('isFirstTime', false);
+        }
+      });
+    }
   }
 
-  void _checkAuthStatus() {
-    setState(() {
-      _isLoggedIn = Provider.of<AuthState>(context, listen: false).user != null;
-    });
-  }
+
+
 
   @override
   void dispose() {
@@ -332,13 +341,13 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     // final themeNotifier = Provider.of<ThemeNotifier>(context);
-
+    final authState = Provider.of<AuthState>(context);
     // print('main');
     return
         //  internetAvailabilityNotifier.getInternetAvailability() == true?
         _isFirstTime
             ? const IntroScreen()
-            : (_isLoggedIn
+            : (authState.user==1
                 ? const MainScreenUser()
                 : (isAdminLoggedIn ? const MainScreenAdmin() : const LoginScreen()));
   }
