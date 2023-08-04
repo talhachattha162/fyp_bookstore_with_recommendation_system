@@ -23,7 +23,7 @@ class BookRecommendationScreen extends StatefulWidget {
 
 class _BookRecommendationScreenState extends State<BookRecommendationScreen> {
 
-  final openAI = OpenAI.instance.build(token: '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',baseOption: HttpSetup(receiveTimeout:  25000),isLogger: true);
+  final openAI = OpenAI.instance.build(token: 'apikey',baseOption: HttpSetup(receiveTimeout:  25000),isLogger: true);
   // String _inputText = '';
   String _recommendation = '';
 bool isLoading=false;
